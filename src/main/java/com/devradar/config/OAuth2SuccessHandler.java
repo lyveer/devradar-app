@@ -73,7 +73,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String token = jwtUtil.generateToken(user.getEmail());
 
-        String targetUrl = UriComponentsBuilder.fromUriString("/auth.html")
+        String targetUrl = UriComponentsBuilder.fromUriString("/auth")
                 .queryParam("token", token)
                 .queryParam("email", user.getEmail())
                 .queryParam("name", user.getFullName())

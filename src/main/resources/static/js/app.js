@@ -79,7 +79,7 @@ async function handleLogin(event) {
             localStorage.setItem('devradar_email', data.email);
             localStorage.setItem('devradar_name', data.fullName);
             showToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
-            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+            setTimeout(() => window.location.href = '/dashboard', 1000);
         } else {
             showToast(data.message || 'Giriş başarısız', 'error');
         }
@@ -108,7 +108,7 @@ async function handleRegister(event) {
             localStorage.setItem('devradar_email', data.email);
             localStorage.setItem('devradar_name', data.fullName);
             showToast('Kayıt başarılı! Yönlendiriliyorsunuz...', 'success');
-            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+            setTimeout(() => window.location.href = '/dashboard', 1000);
         } else {
             showToast(data.message || 'Kayıt başarısız', 'error');
         }
@@ -121,7 +121,7 @@ function handleLogout() {
     localStorage.removeItem('devradar_token');
     localStorage.removeItem('devradar_email');
     localStorage.removeItem('devradar_name');
-    window.location.href = 'auth.html?mode=login';
+    window.location.href = '/auth?mode=login';
 }
 
 // Sidebar Menu Navigation
@@ -833,10 +833,10 @@ async function handlePostAnnouncement(event) {
 // Init Dashboard
 document.addEventListener('DOMContentLoaded', () => {
     // Only run if we are on the dashboard
-    if (window.location.pathname.endsWith('dashboard.html')) {
+    if (window.location.pathname.endsWith('/dashboard') || window.location.pathname.endsWith('dashboard.html')) {
         const token = localStorage.getItem('devradar_token');
         if (!token) {
-            window.location.href = 'auth.html?mode=login';
+            window.location.href = '/auth?mode=login';
             return;
         }
 

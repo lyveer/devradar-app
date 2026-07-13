@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/announcements").permitAll()
                 .requestMatchers("/api/languages/**").permitAll()
                 .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/images/**", "/fonts/**").permitAll()
+                .requestMatchers("/dashboard", "/auth", "/giris", "/panel").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/login/oauth2/**", "/oauth2/**").permitAll()
                 .anyRequest().authenticated()

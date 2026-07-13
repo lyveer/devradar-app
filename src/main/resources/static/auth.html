@@ -9,7 +9,7 @@
 <body>
     <header>
         <div class="container nav-container">
-            <a href="index.html" class="logo" style="text-decoration: none;">🌌 Lyver<span>Software</span></a>
+            <a href="/" class="logo" style="text-decoration: none;">🌌 Lyver<span>Software</span></a>
         </div>
     </header>
 
@@ -89,7 +89,7 @@
                 localStorage.setItem('devradar_email', email || '');
                 localStorage.setItem('devradar_name', name || '');
                 showToast('Sosyal medya ile giriş başarılı! Yönlendiriliyorsunuz...', 'success');
-                setTimeout(() => window.location.href = 'dashboard.html', 1200);
+                setTimeout(() => window.location.href = '/dashboard', 1200);
                 return;
             }
 

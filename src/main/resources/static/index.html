@@ -9,7 +9,7 @@
 <body>
     <header>
         <div class="container nav-container">
-            <a href="index.html" class="logo" style="text-decoration: none;">🌌 Lyver<span>Software</span></a>
+            <a href="/" class="logo" style="text-decoration: none;">🌌 Lyver<span>Software</span></a>
             <div class="nav-links">
                 <a href="#features" class="btn btn-outline" style="border: none; padding: 0.5rem 1rem;">Özellikler</a>
                 <a href="#stats" class="btn btn-outline" style="border: none; padding: 0.5rem 1rem;">İstatistikler</a>
@@ -17,9 +17,9 @@
                 
                 <span style="border-left: 1px solid rgba(255,255,255,0.1); height: 20px; margin: 0 0.5rem;"></span>
                 
-                <a href="auth.html?mode=login" class="btn btn-outline" id="nav-login-btn" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Giriş Yap</a>
-                <a href="auth.html?mode=register" class="btn btn-primary" id="nav-register-btn" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Hemen Katıl</a>
-                <a href="dashboard.html" class="btn btn-primary" id="nav-dashboard-btn" style="display: none; padding: 0.5rem 1.25rem; font-size: 0.85rem;">Panelime Git</a>
+                <a href="/auth?mode=login" class="btn btn-outline" id="nav-login-btn" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Giriş Yap</a>
+                <a href="/auth?mode=register" class="btn btn-primary" id="nav-register-btn" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Hemen Katıl</a>
+                <a href="/dashboard" class="btn btn-primary" id="nav-dashboard-btn" style="display: none; padding: 0.5rem 1.25rem; font-size: 0.85rem;">Panelime Git</a>
             </div>
         </div>
     </header>
@@ -51,7 +51,7 @@
                         DevRadar ile kariyer profilinizi doldurun, yapay zekadan puanınızı alın ve geliştireceğiniz projenin tahmini piyasa değerini, freelancer getirisini ve pazar talebini saniyeler içinde öğrenin.
                     </p>
                     <div class="hero-btns" style="display: flex; gap: 1rem;">
-                        <a href="auth.html?mode=register" class="btn btn-primary" id="hero-cta-btn" style="padding: 1rem 2rem; font-size: 1rem;">Ücretsiz Kayıt Ol</a>
+                        <a href="/auth?mode=register" class="btn btn-primary" id="hero-cta-btn" style="padding: 1rem 2rem; font-size: 1rem;">Ücretsiz Kayıt Ol</a>
                         <a href="#features" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1rem;">Nasıl Çalışır?</a>
                     </div>
                 </div>
@@ -189,7 +189,7 @@
     <footer style="border-top: 1px solid var(--border-color); background: rgba(6,6,12,0.8); padding: 4rem 0 2rem 0;">
         <div class="container" style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 4rem; margin-bottom: 3rem;">
             <div>
-                <a href="index.html" class="logo" style="text-decoration: none; margin-bottom: 1rem; display: inline-flex;">🌌 Lyver<span>Software</span></a>
+                <a href="/" class="logo" style="text-decoration: none; margin-bottom: 1rem; display: inline-flex;">🌌 Lyver<span>Software</span></a>
                 <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; max-width: 320px;">
                     DevRadar, modern yazılımcıların kariyer hedeflerini ve proje kararlarını kolaylaştırmak için Lyver Software tarafından tasarlanmış yapay zeka destekli analiz asistanıdır.
                 </p>
@@ -231,7 +231,7 @@
                 
                 const cta = document.getElementById('hero-cta-btn');
                 if (cta) {
-                    cta.href = 'dashboard.html';
+                    cta.href = '/dashboard';
                     cta.innerText = 'Panelime Git';
                 }
             }
