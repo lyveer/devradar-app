@@ -55,10 +55,7 @@ public class SecurityConfig {
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Enforce HTTPS behind proxy (e.g. Render)
-        if (System.getenv("RENDER") != null) {
-            http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
-        }
+
 
         return http.build();
     }

@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyver Software DevRadar — Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6179884512996719"
+         crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
@@ -47,26 +50,30 @@
                 <span>⚙️</span> Yönetici Paneli
             </div>
 
-            <!-- Sidebar Ad Widget -->
-            <div class="sidebar-ad-card">
-                <span class="ad-badge">Sponsor</span>
-                <h5>Sponsor Veren Aranıyor</h5>
-                <p>Bu alanda kendi ürününüzün tanıtımını yapmak için bizimle iletişime geçin.</p>
-                <a href="mailto:sponsor@lyver.com" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.7rem; width: 100%; border-radius: 6px; box-shadow: none;">İletişim: sponsor@lyver.com</a>
+            <!-- Sidebar Google AdSense Widget -->
+            <div class="sidebar-ad-card" style="padding: 0; overflow: hidden; background: transparent; border: 1px solid var(--border-color); border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                <ins class="adsbygoogle"
+                     style="display:block; width:100%; min-height:250px;"
+                     data-ad-client="ca-pub-6179884512996719"
+                     data-ad-slot="4444444444"
+                     data-ad-format="rectangle"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
         </aside>
 
         <!-- Main Workspace -->
         <main class="dashboard-content">
 
-            <!-- Top Promo Banner -->
-            <div class="ad-banner-top">
-                <div>
-                    <span class="ad-badge" style="margin-bottom: 0.25rem;">Sponsorluk</span>
-                    <div class="ad-banner-title">Bu Sponsorluk Alanı Kiralıktır</div>
-                    <div class="ad-banner-desc">SaaS veya geliştirici araçlarınızı binlerce yazılımcıya ulaştırın. İletişim: sponsor@lyver.com</div>
-                </div>
-                <a href="mailto:sponsor@lyver.com" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap;">Sponsor Ol</a>
+            <!-- Top Google AdSense Banner -->
+            <div style="text-align: center; min-height: 90px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center;">
+                <ins class="adsbygoogle"
+                     style="display:block; width:100%; min-height:90px;"
+                     data-ad-client="ca-pub-6179884512996719"
+                     data-ad-slot="5555555555"
+                     data-ad-format="horizontal"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
             
             <!-- PROFILE TAB -->
@@ -77,17 +84,45 @@
                         <h3 style="margin-bottom: 1.5rem;">Kariyer Profilinizi Doldurun</h3>
                         <form id="profile-form" onsubmit="handleSaveProfile(event)">
                             <div class="form-group">
-                                <label for="profile-specialization">Yazılım Alanı</label>
-                                <select id="profile-specialization" class="form-control" required>
-                                    <option value="">Seçiniz</option>
-                                    <option value="Frontend Developer">Frontend Developer</option>
-                                    <option value="Backend Developer">Backend Developer</option>
-                                    <option value="Fullstack Developer">Fullstack Developer</option>
-                                    <option value="Mobile App Developer">Mobile App Developer</option>
-                                    <option value="DevOps Engineer">DevOps Engineer</option>
-                                    <option value="Data Scientist / AI Engineer">Data Scientist / AI Engineer</option>
-                                    <option value="Embedded Systems Specialist">Embedded Systems Specialist</option>
-                                </select>
+                                <label style="margin-bottom: 0.75rem; display: block;">Yazılım Alanı (Uzmanlık)</label>
+                                <input type="hidden" id="profile-specialization" required>
+                                <div class="specialization-grid">
+                                    <div class="spec-card" data-value="Frontend Developer" onclick="selectSpecialization('Frontend Developer')">
+                                        <span class="spec-icon">💻</span>
+                                        <span class="spec-title">Frontend Developer</span>
+                                        <span class="spec-desc">React, Angular, Vue, CSS</span>
+                                    </div>
+                                    <div class="spec-card" data-value="Backend Developer" onclick="selectSpecialization('Backend Developer')">
+                                        <span class="spec-icon">⚙️</span>
+                                        <span class="spec-title">Backend Developer</span>
+                                        <span class="spec-desc">Spring Boot, Node.js, API, SQL</span>
+                                    </div>
+                                    <div class="spec-card" data-value="Fullstack Developer" onclick="selectSpecialization('Fullstack Developer')">
+                                        <span class="spec-icon">🚀</span>
+                                        <span class="spec-title">Fullstack Developer</span>
+                                        <span class="spec-desc">Hem Front hem Back-end</span>
+                                    </div>
+                                    <div class="spec-card" data-value="Mobile App Developer" onclick="selectSpecialization('Mobile App Developer')">
+                                        <span class="spec-icon">📱</span>
+                                        <span class="spec-title">Mobile App Developer</span>
+                                        <span class="spec-desc">Flutter, iOS, Android</span>
+                                    </div>
+                                    <div class="spec-card" data-value="DevOps Engineer" onclick="selectSpecialization('DevOps Engineer')">
+                                        <span class="spec-icon">☁️</span>
+                                        <span class="spec-title">DevOps Engineer</span>
+                                        <span class="spec-desc">Docker, CI/CD, AWS, K8s</span>
+                                    </div>
+                                    <div class="spec-card" data-value="Data Scientist / AI Engineer" onclick="selectSpecialization('Data Scientist / AI Engineer')">
+                                        <span class="spec-icon">🧠</span>
+                                        <span class="spec-title">AI & Data Scientist</span>
+                                        <span class="spec-desc">Python, ML, NLP, LLM</span>
+                                    </div>
+                                    <div class="spec-card" data-value="Embedded Systems Specialist" onclick="selectSpecialization('Embedded Systems Specialist')">
+                                        <span class="spec-icon">🔌</span>
+                                        <span class="spec-title">Embedded Systems</span>
+                                        <span class="spec-desc">C/C++, IoT, Firmware</span>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="form-group">
@@ -465,14 +500,15 @@
                 </div>
             </section>
 
-            <!-- Sponsor Banner -->
-            <div class="ad-banner-top" style="margin-top: 2rem; border-color: rgba(255,255,255,0.08); background: rgba(0, 0, 0, 0.15); border-style: dashed;">
-                <div>
-                    <span class="ad-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Premium Sponsor</span>
-                    <div class="ad-banner-title">🌌 Lyver Cloud — Gelişmiş Sunucu Altyapısı</div>
-                    <div class="ad-banner-desc">Hızlı, güvenli ve yapay zeka entegrasyonlu bulut sunucuları. DevRadar kullanıcılarına özel ilk ay ücretsiz!</div>
-                </div>
-                <a href="https://lyver.com/cloud" target="_blank" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap; border-color: #10b981; color: #10b981;">Bilgi Al</a>
+            <!-- Bottom Google AdSense Banner -->
+            <div style="text-align: center; min-height: 90px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-top: 2rem; display: flex; align-items: center; justify-content: center;">
+                <ins class="adsbygoogle"
+                     style="display:block; width:100%; min-height:90px;"
+                     data-ad-client="ca-pub-6179884512996719"
+                     data-ad-slot="6666666666"
+                     data-ad-format="horizontal"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
 
         </main>

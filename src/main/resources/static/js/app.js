@@ -65,6 +65,13 @@ async function handleLogin(event) {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Giriş Yap';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Giriş yapılıyor...';
+    }
+
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',
@@ -82,9 +89,17 @@ async function handleLogin(event) {
             setTimeout(() => window.location.href = '/dashboard', 1000);
         } else {
             showToast(data.message || 'Giriş başarısız', 'error');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
         }
     } catch (err) {
         showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
     }
 }
 
@@ -93,6 +108,13 @@ async function handleRegister(event) {
     const fullName = document.getElementById('register-name').value;
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
+
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Kayıt Ol';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Kayıt yapılıyor...';
+    }
 
     try {
         const response = await fetch(`${API_URL}/auth/register`, {
@@ -111,9 +133,17 @@ async function handleRegister(event) {
             setTimeout(() => window.location.href = '/dashboard', 1000);
         } else {
             showToast(data.message || 'Kayıt başarısız', 'error');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
         }
     } catch (err) {
         showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
     }
 }
 
@@ -212,6 +242,21 @@ async function handleSubscribe() {
     }
 }
 
+// Specialization Card Selection
+function selectSpecialization(value) {
+    const input = document.getElementById('profile-specialization');
+    if (input) {
+        input.value = value;
+    }
+    document.querySelectorAll('.spec-card').forEach(card => {
+        if (card.getAttribute('data-value') === value) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+    });
+}
+
 // Profile Page Operations
 async function loadProfile() {
     try {
@@ -228,7 +273,7 @@ async function loadProfile() {
             const profile = await response.json();
             if (profile) {
                 // Populate profile fields
-                document.getElementById('profile-specialization').value = profile.specialization || '';
+                selectSpecialization(profile.specialization || '');
                 document.getElementById('profile-experience').value = profile.experienceYears || '0';
                 document.getElementById('profile-projects').value = profile.previousProjects || '';
                 document.getElementById('profile-github').value = profile.githubUrl || '';
@@ -255,6 +300,7 @@ async function loadProfile() {
                     document.getElementById('profile-ai-results').style.display = 'none';
                 }
             } else {
+                selectSpecialization('');
                 document.getElementById('profile-ai-empty').style.display = 'block';
             }
         }
