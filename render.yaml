@@ -18,7 +18,7 @@ services:
       - key: GITHUB_CLIENT_SECRET
         sync: false
       - key: SPRING_DATASOURCE_URL
-        value: jdbc:h2:file:./data/devradar;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+        value: jdbc:h2:mem:devradar;DB_CLOSE_DELAY=-1
       - key: SPRING_DATASOURCE_USERNAME
         value: sa
       - key: SPRING_DATASOURCE_PASSWORD
