@@ -1,0 +1,9 @@
+target/
+data/
+*.class
+*.log
+.idea/
+*.iml
+.m2/
+.maven/
+

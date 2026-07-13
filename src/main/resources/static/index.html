@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyver Software DevRadar — AI Destekli Yazılımcı & Proje Analiz Platformu</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="text-decoration: none;">🌌 Lyver<span>Software</span></a>
+            <div class="nav-links">
+                <a href="#features" class="btn btn-outline" style="border: none; padding: 0.5rem 1rem;">Özellikler</a>
+                <a href="#stats" class="btn btn-outline" style="border: none; padding: 0.5rem 1rem;">İstatistikler</a>
+                <a href="#faq" class="btn btn-outline" style="border: none; padding: 0.5rem 1rem;">SSS</a>
+                
+                <span style="border-left: 1px solid rgba(255,255,255,0.1); height: 20px; margin: 0 0.5rem;"></span>
+                
+                <a href="auth.html?mode=login" class="btn btn-outline" id="nav-login-btn" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Giriş Yap</a>
+                <a href="auth.html?mode=register" class="btn btn-primary" id="nav-register-btn" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Hemen Katıl</a>
+                <a href="dashboard.html" class="btn btn-primary" id="nav-dashboard-btn" style="display: none; padding: 0.5rem 1.25rem; font-size: 0.85rem;">Panelime Git</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Sponsor Banner Area -->
+    <div class="container" style="margin-top: 1.5rem;">
+        <div class="ad-banner-top" style="margin-bottom: 0;">
+            <div>
+                <span class="ad-badge" style="margin-bottom: 0.25rem;">Sponsorluk</span>
+                <div class="ad-banner-title">🌌 Lyver Cloud — Bulut Entegrasyonlarında Devrim</div>
+                <div class="ad-banner-desc">Projelerinizi saniyeler içinde ölçeklendirin, yapay zeka analizlerinden faydalanın. DevRadar kullanıcılarına özel ilk ay ücretsiz!</div>
+            </div>
+            <a href="https://lyver.com/cloud" target="_blank" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap;">Hemen Keşfet</a>
+        </div>
+    </div>
+
+    <main class="container">
+        <!-- HERO SECTION -->
+        <section class="hero" style="padding-top: 5rem; padding-bottom: 5rem;">
+            <div class="badge">Yapay Zeka Destekli Geliştirici Radar</div>
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; align-items: center; width: 100%; text-align: left; margin-top: 2rem;">
+                
+                <div>
+                    <h1 style="margin-bottom: 1.5rem; font-size: 3.5rem; text-align: left;">
+                        Yazılım Kariyerinizi ve <br>
+                        <span class="gradient-text">Projelerinizi Puanlayın</span>
+                    </h1>
+                    <p style="font-size: 1.1rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 2rem; max-width: 600px;">
+                        DevRadar ile kariyer profilinizi doldurun, yapay zekadan puanınızı alın ve geliştireceğiniz projenin tahmini piyasa değerini, freelancer getirisini ve pazar talebini saniyeler içinde öğrenin.
+                    </p>
+                    <div class="hero-btns" style="display: flex; gap: 1rem;">
+                        <a href="auth.html?mode=register" class="btn btn-primary" id="hero-cta-btn" style="padding: 1rem 2rem; font-size: 1rem;">Ücretsiz Kayıt Ol</a>
+                        <a href="#features" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1rem;">Nasıl Çalışır?</a>
+                    </div>
+                </div>
+
+                <!-- Floating Interactive Premium AI Score Illustration -->
+                <div class="card" style="padding: 2rem; background: linear-gradient(135deg, rgba(15,15,30,0.85), rgba(124,58,237,0.05)); border: 1px solid var(--border-highlight); position: relative; box-shadow: var(--shadow-premium); overflow: hidden; display: flex; flex-direction: column; align-items: center;">
+                    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%); pointer-events: none;"></div>
+                    
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--secondary); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.5rem;">AI DEĞERLENDİRME PANELİ</div>
+                    
+                    <!-- Circular Gauge -->
+                    <div class="radial-progress" style="--progress: 306deg; background: conic-gradient(var(--success) 306deg, rgba(255,255,255,0.05) 0deg); width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; position: relative;">
+                        <div style="position: absolute; width: 122px; height: 122px; background: var(--bg-main); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span style="font-size: 2.25rem; font-weight: 800; color: white;">85</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">AI SKOR</span>
+                        </div>
+                    </div>
+
+                    <!-- Mini Metric Card -->
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; width: 100%; text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Tahmini Proje Değeri</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--success);">$12,500 - $35,000</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Dynamic Live Statistics -->
+        <section id="stats" style="margin-bottom: 6rem; padding: 4rem 2rem; border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.01) 0%, rgba(124,58,237,0.03) 100%); border: 1px solid var(--border-color);">
+            <div class="section-title" style="text-align: center; margin-bottom: 3.5rem;">
+                <h2 style="font-size: 2rem; margin-bottom: 0.75rem;">Canlı Platform İstatistikleri</h2>
+                <p style="color: var(--text-secondary);">Lyver Software altyapısıyla her saniye büyüyen AI radar verileri.</p>
+            </div>
+            <div class="grid-3" style="grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+                <div class="card" style="text-align: center; padding: 2rem 1.5rem;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 0.5rem;">12.4K+</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">Kayıtlı Geliştirici</div>
+                </div>
+                <div class="card" style="text-align: center; padding: 2rem 1.5rem;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary-light); margin-bottom: 0.5rem;">45.8K+</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">Analiz Edilen Proje</div>
+                </div>
+                <div class="card" style="text-align: center; padding: 2rem 1.5rem;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;">98.7%</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">AI Karar Doğruluğu</div>
+                </div>
+                <div class="card" style="text-align: center; padding: 2rem 1.5rem;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--success); margin-bottom: 0.5rem;">3.2K+</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">Premium Üye</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inline Sponsor Banner Area -->
+        <div style="margin-bottom: 6rem;">
+            <div class="ad-banner-top" style="background: linear-gradient(90deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08)); border-color: rgba(6,182,212,0.25);">
+                <div>
+                    <span class="ad-badge" style="background: rgba(124,58,237,0.15); color: var(--primary-light);">Sponsor</span>
+                    <div class="ad-banner-title">⚡ Copilot AI — Akıllı Kod Asistanınız</div>
+                    <div class="ad-banner-desc">Hata yapma oranını %40 azaltın. Kod bloklarınızı yapay zeka desteğiyle saniyeler içinde tamamlayın.</div>
+                </div>
+                <a href="https://lyver.com/copilot" target="_blank" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap; border-color: var(--secondary); color: var(--secondary);">Ücretsiz Dene</a>
+            </div>
+        </div>
+
+        <!-- FEATURES SECTION -->
+        <section id="features" class="features" style="margin-bottom: 6rem;">
+            <div class="section-title" style="text-align: center; margin-bottom: 3.5rem;">
+                <h2 style="font-size: 2.25rem; margin-bottom: 0.75rem;">Platform Özellikleri</h2>
+                <p style="color: var(--text-secondary);">Kariyeriniz ve projeleriniz hakkında veri odaklı kararlar alın.</p>
+            </div>
+            <div class="grid-3" style="gap: 2rem;">
+                <div class="card" style="padding: 2.5rem 2rem;">
+                    <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1.5rem;">👤</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: white;">Detaylı Profil Analizi</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Kullandığınız dilleri, deneyiminizi ve uzmanlığınızı girin. Yapay zeka profilinizi analiz edip güçlü/zayıf yönlerinizle puanlasın.</p>
+                </div>
+                <div class="card" style="padding: 2.5rem 2rem;">
+                    <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1.5rem;">📊</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: white;">Piyasa Fiyatı & Kazanç</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Geliştirmek istediğiniz fikrin tahmini piyasa satış değerini ve freelancer saatlik/proje bazlı kazanç potansiyelini anında hesaplayın.</p>
+                </div>
+                <div class="card" style="padding: 2.5rem 2rem;">
+                    <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1.5rem;">📈</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: white;">Geliştirme Yol Haritası</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Analiz ettiğiniz projeler için otomatik oluşturulan checklist'leri kullanarak geliştirme aşamalarını tarayıcınızda adım adım takip edin.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SSS (FAQ) SECTION -->
+        <section id="faq" style="margin-bottom: 6rem;">
+            <div class="section-title" style="text-align: center; margin-bottom: 3.5rem;">
+                <h2 style="font-size: 2.25rem; margin-bottom: 0.75rem;">Sıkça Sorulan Sorular</h2>
+                <p style="color: var(--text-secondary);">DevRadar ve platform işleyişi hakkında aradığınız tüm yanıtlar.</p>
+            </div>
+            
+            <div class="faq-container" style="max-width: 800px; margin: 0 auto;">
+                <div class="faq-item" style="margin-bottom: 1rem;">
+                    <div class="faq-question" onclick="toggleLandingFaq(this)" style="padding: 1.5rem; border-radius: 10px; background: var(--bg-surface); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; color: white;">DevRadar ücretsiz mi?</span>
+                        <span class="faq-arrow">▼</span>
+                    </div>
+                    <div class="faq-answer" style="padding: 1.5rem; color: var(--text-secondary); display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.03);">
+                        Evet! Her yeni kayıt olan kullanıcımıza 5 adet ücretsiz analiz kredisi tanımlanır. Krediniz bittiğinde veya sınırsız özelliklere erişmek istediğinizde premium aboneliğe geçiş yapabilirsiniz.
+                    </div>
+                </div>
+
+                <div class="faq-item" style="margin-bottom: 1rem;">
+                    <div class="faq-question" onclick="toggleLandingFaq(this)" style="padding: 1.5rem; border-radius: 10px; background: var(--bg-surface); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; color: white;">Profil puanlama ve proje analiz raporu ne kadar sürer?</span>
+                        <span class="faq-arrow">▼</span>
+                    </div>
+                    <div class="faq-answer" style="padding: 1.5rem; color: var(--text-secondary); display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.03);">
+                        Gelişmiş AI modellerimiz ve Google Search Grounding entegrasyonumuz sayesinde tüm piyasa analizi ve profil değerlendirme işlemi ortalama 3-5 saniye içinde tamamlanır ve önünüze sunulur.
+                    </div>
+                </div>
+
+        <!-- Bottom Sponsor Banner Area -->
+        <div style="margin-bottom: 6rem;">
+            <div class="ad-banner-top" style="border-style: dashed; border-color: var(--border-highlight); background: rgba(0,0,0,0.2);">
+                <div>
+                    <span class="ad-badge" style="background: rgba(244,63,94,0.15); color: var(--accent);">Sponsorluk Anlaşması</span>
+                    <div class="ad-banner-title">Burada Kendi Ürününüzün Reklamını Yapın</div>
+                    <div class="ad-banner-desc">Platformumuzda binlerce geliştiriciye ve teknoloji liderine ulaşmak için reklam alanlarımızı kiralayın.</div>
+                </div>
+                <a href="mailto:sponsor@lyver.com" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap;">Bize Ulaşın</a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--border-color); background: rgba(6,6,12,0.8); padding: 4rem 0 2rem 0;">
+        <div class="container" style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 4rem; margin-bottom: 3rem;">
+            <div>
+                <a href="index.html" class="logo" style="text-decoration: none; margin-bottom: 1rem; display: inline-flex;">🌌 Lyver<span>Software</span></a>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; max-width: 320px;">
+                    DevRadar, modern yazılımcıların kariyer hedeflerini ve proje kararlarını kolaylaştırmak için Lyver Software tarafından tasarlanmış yapay zeka destekli analiz asistanıdır.
+                </p>
+            </div>
+            <div>
+                <h4 style="color: white; font-size: 1rem; margin-bottom: 1.25rem;">Platform</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem;">
+                    <li><a href="#features" style="color: var(--text-secondary); text-decoration: none;">Özellikler</a></li>
+                    <li><a href="#stats" style="color: var(--text-secondary); text-decoration: none;">İstatistikler</a></li>
+                    <li><a href="#faq" style="color: var(--text-secondary); text-decoration: none;">Sıkça Sorulan Sorular</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: white; font-size: 1rem; margin-bottom: 1.25rem;">İletişim & Sponsorluk</h4>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;">
+                    Sponsorluk ve kurumsal ortaklık anlaşmaları için:
+                </p>
+                <a href="mailto:sponsor@lyver.com" style="color: var(--secondary); font-weight: 600; text-decoration: none; font-size: 0.95rem;">sponsor@lyver.com</a>
+            </div>
+        </div>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 2rem; font-size: 0.85rem; color: var(--text-muted);">
+            <div>© 2026 Lyver Software. Tüm hakları saklıdır.</div>
+            <div>Designed by Lyver Software</div>
+        </div>
+    </footer>
+
+    <script>
+        // Check authentication state for dynamic buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('devradar_token');
+            if (token) {
+                const loginBtn = document.getElementById('nav-login-btn');
+                const registerBtn = document.getElementById('nav-register-btn');
+                const dashboardBtn = document.getElementById('nav-dashboard-btn');
+                
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (registerBtn) registerBtn.style.display = 'none';
+                if (dashboardBtn) dashboardBtn.style.display = 'inline-flex';
+                
+                const cta = document.getElementById('hero-cta-btn');
+                if (cta) {
+                    cta.href = 'dashboard.html';
+                    cta.innerText = 'Panelime Git';
+                }
+            }
+        });
+
+        // FAQ accordion toggle logic for landing page
+        function toggleLandingFaq(element) {
+            const parent = element.parentElement;
+            const answer = parent.querySelector('.faq-answer');
+            const arrow = parent.querySelector('.faq-arrow');
+            
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                answer.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+    </script>
+</body>
+</html>

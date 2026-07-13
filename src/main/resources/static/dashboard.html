@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyver Software DevRadar — Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="text-decoration: none;">🌌 Lyver<span>Software</span></a>
+            <div class="nav-links">
+                <span id="credit-display" class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 6px; margin-right: 0.5rem; margin-bottom: 0; display: inline-flex; text-transform: none; border: 1px solid rgba(16, 185, 129, 0.25);">Kredi: --</span>
+                <button id="subscribe-btn" onclick="handleSubscribe()" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; margin-right: 0.5rem;">Sınırsız Kredi Al</button>
+                <span id="user-display" style="font-weight: 600; color: var(--text-secondary); margin-right: 0.5rem;">Geliştirici</span>
+                <button onclick="handleLogout()" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Çıkış Yap</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-link active" id="menu-profile" onclick="switchTab('profile')">
+                <span>👤</span> Profil Puanlama
+            </div>
+            <div class="sidebar-link" id="menu-project" onclick="switchTab('project')">
+                <span>📊</span> Proje Analizi
+            </div>
+            <div class="sidebar-link" id="menu-history" onclick="switchTab('history')">
+                <span>📜</span> Analiz Geçmişi
+            </div>
+            <div class="sidebar-link" id="menu-progress" onclick="switchTab('progress')">
+                <span>📈</span> Proje İlerlemesi
+            </div>
+            <div class="sidebar-link" id="menu-roadmap" onclick="switchTab('roadmap')">
+                <span>🗺️</span> Yol Haritası
+            </div>
+            <div class="sidebar-link" id="menu-announcements" onclick="switchTab('announcements')">
+                <span>📢</span> Duyurular
+            </div>
+            <div class="sidebar-link" id="menu-faq" onclick="switchTab('faq')">
+                <span>❓</span> SSS
+            </div>
+            <div class="sidebar-link" id="menu-admin" onclick="switchTab('admin')" style="display: none;">
+                <span>⚙️</span> Yönetici Paneli
+            </div>
+
+            <!-- Sidebar Ad Widget -->
+            <div class="sidebar-ad-card">
+                <span class="ad-badge">Sponsor</span>
+                <h5>Sponsor Veren Aranıyor</h5>
+                <p>Bu alanda kendi ürününüzün tanıtımını yapmak için bizimle iletişime geçin.</p>
+                <a href="mailto:sponsor@lyver.com" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.7rem; width: 100%; border-radius: 6px; box-shadow: none;">İletişim: sponsor@lyver.com</a>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="dashboard-content">
+
+            <!-- Top Promo Banner -->
+            <div class="ad-banner-top">
+                <div>
+                    <span class="ad-badge" style="margin-bottom: 0.25rem;">Sponsorluk</span>
+                    <div class="ad-banner-title">Bu Sponsorluk Alanı Kiralıktır</div>
+                    <div class="ad-banner-desc">SaaS veya geliştirici araçlarınızı binlerce yazılımcıya ulaştırın. İletişim: sponsor@lyver.com</div>
+                </div>
+                <a href="mailto:sponsor@lyver.com" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap;">Sponsor Ol</a>
+            </div>
+            
+            <!-- PROFILE TAB -->
+            <section id="tab-profile-pane" class="tab-pane active">
+                <div class="dashboard-grid">
+                    <!-- Left: Profile Form Card -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1.5rem;">Kariyer Profilinizi Doldurun</h3>
+                        <form id="profile-form" onsubmit="handleSaveProfile(event)">
+                            <div class="form-group">
+                                <label for="profile-specialization">Yazılım Alanı</label>
+                                <select id="profile-specialization" class="form-control" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Frontend Developer">Frontend Developer</option>
+                                    <option value="Backend Developer">Backend Developer</option>
+                                    <option value="Fullstack Developer">Fullstack Developer</option>
+                                    <option value="Mobile App Developer">Mobile App Developer</option>
+                                    <option value="DevOps Engineer">DevOps Engineer</option>
+                                    <option value="Data Scientist / AI Engineer">Data Scientist / AI Engineer</option>
+                                    <option value="Embedded Systems Specialist">Embedded Systems Specialist</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Kullandığınız Diller / Teknolojiler</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="Java" id="lang-java">
+                                        <label for="lang-java" class="checkbox-label">Java</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="Kotlin" id="lang-kotlin">
+                                        <label for="lang-kotlin" class="checkbox-label">Kotlin</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="JavaScript" id="lang-js">
+                                        <label for="lang-js" class="checkbox-label">JavaScript</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="TypeScript" id="lang-ts">
+                                        <label for="lang-ts" class="checkbox-label">TypeScript</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="Python" id="lang-py">
+                                        <label for="lang-py" class="checkbox-label">Python</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="Go" id="lang-go">
+                                        <label for="lang-go" class="checkbox-label">Go</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="Swift" id="lang-swift">
+                                        <label for="lang-swift" class="checkbox-label">Swift</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="C#" id="lang-csharp">
+                                        <label for="lang-csharp" class="checkbox-label">C#</label>
+                                    </div>
+                                    <div class="checkbox-btn">
+                                        <input type="checkbox" name="languages" value="Rust" id="lang-rust">
+                                        <label for="lang-rust" class="checkbox-label">Rust</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profile-experience">Deneyim Süresi (Yıl)</label>
+                                <input type="number" id="profile-experience" class="form-control" min="0" max="50" required placeholder="Örn: 3">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profile-projects">Önceki Projeler / Referanslar</label>
+                                <textarea id="profile-projects" class="form-control" rows="3" placeholder="Geliştirdiğiniz e-ticaret siteleri, mobil uygulamalar veya open-source katkıları..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profile-github">GitHub Adresi (İsteğe Bağlı)</label>
+                                <input type="url" id="profile-github" class="form-control" placeholder="https://github.com/username">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Profili Kaydet</button>
+                        </form>
+                    </div>
+
+                    <!-- Right: AI Evaluation Output -->
+                    <div class="card profile-score-box" id="profile-ai-box">
+                        <h3 style="margin-bottom: 2rem;">Yapay Zeka Profil Skoru</h3>
+                        
+                        <div class="radial-progress" id="profile-score-meter">
+                            <span class="value" id="profile-score-val">-</span>
+                        </div>
+                        
+                        <button onclick="handleTriggerScoring()" class="btn btn-secondary" id="score-btn" style="margin-bottom: 2rem; display: none;">Profil Puanımı Analiz Et</button>
+                        
+                        <div id="profile-ai-results" style="display: none; width: 100%;">
+                            <p class="score-desc" id="profile-ai-summary" style="margin-bottom: 1.5rem;"></p>
+                            
+                            <h4 style="text-align: left; margin-bottom: 0.5rem;">Güçlü Yönler</h4>
+                            <ul class="detail-list strengths" id="profile-ai-strengths"></ul>
+
+                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;">Zayıf Yönler</h4>
+                            <ul class="detail-list weaknesses" id="profile-ai-weaknesses"></ul>
+
+                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;">AI Tavsiyeleri</h4>
+                            <ul class="detail-list" id="profile-ai-recommendations"></ul>
+                        </div>
+
+                        <div id="profile-ai-empty">
+                            <p class="score-desc">Öncelikle sol taraftaki formu doldurup kaydetmeniz gerekmektedir.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROJECT ANALYSIS TAB -->
+            <section id="tab-project-pane" class="tab-pane">
+                <div class="dashboard-grid">
+                    <!-- Left: Project Form Card -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1.5rem;">Yeni Proje Fikri Analiz Edin</h3>
+                        <form id="project-form" onsubmit="handleAnalyzeProject(event)">
+                            <div class="form-group">
+                                <label for="project-name">Proje Adı</label>
+                                <input type="text" id="project-name" class="form-control" placeholder="Örn: Restoran Sipariş SaaS Modülü" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="project-description">Proje Detayları & Amacı</label>
+                                <textarea id="project-description" class="form-control" rows="4" placeholder="Projenin işlevi nedir? Kullanıcılar ne yapacak? Temel özellikler..." required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="project-language">Kullanılacak Dil / Ana Teknoloji</label>
+                                <input type="text" id="project-language" class="form-control" placeholder="Örn: Java (Spring Boot) & React" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%;" id="analyze-submit-btn">Analizi Başlat</button>
+                        </form>
+                    </div>
+
+                    <!-- Right: Analysis Output Display -->
+                    <div class="card" id="project-analysis-result-card">
+                        <h3 id="analysis-result-header" style="margin-bottom: 1.5rem;">Proje Analiz Raporu</h3>
+                        
+                        <div id="analysis-empty">
+                            <p class="score-desc" style="text-align: center; padding: 4rem 0;">Sol taraftan projenizi girin ve AI tabanlı pazar radarını çalıştırın.</p>
+                        </div>
+
+                        <div id="analysis-loading" style="display: none; text-align: center; padding: 4rem 0;">
+                            <div class="radial-progress" style="margin: 0 auto; --progress: 180deg; animation: spin 2s linear infinite;">
+                                <span class="value" style="font-size: 1.5rem;">AI</span>
+                            </div>
+                            <p class="score-desc" style="margin-top: 2rem;">Yapay Zeka pazar verilerini, freelancer gelir oranlarını ve teknolojik tüyoları derliyor...</p>
+                        </div>
+
+                        <div id="analysis-content" style="display: none;">
+                            <div class="analysis-results-grid">
+                                <div class="metric-card">
+                                    <div class="metric-title">💰 Piyasa Satış Fiyatı (Tahmini)</div>
+                                    <div class="metric-val" id="res-market-price">-</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-title">💼 Freelancer Saatlik Ücret</div>
+                                    <div class="metric-val" id="res-freelancer-hourly">-</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-title">🔥 Pazar Talebi</div>
+                                    <div class="metric-val" id="res-demand">-</div>
+                                    <p class="score-desc" id="res-demand-desc" style="font-size: 0.8rem; margin-top: 0.5rem;"></p>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-title">⏱️ Geliştirme Süresi</div>
+                                    <div class="metric-val" id="res-dev-time">-</div>
+                                    <p class="score-desc" id="res-dev-time-desc" style="font-size: 0.8rem; margin-top: 0.5rem;"></p>
+                                </div>
+                                
+                                <div class="metric-card analysis-full-width">
+                                    <h4 style="margin-bottom: 0.75rem;">🛠️ Önerilen Teknoloji Stack Detayları</h4>
+                                    <div id="res-tech-stack"></div>
+                                </div>
+
+                                <div class="metric-card analysis-full-width">
+                                    <h4 style="margin-bottom: 0.75rem;">💡 Nasıl Ekleme Yapılabilir & Geliştirilebilir</h4>
+                                    <ul class="detail-list" id="res-enhancements" style="margin-top: 0;"></ul>
+                                </div>
+
+                                <div class="metric-card analysis-full-width">
+                                    <h4 style="margin-bottom: 0.75rem;">⭐ Önemli Geliştirici Tüyoları</h4>
+                                    <ul class="detail-list" id="res-tips" style="margin-top: 0;"></ul>
+                                </div>
+
+                                <div class="metric-card analysis-full-width" id="res-competitor-box" style="display: none;">
+                                    <h4 style="margin-bottom: 0.5rem;">📊 Pazar Rekabet Analizi</h4>
+                                    <p class="score-desc" id="res-competitor-insight"></p>
+                                </div>
+
+                                <div class="metric-card analysis-full-width" id="res-competitors-list-box" style="display: none;">
+                                    <h4 style="margin-bottom: 0.75rem;">🌐 Pazardaki Örnekler & Rakipler</h4>
+                                    <div id="res-competitors-list" style="display: flex; flex-wrap: wrap; gap: 0.75rem;"></div>
+                                </div>
+
+                                <div class="metric-card analysis-full-width" id="res-freelancer-platforms-box" style="display: none;">
+                                    <h4 style="margin-bottom: 0.75rem;">💼 Freelance Pazarı & Fiyatlandırma</h4>
+                                    <div id="res-freelancer-platforms" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORY TAB -->
+            <section id="tab-history-pane" class="tab-pane">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3>Geçmiş Proje Analizleriniz</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;">Daha önce yaptığınız analizleri buradan görebilir ve raporlara tekrar göz atabilirsiniz.</p>
+                    
+                    <div id="history-empty" class="score-desc" style="text-align: center; padding: 3rem 0;">
+                        Henüz herhangi bir proje analizi yapmadınız.
+                    </div>
+
+                    <div id="history-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Dynamically filled history list -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROGRESS TRACKER TAB -->
+            <section id="tab-progress-pane" class="tab-pane">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3>Proje İlerleme Takibi</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;">Analiz ettiğiniz projelerin geliştirme adımlarını işaretleyerek ilerlemenizi adım adım takip edin.</p>
+                    
+                    <div id="progress-empty" class="score-desc" style="text-align: center; padding: 3rem 0;">
+                        İlerleme takibi yapmak için öncelikle "Proje Analizi" sekmesinden bir proje analizi yapmalısınız.
+                    </div>
+
+                    <div id="progress-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Checklists generated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ROADMAP TAB -->
+            <section id="tab-roadmap-pane" class="tab-pane">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3>Lyver Software Ürün Yol Haritası (Roadmap)</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;">Lyver Software DevRadar platformu için 2026 yılı geliştirme hedefleri ve gelecek planlarımız.</p>
+                    
+                    <div class="roadmap-timeline">
+                        <div class="roadmap-card completed">
+                            <div class="roadmap-quarter">Q1 2026 — Tamamlandı</div>
+                            <div class="roadmap-title">Yapay Zeka Altyapısı & Grounding</div>
+                            <p class="score-desc">Gemini ve Llama 3 entegrasyonu tamamlandı. Canlı web aramaları (Google Search Grounding) ve dizi parse tolerans sistemleri aktif edildi.</p>
+                        </div>
+                        <div class="roadmap-card">
+                            <div class="roadmap-quarter">Q2 2026 — Planlanıyor</div>
+                            <div class="roadmap-title">Çoklu Dil Desteği & Global Pazar Raporları</div>
+                            <p class="score-desc">Platformun tüm dillere çevrilmesi, yerel pazar fiyatlandırmalarının (TL, Euro, Yen) otomatik tespiti ve para birimi desteği.</p>
+                        </div>
+                        <div class="roadmap-card">
+                            <div class="roadmap-quarter">Q3 2026 — Planlanıyor</div>
+                            <div class="roadmap-title">Gelişmiş Ekip & Organizasyon Yönetimi</div>
+                            <p class="score-desc">Yazılım şirketleri için çoklu kullanıcı organizasyonları, takım içi proje paylaşımı ve ortak analiz raporu oluşturma.</p>
+                        </div>
+                        <div class="roadmap-card">
+                            <div class="roadmap-quarter">Q4 2026 — Planlanıyor</div>
+                            <div class="roadmap-title">AI Kod İskeleti Oluşturma</div>
+                            <p class="score-desc">Analiz edilen projeler için otomatik backend (Spring Boot/NestJS) ve frontend (React/Vue) başlangıç kod şablonlarının üretilmesi.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ANNOUNCEMENTS TAB -->
+            <section id="tab-announcements-pane" class="tab-pane">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3>Sistem Duyuruları & Güncellemeler</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;">Lyver Software ekibi tarafından yayınlanan en güncel sistem haberleri.</p>
+                    
+                    <div id="announcements-empty" class="score-desc" style="text-align: center; padding: 3rem 0;">
+                        Şu anda yayınlanmış yeni bir duyuru bulunmamaktadır.
+                    </div>
+
+                    <div id="announcements-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Announcement cards populated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ TAB -->
+            <section id="tab-faq-pane" class="tab-pane">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3>Sıkça Sorulan Sorular (SSS)</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;">DevRadar platformu, analiz özellikleri ve kredi sistemi hakkında merak edilenler.</p>
+                    
+                    <div class="faq-container">
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">
+                                <span>Kredi sistemi nasıl çalışır?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                Her yeni kayıt olan kullanıcıya ücretsiz 5 analiz kredisi tanımlanır. Yapılan her Profil Puanlama veya Proje Analizi işlemi bakiyenizden 1 kredi düşer. Üst bardaki "Sınırsız Kredi Al" butonu ile abonelik simüle edilebilir.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">
+                                <span>Hangi yapay zeka modelleri kullanılıyor?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                Platformumuz hibrit bir altyapıya sahiptir. Varsayılan olarak Google'ın gelişmiş Gemini 2.5 modeli (Google Search Grounding / Canlı arama entegrasyonu ile) kullanılır. Alternatif olarak Groq üzerinden Llama 3 model entegrasyonu da aktiftir.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">
+                                <span>Lyver Software nedir?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                Lyver Software, modern yazılım çözümleri, yapay zeka destekli analiz toolları ve geliştirici dostu SaaS ürünleri üreten bağımsız bir teknoloji girişimidir. DevRadar, geliştiricilerin pazar analizini hızlandırmak için Lyver Software tarafından üretilmiştir.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">
+                                <span>Analizlerin doğruluğu nedir?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                Yapay zekamız, projenizin detaylarına göre popüler serbest çalışan (freelance) sitelerindeki ilanları, benzer SaaS ürünlerini ve güncel yazılım maliyetlerini gerçek zamanlı analiz ederek ortalama bir pazar değerlemesi çıkarır.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ADMIN PANEL TAB -->
+            <section id="tab-admin-pane" class="tab-pane">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3>Lyver Yönetici Kontrol Paneli</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;">Kullanıcı yönetimi, kredi müdahaleleri, sistem istatistikleri ve genel duyuru yönetimi.</p>
+
+                    <!-- Admin Statistics -->
+                    <div class="admin-stats-grid">
+                        <div class="metric-card">
+                            <div class="metric-title">Toplam Kayıtlı Kullanıcı</div>
+                            <div class="metric-val" id="admin-stat-users">0</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Toplam Yapılan Analiz</div>
+                            <div class="metric-val" id="admin-stat-analyses">0</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">Premium Üye Sayısı</div>
+                            <div class="metric-val" id="admin-stat-premium">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Announcement Form -->
+                    <h4 style="margin-bottom: 1rem; color: white;">Yeni Sistem Duyurusu Yayınla</h4>
+                    <form id="announcement-form" onsubmit="handlePostAnnouncement(event)" style="margin-bottom: 2rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div class="form-group">
+                            <label for="announce-title">Duyuru Başlığı</label>
+                            <input type="text" id="announce-title" class="form-control" placeholder="Örn. Sistem Bakım Çalışması Hakkında" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="announce-content">Duyuru İçeriği</label>
+                            <textarea id="announce-content" class="form-control" rows="3" placeholder="Yayınlamak istediğiniz duyuru detayları..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Duyuruyu Yayınla</button>
+                    </form>
+
+                    <!-- User Management Table -->
+                    <h4 style="margin-bottom: 1rem; color: white;">Kullanıcı Listesi & Yönetimi</h4>
+                    <div class="admin-table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ad Soyad</th>
+                                    <th>E-posta</th>
+                                    <th>Kredi</th>
+                                    <th>Üyelik</th>
+                                    <th>Aksiyonlar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-user-rows">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sponsor Banner -->
+            <div class="ad-banner-top" style="margin-top: 2rem; border-color: rgba(255,255,255,0.08); background: rgba(0, 0, 0, 0.15); border-style: dashed;">
+                <div>
+                    <span class="ad-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Premium Sponsor</span>
+                    <div class="ad-banner-title">🌌 Lyver Cloud — Gelişmiş Sunucu Altyapısı</div>
+                    <div class="ad-banner-desc">Hızlı, güvenli ve yapay zeka entegrasyonlu bulut sunucuları. DevRadar kullanıcılarına özel ilk ay ücretsiz!</div>
+                </div>
+                <a href="https://lyver.com/cloud" target="_blank" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap; border-color: #10b981; color: #10b981;">Bilgi Al</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
