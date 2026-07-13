@@ -17,3 +17,13 @@ services:
         sync: false
       - key: GITHUB_CLIENT_SECRET
         sync: false
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        sync: false
+      - key: SPRING_JPA_DATABASE_PLATFORM
+        sync: false
