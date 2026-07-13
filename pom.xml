@@ -58,6 +58,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- PostgreSQL Connector -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- JWT (io.jsonwebtoken 0.12.x API, matches JwtUtil.java's builder()/verifyWith() calls) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
