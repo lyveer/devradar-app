@@ -18,8 +18,19 @@ services:
       - key: GITHUB_CLIENT_SECRET
         sync: false
       - key: SPRING_DATASOURCE_URL
-        value: jdbc:h2:mem:devradar;DB_CLOSE_DELAY=-1
+        fromDatabase:
+          name: devradar-db
+          property: jdbcConnectionString
       - key: SPRING_DATASOURCE_USERNAME
-        value: sa
+        fromDatabase:
+          name: devradar-db
+          property: user
       - key: SPRING_DATASOURCE_PASSWORD
-        value: ""
+        fromDatabase:
+          name: devradar-db
+          property: password
+
+databases:
+  - name: devradar-db
+    plan: free
+    region: oregon
