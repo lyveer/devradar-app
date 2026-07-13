@@ -16,6 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @org.springframework.beans.factory.annotation.Value("${security.require-ssl:false}")
+    private boolean requireSsl;
+
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
@@ -42,17 +45,21 @@ public class SecurityConfig {
             .oauth2Login(oauth2 -> oauth2
                 .successHandler(oAuth2SuccessHandler)
             )
-            .headers(headers -> headers
-                .frameOptions(fo -> fo.sameOrigin())
-                .httpStrictTransportSecurity(hsts -> hsts
-                    .includeSubDomains(true)
-                    .maxAgeInSeconds(31536000)
-                    .preload(true)
-                )
-                .contentSecurityPolicy(csp -> csp
-                    .policyDirectives("upgrade-insecure-requests")
-                )
-            )
+            .headers(headers -> {
+                headers.frameOptions(fo -> fo.sameOrigin());
+                if (requireSsl) {
+                    headers.httpStrictTransportSecurity(hsts -> hsts
+                        .includeSubDomains(true)
+                        .maxAgeInSeconds(31536000)
+                        .preload(true)
+                    );
+                    headers.contentSecurityPolicy(csp -> csp
+                        .policyDirectives("upgrade-insecure-requests")
+                    );
+                } else {
+                    headers.httpStrictTransportSecurity(hsts -> hsts.disable());
+                }
+            })
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 
