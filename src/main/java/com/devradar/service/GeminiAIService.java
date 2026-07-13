@@ -99,11 +99,11 @@ public class GeminiAIService {
             JsonNode node = objectMapper.readTree(json);
 
             return ProfileScoreResponse.builder()
-                    .score(node.get("score").asInt())
-                    .summary(node.get("summary").asText())
-                    .strengths(jsonArrayToList(node.get("strengths")))
-                    .weaknesses(jsonArrayToList(node.get("weaknesses")))
-                    .recommendations(jsonArrayToList(node.get("recommendations")))
+                    .score(node.path("score").asInt(50))
+                    .summary(node.path("summary").asText(""))
+                    .strengths(jsonArrayToList(node.path("strengths")))
+                    .weaknesses(jsonArrayToList(node.path("weaknesses")))
+                    .recommendations(jsonArrayToList(node.path("recommendations")))
                     .aiPowered(true)
                     .build();
         } catch (Exception e) {
@@ -142,35 +142,35 @@ public class GeminiAIService {
             }
 
             // Parse market price range
-            JsonNode priceNode = node.get("marketPriceRange");
+            JsonNode priceNode = node.path("marketPriceRange");
             ProjectAnalysisResponse.PriceRange marketPrice = ProjectAnalysisResponse.PriceRange.builder()
-                    .min(priceNode.get("min").asInt())
-                    .max(priceNode.get("max").asInt())
+                    .min(priceNode.path("min").asInt(5000))
+                    .max(priceNode.path("max").asInt(25000))
                     .currency(priceNode.path("currency").asText("USD"))
                     .build();
 
             // Parse freelancer income
-            JsonNode incomeNode = node.get("freelancerIncome");
-            JsonNode hourlyNode = incomeNode.get("hourlyRate");
-            JsonNode projectNode = incomeNode.get("projectBased");
+            JsonNode incomeNode = node.path("freelancerIncome");
+            JsonNode hourlyNode = incomeNode.path("hourlyRate");
+            JsonNode projectNode = incomeNode.path("projectBased");
 
             ProjectAnalysisResponse.FreelancerIncome income = ProjectAnalysisResponse.FreelancerIncome.builder()
                     .hourlyRate(ProjectAnalysisResponse.PriceRange.builder()
-                            .min(hourlyNode.get("min").asInt())
-                            .max(hourlyNode.get("max").asInt())
+                            .min(hourlyNode.path("min").asInt(25))
+                            .max(hourlyNode.path("max").asInt(75))
                             .currency("USD").build())
                     .projectBased(ProjectAnalysisResponse.PriceRange.builder()
-                            .min(projectNode.get("min").asInt())
-                            .max(projectNode.get("max").asInt())
+                            .min(projectNode.path("min").asInt(3000))
+                            .max(projectNode.path("max").asInt(15000))
                             .currency("USD").build())
                     .build();
 
             // Parse development time
-            JsonNode timeNode = node.get("estimatedDevelopmentTime");
+            JsonNode timeNode = node.path("estimatedDevelopmentTime");
             ProjectAnalysisResponse.DevelopmentTime devTime = ProjectAnalysisResponse.DevelopmentTime.builder()
-                    .minWeeks(timeNode.get("minWeeks").asInt())
-                    .maxWeeks(timeNode.get("maxWeeks").asInt())
-                    .description(timeNode.get("description").asText())
+                    .minWeeks(timeNode.path("minWeeks").asInt(4))
+                    .maxWeeks(timeNode.path("maxWeeks").asInt(12))
+                    .description(timeNode.path("description").asText(""))
                     .build();
 
             // Parse tech stack
@@ -178,8 +178,8 @@ public class GeminiAIService {
             if (node.has("recommendedTechStack")) {
                 for (JsonNode tech : node.get("recommendedTechStack")) {
                     techStack.add(ProjectAnalysisResponse.TechRecommendation.builder()
-                            .name(tech.get("name").asText())
-                            .purpose(tech.get("purpose").asText())
+                            .name(tech.path("name").asText(""))
+                            .purpose(tech.path("purpose").asText(""))
                             .build());
                 }
             }
@@ -189,8 +189,8 @@ public class GeminiAIService {
             if (node.has("enhancements")) {
                 for (JsonNode enh : node.get("enhancements")) {
                     enhancements.add(ProjectAnalysisResponse.Enhancement.builder()
-                            .title(enh.get("title").asText())
-                            .description(enh.get("description").asText())
+                            .title(enh.path("title").asText(""))
+                            .description(enh.path("description").asText(""))
                             .build());
                 }
             }
@@ -200,8 +200,8 @@ public class GeminiAIService {
             if (node.has("tips")) {
                 for (JsonNode tip : node.get("tips")) {
                     tips.add(ProjectAnalysisResponse.Tip.builder()
-                            .title(tip.get("title").asText())
-                            .description(tip.get("description").asText())
+                            .title(tip.path("title").asText(""))
+                            .description(tip.path("description").asText(""))
                             .build());
                 }
             }
@@ -211,8 +211,8 @@ public class GeminiAIService {
             if (node.has("competitors")) {
                 for (JsonNode comp : node.get("competitors")) {
                     competitors.add(ProjectAnalysisResponse.CompetitorExample.builder()
-                            .name(comp.get("name").asText())
-                            .url(comp.get("url").asText())
+                            .name(comp.path("name").asText(""))
+                            .url(comp.path("url").asText(""))
                             .build());
                 }
             }
@@ -222,9 +222,9 @@ public class GeminiAIService {
             if (node.has("freelancerPlatforms")) {
                 for (JsonNode plat : node.get("freelancerPlatforms")) {
                     freelancerPlatforms.add(ProjectAnalysisResponse.FreelancerPlatform.builder()
-                            .name(plat.get("name").asText())
-                            .estimatedPrice(plat.get("estimatedPrice").asText())
-                            .url(plat.get("url").asText())
+                            .name(plat.path("name").asText(""))
+                            .estimatedPrice(plat.path("estimatedPrice").asText(""))
+                            .url(plat.path("url").asText(""))
                             .build());
                 }
             }
@@ -234,8 +234,8 @@ public class GeminiAIService {
                     .targetLanguage(targetLanguage)
                     .marketPriceRange(marketPrice)
                     .freelancerIncome(income)
-                    .demandLevel(node.get("demandLevel").asText())
-                    .demandDescription(node.get("demandDescription").asText())
+                    .demandLevel(node.path("demandLevel").asText("HIGH"))
+                    .demandDescription(node.path("demandDescription").asText(""))
                     .estimatedDevelopmentTime(devTime)
                     .recommendedTechStack(techStack)
                     .enhancements(enhancements)
