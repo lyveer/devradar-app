@@ -25,24 +25,31 @@ public class ProjectAnalysis {
     @Column(columnDefinition = "TEXT")
     private String aiAnalysisResult;
 
+    @Column(name = "completed_steps", length = 255)
+    private String completedSteps = "";
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        if (this.completedSteps == null) {
+            this.completedSteps = "";
+        }
     }
 
     public ProjectAnalysis() {}
 
     public ProjectAnalysis(Long id, Long userId, String projectName, String projectDescription,
-                           String targetLanguage, String aiAnalysisResult, LocalDateTime createdAt) {
+                           String targetLanguage, String aiAnalysisResult, String completedSteps, LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
         this.targetLanguage = targetLanguage;
         this.aiAnalysisResult = aiAnalysisResult;
+        this.completedSteps = completedSteps != null ? completedSteps : "";
         this.createdAt = createdAt;
     }
 
@@ -64,6 +71,9 @@ public class ProjectAnalysis {
     public String getAiAnalysisResult() { return aiAnalysisResult; }
     public void setAiAnalysisResult(String aiAnalysisResult) { this.aiAnalysisResult = aiAnalysisResult; }
 
+    public String getCompletedSteps() { return completedSteps; }
+    public void setCompletedSteps(String completedSteps) { this.completedSteps = completedSteps; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
@@ -78,6 +88,7 @@ public class ProjectAnalysis {
         private String projectDescription;
         private String targetLanguage;
         private String aiAnalysisResult;
+        private String completedSteps;
         private LocalDateTime createdAt;
 
         public ProjectAnalysisBuilder id(Long id) { this.id = id; return this; }
@@ -86,10 +97,11 @@ public class ProjectAnalysis {
         public ProjectAnalysisBuilder projectDescription(String projectDescription) { this.projectDescription = projectDescription; return this; }
         public ProjectAnalysisBuilder targetLanguage(String targetLanguage) { this.targetLanguage = targetLanguage; return this; }
         public ProjectAnalysisBuilder aiAnalysisResult(String aiAnalysisResult) { this.aiAnalysisResult = aiAnalysisResult; return this; }
+        public ProjectAnalysisBuilder completedSteps(String completedSteps) { this.completedSteps = completedSteps; return this; }
         public ProjectAnalysisBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
 
         public ProjectAnalysis build() {
-            return new ProjectAnalysis(id, userId, projectName, projectDescription, targetLanguage, aiAnalysisResult, createdAt);
+            return new ProjectAnalysis(id, userId, projectName, projectDescription, targetLanguage, aiAnalysisResult, completedSteps, createdAt);
         }
     }
 }

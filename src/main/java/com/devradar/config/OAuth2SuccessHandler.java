@@ -67,6 +67,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                             .password(passwordEncoder.encode("OAUTH_PASSWORD_" + UUID.randomUUID().toString()))
                             .credits(5)
                             .isPremium(false)
+                            .isVerified(true)
                             .build();
                     return userRepository.save(newUser);
                 });

@@ -46,8 +46,11 @@
             <div class="sidebar-link" id="menu-faq" onclick="switchTab('faq')">
                 <span>❓</span> SSS
             </div>
+            <div class="sidebar-link" id="menu-settings" onclick="switchTab('settings')">
+                <span>👤</span> Profil & Ayarlar
+            </div>
             <div class="sidebar-link" id="menu-admin" onclick="switchTab('admin')" style="display: none;">
-                <span>⚙️</span> Yönetici Paneli
+                <span>🛠️</span> Yönetici Paneli
             </div>
 
             <!-- Sidebar Google AdSense Widget -->
@@ -438,6 +441,60 @@
                                 Yapay zekamız, projenizin detaylarına göre popüler serbest çalışan (freelance) sitelerindeki ilanları, benzer SaaS ürünlerini ve güncel yazılım maliyetlerini gerçek zamanlı analiz ederek ortalama bir pazar değerlemesi çıkarır.
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SETTINGS TAB -->
+            <section id="tab-settings-pane" class="tab-pane">
+                <div class="profile-container-grid">
+                    <!-- Left: Profile Preview Card -->
+                    <div class="profile-preview-card">
+                        <div class="profile-avatar-container">
+                            <div class="profile-avatar" id="profile-card-avatar">-</div>
+                        </div>
+                        <h3 class="profile-name" id="profile-card-name">-</h3>
+                        <p class="profile-email" id="profile-card-email">-</p>
+                        
+                        <div id="profile-card-badge" class="badge badge-standard">STANDART ÜYE</div>
+                        
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">⚡ Kalan Kredi:</span>
+                                <span class="stat-value" id="profile-card-credits">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">📅 Katılım Tarihi:</span>
+                                <span class="stat-value" id="profile-card-date">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Edit Form Card -->
+                    <div class="card">
+                        <h3>Hesap Ayarları</h3>
+                        <p class="score-desc" style="margin-bottom: 1.5rem;">Kullanıcı bilgilerinizi ve şifrenizi güncelleyebilirsiniz.</p>
+                        
+                        <form id="settings-form" onsubmit="handleUpdateSettings(event)">
+                            <div class="form-group">
+                                <label for="settings-name">Ad Soyad</label>
+                                <input type="text" id="settings-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="settings-email">E-posta Adresi</label>
+                                <input type="email" id="settings-email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="settings-password">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)</label>
+                                <input type="password" id="settings-password" class="form-control" placeholder="••••••••" minlength="6">
+                            </div>
+                            <div class="form-group" id="settings-code-group" style="display: none;">
+                                <label for="settings-code" style="color: var(--secondary); font-weight: bold;">E-postanıza Gönderilen 6 Haneli Doğrulama Kodu</label>
+                                <input type="text" id="settings-code" class="form-control" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
+                                <small style="display: block; color: var(--text-secondary); margin-top: 0.4rem;">Şifre değişikliğini onaylamak için e-posta adresinize gönderilen kodu girin.</small>
+                            </div>
+                            <button type="submit" id="settings-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Bilgileri Güncelle</button>
+                        </form>
                     </div>
                 </div>
             </section>

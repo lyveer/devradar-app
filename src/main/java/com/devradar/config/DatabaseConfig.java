@@ -21,9 +21,9 @@ public class DatabaseConfig {
 
         boolean isRender = System.getenv("RENDER") != null;
 
-        // If running on Render and the URL points to localhost (default MySQL fallback),
+        // If running on Render and the URL points to localhost/127.0.0.1 (default MySQL fallback),
         // automatically switch to in-memory H2 so the service starts up without crashing.
-        if (isRender && (url == null || url.contains("localhost:3306"))) {
+        if (isRender && (url == null || url.contains("localhost:3306") || url.contains("127.0.0.1:3306"))) {
             url = "jdbc:h2:mem:devradar;DB_CLOSE_DELAY=-1";
             username = "sa";
             password = "";

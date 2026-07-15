@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyver Software DevRadar — Giriş & Kayıt</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6179884512996719"
-         crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
@@ -23,7 +20,7 @@
                 <p id="auth-desc">Lyver Software DevRadar paneline erişmek için bilgilerinizi girin.</p>
             </div>
 
-            <div class="auth-tabs">
+            <div class="auth-tabs" id="auth-tabs-container">
                 <button class="auth-tab active" id="tab-login" onclick="switchAuthMode('login')">Giriş Yap</button>
                 <button class="auth-tab" id="tab-register" onclick="switchAuthMode('register')">Kayıt Ol</button>
             </div>
@@ -35,7 +32,10 @@
                     <input type="email" id="login-email" class="form-control" placeholder="isim@sirket.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="login-password">Şifre</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                        <label for="login-password" style="margin-bottom: 0;">Şifre</label>
+                        <a href="javascript:void(0)" onclick="switchAuthMode('forgot-password')" style="font-size: 0.8rem; color: var(--secondary); text-decoration: none;">Şifremi Unuttum</a>
+                    </div>
                     <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Giriş Yap</button>
@@ -58,13 +58,57 @@
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Kayıt Ol</button>
             </form>
 
-            <div class="form-divider" style="display: flex; align-items: center; text-align: center; color: #6b7280; font-size: 0.85rem; margin: 1.5rem 0;">
+            <!-- Verification Code Form -->
+            <form id="verify-form" onsubmit="handleVerify(event)" style="display: none;">
+                <p id="verify-email-text" class="score-desc" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-secondary);"></p>
+                <div class="form-group">
+                    <label for="verify-code">6 Haneli Doğrulama Kodu</label>
+                    <input type="text" id="verify-code" class="form-control" placeholder="123456" required maxlength="6" minlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3rem;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Doğrula ve Giriş Yap</button>
+                <div style="text-align: center; margin-top: 1.25rem; display: flex; justify-content: space-between; font-size: 0.85rem;">
+                    <a href="javascript:void(0)" onclick="handleResendCode()" style="color: var(--secondary); text-decoration: none; font-weight: 600;">Kodu Tekrar Gönder</a>
+                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" style="color: var(--text-secondary); text-decoration: none;">Geri Dön</a>
+                </div>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <form id="forgot-form" onsubmit="handleForgotPassword(event)" style="display: none;">
+                <p class="score-desc" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-secondary);">Şifrenizi sıfırlamak için kayıtlı e-posta adresinizi girin.</p>
+                <div class="form-group">
+                    <label for="forgot-email">E-posta Adresi</label>
+                    <input type="email" id="forgot-email" class="form-control" placeholder="isim@sirket.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sıfırlama Kodu Gönder</button>
+                <div style="text-align: center; margin-top: 1.25rem;">
+                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none;">Giriş Ekranına Dön</a>
+                </div>
+            </form>
+
+            <!-- Reset Password Form -->
+            <form id="reset-form" onsubmit="handleResetPassword(event)" style="display: none;">
+                <p id="reset-email-text" class="score-desc" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-secondary);"></p>
+                <div class="form-group">
+                    <label for="reset-code">6 Haneli Doğrulama Kodu</label>
+                    <input type="text" id="reset-code" class="form-control" placeholder="123456" required maxlength="6" minlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3rem;">
+                </div>
+                <div class="form-group">
+                    <label for="reset-password">Yeni Şifre</label>
+                    <input type="password" id="reset-password" class="form-control" placeholder="En az 6 karakter" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Şifremi Güncelle</button>
+                <div style="text-align: center; margin-top: 1.25rem;">
+                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none;">Giriş Ekranına Dön</a>
+                </div>
+            </form>
+
+            <div id="social-divider" class="form-divider" style="display: flex; align-items: center; text-align: center; color: #6b7280; font-size: 0.85rem; margin: 1.5rem 0;">
                 <span style="flex: 1; border-bottom: 1px solid rgba(255,255,255,0.08); margin-right: 0.5rem;"></span>
                 veya sosyal medya ile bağlanın
                 <span style="flex: 1; border-bottom: 1px solid rgba(255,255,255,0.08); margin-left: 0.5rem;"></span>
             </div>
 
-            <div class="social-login-buttons" style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
+            <div id="social-buttons" class="social-login-buttons" style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
                 <a href="/oauth2/authorization/google" class="btn" style="flex: 1; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; border-radius: 8px; padding: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
                     <span style="font-weight: 800;">G</span> Google ile Giriş
                 </a>

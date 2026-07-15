@@ -36,6 +36,35 @@ public class AuthController {
         return ResponseEntity.ok(authService.getMe(authentication.getName()));
     }
 
+    @PostMapping("/verify")
+    public ResponseEntity<AuthResponse> verify(@Valid @RequestBody com.devradar.dto.VerifyRequest request) {
+        return ResponseEntity.ok(authService.verify(request.getEmail(), request.getCode()));
+    }
+
+    @PostMapping("/resend")
+    public ResponseEntity<Void> resendCode(@RequestParam String email) {
+        authService.resendCode(email);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody com.devradar.dto.ForgotPasswordRequest request) {
+        authService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody com.devradar.dto.ResetPasswordRequest request) {
+        authService.resetPassword(request.getEmail(), request.getCode(), request.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<AuthResponse> updateProfile(Authentication authentication,
+                                                      @Valid @RequestBody com.devradar.dto.UpdateProfileRequest request) {
+        return ResponseEntity.ok(authService.updateProfile(authentication.getName(), request));
+    }
+
     @PostMapping("/subscribe")
     public ResponseEntity<User> subscribe(Authentication authentication) {
         return ResponseEntity.ok(authService.subscribe(authentication.getName()));

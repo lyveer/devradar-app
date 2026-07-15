@@ -59,6 +59,7 @@ public class ProjectAnalysisService {
                 .projectName(request.getProjectName())
                 .projectDescription(request.getProjectDescription())
                 .targetLanguage(request.getTargetLanguage())
+                .completedSteps("")
                 .build();
 
         try {
@@ -72,6 +73,7 @@ public class ProjectAnalysisService {
         response.setProjectName(analysis.getProjectName());
         response.setTargetLanguage(analysis.getTargetLanguage());
         response.setCreatedAt(analysis.getCreatedAt().toString());
+        response.setCompletedSteps(analysis.getCompletedSteps());
 
         return response;
     }
@@ -90,6 +92,7 @@ public class ProjectAnalysisService {
                         response.setProjectName(analysis.getProjectName());
                         response.setTargetLanguage(analysis.getTargetLanguage());
                         response.setCreatedAt(analysis.getCreatedAt().toString());
+                        response.setCompletedSteps(analysis.getCompletedSteps());
                         return response;
                     } catch (Exception e) {
                         return ProjectAnalysisResponse.builder()
@@ -97,9 +100,28 @@ public class ProjectAnalysisService {
                                 .projectName(analysis.getProjectName())
                                 .targetLanguage(analysis.getTargetLanguage())
                                 .createdAt(analysis.getCreatedAt().toString())
+                                .completedSteps(analysis.getCompletedSteps())
                                 .build();
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    public void updateCompletedSteps(String email, Long analysisId, List<Integer> steps) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        ProjectAnalysis analysis = analysisRepository.findById(analysisId)
+                .orElseThrow(() -> new RuntimeException("Analiz bulunamadı"));
+
+        if (!analysis.getUserId().equals(user.getId())) {
+            throw new RuntimeException("Yetkisiz işlem");
+        }
+
+        String stepsStr = steps.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        analysis.setCompletedSteps(stepsStr);
+        analysisRepository.save(analysis);
     }
 }

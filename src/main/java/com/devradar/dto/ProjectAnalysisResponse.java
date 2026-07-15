@@ -19,6 +19,7 @@ public class ProjectAnalysisResponse {
     private List<CompetitorExample> competitors;
     private List<FreelancerPlatform> freelancerPlatforms;
     private String createdAt;
+    private String completedSteps;
 
     // True when this result actually came from Gemini; false when it's fallback/mock data
     // (no API key configured, or the AI call failed).
@@ -31,7 +32,7 @@ public class ProjectAnalysisResponse {
                                    DevelopmentTime estimatedDevelopmentTime, List<TechRecommendation> recommendedTechStack,
                                    List<Enhancement> enhancements, List<Tip> tips, String competitorInsight,
                                    List<CompetitorExample> competitors, List<FreelancerPlatform> freelancerPlatforms,
-                                   String createdAt, Boolean aiPowered) {
+                                   String createdAt, String completedSteps, Boolean aiPowered) {
         this.id = id;
         this.projectName = projectName;
         this.targetLanguage = targetLanguage;
@@ -47,6 +48,7 @@ public class ProjectAnalysisResponse {
         this.competitors = competitors;
         this.freelancerPlatforms = freelancerPlatforms;
         this.createdAt = createdAt;
+        this.completedSteps = completedSteps;
         this.aiPowered = aiPowered;
     }
 
@@ -95,6 +97,9 @@ public class ProjectAnalysisResponse {
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
+    public String getCompletedSteps() { return completedSteps; }
+    public void setCompletedSteps(String completedSteps) { this.completedSteps = completedSteps; }
+
     public Boolean getAiPowered() { return aiPowered; }
     public void setAiPowered(Boolean aiPowered) { this.aiPowered = aiPowered; }
 
@@ -118,6 +123,7 @@ public class ProjectAnalysisResponse {
         private List<CompetitorExample> competitors;
         private List<FreelancerPlatform> freelancerPlatforms;
         private String createdAt;
+        private String completedSteps;
         private Boolean aiPowered;
 
         public ProjectAnalysisResponseBuilder id(Long id) { this.id = id; return this; }
@@ -135,12 +141,13 @@ public class ProjectAnalysisResponse {
         public ProjectAnalysisResponseBuilder competitors(List<CompetitorExample> competitors) { this.competitors = competitors; return this; }
         public ProjectAnalysisResponseBuilder freelancerPlatforms(List<FreelancerPlatform> freelancerPlatforms) { this.freelancerPlatforms = freelancerPlatforms; return this; }
         public ProjectAnalysisResponseBuilder createdAt(String createdAt) { this.createdAt = createdAt; return this; }
+        public ProjectAnalysisResponseBuilder completedSteps(String completedSteps) { this.completedSteps = completedSteps; return this; }
         public ProjectAnalysisResponseBuilder aiPowered(Boolean aiPowered) { this.aiPowered = aiPowered; return this; }
 
         public ProjectAnalysisResponse build() {
             return new ProjectAnalysisResponse(id, projectName, targetLanguage, marketPriceRange, freelancerIncome,
                     demandLevel, demandDescription, estimatedDevelopmentTime, recommendedTechStack, enhancements, tips,
-                    competitorInsight, competitors, freelancerPlatforms, createdAt, aiPowered);
+                    competitorInsight, competitors, freelancerPlatforms, createdAt, completedSteps, aiPowered);
         }
     }
 

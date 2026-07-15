@@ -279,21 +279,48 @@ public class GeminiAIService {
         }
     }
 
+    private String getEffectiveModel() {
+        if (apiKey != null && apiKey.trim().startsWith("gsk_")) {
+            if (model == null || (!model.contains("llama") && !model.contains("mixtral") && !model.contains("gemma") && !model.contains("groq"))) {
+                return "llama-3.3-70b-versatile";
+            }
+            return model;
+        } else {
+            if (model == null || model.contains("llama") || model.contains("mixtral") || model.contains("gemma") || model.contains("groq")) {
+                return "gemini-1.5-flash";
+            }
+            return model;
+        }
+    }
+
     private GeminiCallResult callGemini(String prompt) {
         if (apiKey != null && apiKey.trim().startsWith("gsk_")) {
             return callGroq(prompt);
         }
+        String resolvedModel = getEffectiveModel();
+        return callGeminiInternal(prompt, resolvedModel, true);
+    }
 
+    private GeminiCallResult callGeminiInternal(String prompt, String resolvedModel, boolean useSearch) {
         String url = String.format(
                 "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
-                model, apiKey);
+                resolvedModel, apiKey);
 
-        Map<String, Object> body = Map.of(
-                "contents", List.of(Map.of(
-                        "parts", List.of(Map.of("text", prompt))
-                )),
-                "tools", List.of(Map.of("google_search", Map.of()))
-        );
+        Map<String, Object> body;
+        if (useSearch) {
+            body = Map.of(
+                    "contents", List.of(Map.of(
+                            "parts", List.of(Map.of("text", prompt))
+                    )),
+                    "tools", List.of(Map.of("google_search", Map.of()))
+            );
+        } else {
+            body = Map.of(
+                    "contents", List.of(Map.of(
+                            "parts", List.of(Map.of("text", prompt))
+                    ))
+            );
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -328,27 +355,29 @@ public class GeminiAIService {
             return GeminiCallResult.fail("Gemini response had no candidates. Full body: " + responseBody);
 
         } catch (RestClientResponseException e) {
-            // This is the important one: it surfaces WHY the call failed (bad model name -> 404,
-            // bad/expired API key -> 400/403, quota exceeded -> 429) instead of silently hiding it.
             log.error("Gemini API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
+            if (useSearch) {
+                log.warn("Retrying Gemini API call without search grounding tool...");
+                return callGeminiInternal(prompt, resolvedModel, false);
+            }
             return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString());
         } catch (Exception e) {
             log.error("Gemini API call failed unexpectedly", e);
+            if (useSearch) {
+                log.warn("Retrying Gemini API call without search grounding tool...");
+                return callGeminiInternal(prompt, resolvedModel, false);
+            }
             return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
     private GeminiCallResult callGroq(String prompt) {
         String url = "https://api.groq.com/openai/v1/chat/completions";
-        
-        String groqModel = "llama-3.3-70b-versatile";
-        if (model != null && (model.contains("llama") || model.contains("gemma") || model.contains("mixtral") || model.contains("groq"))) {
-            groqModel = model;
-        }
+        String resolvedModel = getEffectiveModel();
 
         Map<String, Object> message = Map.of("role", "user", "content", prompt);
         Map<String, Object> body = Map.of(
-                "model", groqModel,
+                "model", resolvedModel,
                 "messages", List.of(message),
                 "response_format", Map.of("type", "json_object")
         );

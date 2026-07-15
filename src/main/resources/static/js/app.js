@@ -31,31 +31,73 @@ function getAuthHeaders() {
     };
 }
 
+let currentVerificationEmail = '';
+
 // Switch between Login and Register on auth.html
 function switchAuthMode(mode) {
     const title = document.getElementById('auth-title');
     const desc = document.getElementById('auth-desc');
+    
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
+    const verifyForm = document.getElementById('verify-form');
+    const forgotForm = document.getElementById('forgot-form');
+    const resetForm = document.getElementById('reset-form');
+    
     const tabLogin = document.getElementById('tab-login');
     const tabRegister = document.getElementById('tab-register');
+    const tabsContainer = document.getElementById('auth-tabs-container');
+    const socialDivider = document.getElementById('social-divider');
+    const socialButtons = document.getElementById('social-buttons');
 
     if (!title) return;
+
+    // Default forms hide
+    if (loginForm) loginForm.style.display = 'none';
+    if (registerForm) registerForm.style.display = 'none';
+    if (verifyForm) verifyForm.style.display = 'none';
+    if (forgotForm) forgotForm.style.display = 'none';
+    if (resetForm) resetForm.style.display = 'none';
 
     if (mode === 'login') {
         title.innerText = 'Giriş Yap';
         desc.innerText = 'Lyver Software DevRadar paneline erişmek için bilgilerinizi girin.';
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
-    } else {
+        if (loginForm) loginForm.style.display = 'block';
+        if (tabLogin) tabLogin.classList.add('active');
+        if (tabRegister) tabRegister.classList.remove('active');
+        if (tabsContainer) tabsContainer.style.display = 'flex';
+        if (socialDivider) socialDivider.style.display = 'flex';
+        if (socialButtons) socialButtons.style.display = 'flex';
+    } else if (mode === 'register') {
         title.innerText = 'Hesap Oluştur';
         desc.innerText = 'Hemen ücretsiz kaydolun ve AI gücünü keşfedin.';
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        tabLogin.classList.remove('active');
-        tabRegister.classList.add('active');
+        if (registerForm) registerForm.style.display = 'block';
+        if (tabLogin) tabLogin.classList.remove('active');
+        if (tabRegister) tabRegister.classList.add('active');
+        if (tabsContainer) tabsContainer.style.display = 'flex';
+        if (socialDivider) socialDivider.style.display = 'flex';
+        if (socialButtons) socialButtons.style.display = 'flex';
+    } else if (mode === 'verify') {
+        title.innerText = 'E-postanızı Doğrulayın';
+        desc.innerText = 'Hesabınızı aktifleştirmek için e-postanıza gönderilen doğrulama kodunu girin.';
+        if (verifyForm) verifyForm.style.display = 'block';
+        if (tabsContainer) tabsContainer.style.display = 'none';
+        if (socialDivider) socialDivider.style.display = 'none';
+        if (socialButtons) socialButtons.style.display = 'none';
+    } else if (mode === 'forgot-password') {
+        title.innerText = 'Şifremi Unuttum';
+        desc.innerText = 'Şifrenizi güvenle sıfırlayın.';
+        if (forgotForm) forgotForm.style.display = 'block';
+        if (tabsContainer) tabsContainer.style.display = 'none';
+        if (socialDivider) socialDivider.style.display = 'none';
+        if (socialButtons) socialButtons.style.display = 'none';
+    } else if (mode === 'reset-password') {
+        title.innerText = 'Şifrenizi Sıfırlayın';
+        desc.innerText = 'Lütfen yeni bir şifre belirleyin.';
+        if (resetForm) resetForm.style.display = 'block';
+        if (tabsContainer) tabsContainer.style.display = 'none';
+        if (socialDivider) socialDivider.style.display = 'none';
+        if (socialButtons) socialButtons.style.display = 'none';
     }
 }
 
@@ -88,7 +130,14 @@ async function handleLogin(event) {
             showToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
             setTimeout(() => window.location.href = '/dashboard', 1000);
         } else {
-            showToast(data.message || 'Giriş başarısız', 'error');
+            if (data.message && data.message.includes('EMAIL_NOT_VERIFIED')) {
+                currentVerificationEmail = email;
+                document.getElementById('verify-email-text').innerText = `${email} adresine doğrulama kodu gönderilmiştir. Lütfen kodu girin.`;
+                showToast('Lütfen e-posta adresinizi doğrulayın.', 'error');
+                switchAuthMode('verify');
+            } else {
+                showToast(data.message || 'Giriş başarısız', 'error');
+            }
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerText = originalText;
@@ -126,20 +175,152 @@ async function handleRegister(event) {
         const data = await response.json();
 
         if (response.ok) {
-            localStorage.setItem('devradar_token', data.token);
-            localStorage.setItem('devradar_email', data.email);
-            localStorage.setItem('devradar_name', data.fullName);
-            showToast('Kayıt başarılı! Yönlendiriliyorsunuz...', 'success');
-            setTimeout(() => window.location.href = '/dashboard', 1000);
+            currentVerificationEmail = email;
+            document.getElementById('verify-email-text').innerText = `${email} adresine doğrulama kodu gönderilmiştir. Lütfen kodu girin.`;
+            showToast('Kayıt başarılı! Lütfen e-postanıza gelen doğrulama kodunu girin.', 'success');
+            switchAuthMode('verify');
         } else {
             showToast(data.message || 'Kayıt başarısız', 'error');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
-            }
         }
     } catch (err) {
         showToast('Sunucu ile bağlantı kurulamadı', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    }
+}
+
+async function handleVerify(event) {
+    event.preventDefault();
+    const code = document.getElementById('verify-code').value;
+    const email = currentVerificationEmail;
+
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Doğrula ve Giriş Yap';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Doğrulanıyor...';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/auth/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('devradar_token', data.token);
+            localStorage.setItem('devradar_email', data.email);
+            localStorage.setItem('devradar_name', data.fullName);
+            showToast('Hesabınız başarıyla doğrulandı! Yönlendiriliyorsunuz...', 'success');
+            setTimeout(() => window.location.href = '/dashboard', 1000);
+        } else {
+            showToast(data.message || 'Doğrulama başarısız', 'error');
+        }
+    } catch (err) {
+        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    }
+}
+
+async function handleResendCode() {
+    const email = currentVerificationEmail;
+    if (!email) {
+        showToast('E-posta adresi bulunamadı', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/auth/resend?email=${encodeURIComponent(email)}`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            showToast('Yeni doğrulama kodu e-postanıza gönderildi!', 'success');
+        } else {
+            showToast('Kod gönderilemedi', 'error');
+        }
+    } catch (err) {
+        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+    }
+}
+
+async function handleForgotPassword(event) {
+    event.preventDefault();
+    const email = document.getElementById('forgot-email').value;
+
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Sıfırlama Kodu Gönder';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Gönderiliyor...';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/auth/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        if (response.ok) {
+            currentVerificationEmail = email;
+            document.getElementById('reset-email-text').innerText = `${email} adresine gönderilen 6 haneli şifre sıfırlama kodunu ve yeni şifrenizi girin.`;
+            showToast('Sıfırlama kodu e-postanıza gönderildi!', 'success');
+            switchAuthMode('reset-password');
+        } else {
+            const data = await response.json().catch(() => ({}));
+            showToast(data.message || 'Sıfırlama kodu gönderilemedi', 'error');
+        }
+    } catch (err) {
+        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    }
+}
+
+async function handleResetPassword(event) {
+    event.preventDefault();
+    const email = currentVerificationEmail;
+    const code = document.getElementById('reset-code').value;
+    const newPassword = document.getElementById('reset-password').value;
+
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Şifremi Güncelle';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Güncelleniyor...';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/auth/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, newPassword })
+        });
+
+        if (response.ok) {
+            showToast('Şifreniz başarıyla sıfırlandı! Yeni şifrenizle giriş yapabilirsiniz.', 'success');
+            switchAuthMode('login');
+        } else {
+            const data = await response.json().catch(() => ({}));
+            showToast(data.message || 'Şifre sıfırlama başarısız', 'error');
+        }
+    } catch (err) {
+        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+    } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerText = originalText;
@@ -174,6 +355,8 @@ function switchTab(tabId) {
         loadAnnouncements();
     } else if (tabId === 'admin') {
         loadAdminPanel();
+    } else if (tabId === 'settings') {
+        loadSettingsForm();
     }
 }
 
@@ -215,6 +398,43 @@ async function loadUserInfo() {
                     creditDisplay.style.color = '#10b981';
                     creditDisplay.style.borderColor = 'rgba(16, 185, 129, 0.25)';
                     if (subscribeBtn) subscribeBtn.style.display = 'inline-flex';
+                }
+            }
+
+            // Update user profile card in settings/profile tab if elements exist
+            const cardName = document.getElementById('profile-card-name');
+            const cardEmail = document.getElementById('profile-card-email');
+            const cardCredits = document.getElementById('profile-card-credits');
+            const cardDate = document.getElementById('profile-card-date');
+            const cardAvatar = document.getElementById('profile-card-avatar');
+            const cardBadge = document.getElementById('profile-card-badge');
+
+            if (cardName) cardName.innerText = user.fullName || 'Geliştirici';
+            if (cardEmail) cardEmail.innerText = user.email || '';
+            if (cardCredits) cardCredits.innerText = user.isPremium ? 'Sınırsız' : user.credits;
+            if (cardDate) {
+                if (user.createdAt) {
+                    const d = new Date(user.createdAt);
+                    cardDate.innerText = d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                } else {
+                    cardDate.innerText = '-';
+                }
+            }
+            if (cardAvatar) {
+                const name = user.fullName || '?';
+                const parts = name.trim().split(' ');
+                let initials = '?';
+                if (parts.length === 1) initials = parts[0].substring(0, 2).toUpperCase();
+                else if (parts.length > 1) initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                cardAvatar.innerText = initials;
+            }
+            if (cardBadge) {
+                if (user.isPremium) {
+                    cardBadge.innerText = 'PREMIUM ÜYE';
+                    cardBadge.className = 'badge badge-premium';
+                } else {
+                    cardBadge.innerText = 'STANDART ÜYE';
+                    cardBadge.className = 'badge badge-standard';
                 }
             }
         }
@@ -642,9 +862,14 @@ async function loadProgressTracker() {
                 emptyEl.style.display = 'none';
                 
                 listEl.innerHTML = list.map(item => {
-                    // Check completion checks from local storage
-                    const storageKey = `progress_${localStorage.getItem('devradar_email')}_${item.id}`;
-                    const savedChecks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    // Check completion checks from DB, fall back to local storage
+                    let savedChecks = [];
+                    if (item.completedSteps !== undefined && item.completedSteps !== null) {
+                        savedChecks = item.completedSteps ? item.completedSteps.split(',').map(x => parseInt(x)) : [];
+                    } else {
+                        const storageKey = `progress_${localStorage.getItem('devradar_email')}_${item.id}`;
+                        savedChecks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    }
                     
                     const steps = [
                         "Frontend Tasarımı & Arayüz Şablonu",
@@ -693,7 +918,7 @@ async function loadProgressTracker() {
     }
 }
 
-function toggleChecklistItem(projectId, stepIdx, checkbox) {
+async function toggleChecklistItem(projectId, stepIdx, checkbox) {
     const userEmail = localStorage.getItem('devradar_email');
     const storageKey = `progress_${userEmail}_${projectId}`;
     let savedChecks = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -721,6 +946,17 @@ function toggleChecklistItem(projectId, stepIdx, checkbox) {
 
     const fillBar = document.getElementById(`bar-${projectId}`);
     if (fillBar) fillBar.style.width = `${percentage}%`;
+
+    // Save to database
+    try {
+        await fetch(`${API_URL}/analysis/${projectId}/steps`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(savedChecks)
+        });
+    } catch (err) {
+        console.error('İlerleme sunucuya kaydedilemedi', err);
+    }
 }
 
 // --- NEW COMPONENT: Announcements ---
@@ -873,6 +1109,79 @@ async function handlePostAnnouncement(event) {
         }
     } catch (err) {
         showToast('Bağlantı hatası', 'error');
+    }
+}
+
+// --- NEW COMPONENT: Settings ---
+
+async function loadSettingsForm() {
+    try {
+        const response = await fetch(`${API_URL}/auth/me`, {
+            headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+            const user = await response.json();
+            document.getElementById('settings-name').value = user.fullName || '';
+            document.getElementById('settings-email').value = user.email || '';
+            document.getElementById('settings-password').value = '';
+        }
+    } catch (err) {
+        showToast('Kullanıcı bilgileri yüklenemedi', 'error');
+    }
+}
+
+async function handleUpdateSettings(event) {
+    event.preventDefault();
+
+    const fullName = document.getElementById('settings-name').value;
+    const email = document.getElementById('settings-email').value;
+    const password = document.getElementById('settings-password').value;
+    const code = document.getElementById('settings-code').value;
+
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Bilgileri Güncelle';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Güncelleniyor...';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/auth/update`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ fullName, email, password, code })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('devradar_token', data.token);
+            localStorage.setItem('devradar_email', data.email);
+            localStorage.setItem('devradar_name', data.fullName);
+
+            document.getElementById('user-display').innerText = data.fullName;
+
+            showToast('Hesap bilgileriniz başarıyla güncellendi!', 'success');
+            document.getElementById('settings-password').value = '';
+            document.getElementById('settings-code').value = '';
+            document.getElementById('settings-code-group').style.display = 'none';
+            await loadUserInfo();
+        } else {
+            if (data.message && data.message.includes('PASSWORD_CHANGE_CODE_SENT')) {
+                document.getElementById('settings-code-group').style.display = 'block';
+                showToast('Şifre değişikliği için e-postanıza gönderilen doğrulama kodunu girin.', 'success');
+            } else {
+                showToast(data.message || 'Güncelleme başarısız', 'error');
+            }
+        }
+    } catch (err) {
+        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
     }
 }
 

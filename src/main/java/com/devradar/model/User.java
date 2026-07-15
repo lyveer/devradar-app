@@ -26,6 +26,15 @@ public class User {
     @Column(nullable = false)
     private Boolean isPremium = false;
 
+    @Column(nullable = false)
+    private Boolean isVerified = false;
+
+    @Column
+    private String verificationCode;
+
+    @Column
+    private LocalDateTime verificationCodeExpiresAt;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -34,17 +43,21 @@ public class User {
         this.createdAt = LocalDateTime.now();
         if (this.credits == null) this.credits = 5;
         if (this.isPremium == null) this.isPremium = false;
+        if (this.isVerified == null) this.isVerified = false;
     }
 
     public User() {}
 
-    public User(Long id, String email, String password, String fullName, Integer credits, Boolean isPremium, LocalDateTime createdAt) {
+    public User(Long id, String email, String password, String fullName, Integer credits, Boolean isPremium, Boolean isVerified, String verificationCode, LocalDateTime verificationCodeExpiresAt, LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.fullName = fullName;
         this.credits = credits != null ? credits : 5;
         this.isPremium = isPremium != null ? isPremium : false;
+        this.isVerified = isVerified != null ? isVerified : false;
+        this.verificationCode = verificationCode;
+        this.verificationCodeExpiresAt = verificationCodeExpiresAt;
         this.createdAt = createdAt;
     }
 
@@ -66,6 +79,15 @@ public class User {
     public Boolean getIsPremium() { return isPremium; }
     public void setIsPremium(Boolean isPremium) { this.isPremium = isPremium; }
 
+    public Boolean getIsVerified() { return isVerified; }
+    public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
+
+    public String getVerificationCode() { return verificationCode; }
+    public void setVerificationCode(String verificationCode) { this.verificationCode = verificationCode; }
+
+    public LocalDateTime getVerificationCodeExpiresAt() { return verificationCodeExpiresAt; }
+    public void setVerificationCodeExpiresAt(LocalDateTime verificationCodeExpiresAt) { this.verificationCodeExpiresAt = verificationCodeExpiresAt; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
@@ -81,6 +103,9 @@ public class User {
         private String fullName;
         private Integer credits;
         private Boolean isPremium;
+        private Boolean isVerified;
+        private String verificationCode;
+        private LocalDateTime verificationCodeExpiresAt;
         private LocalDateTime createdAt;
 
         public UserBuilder id(Long id) { this.id = id; return this; }
@@ -89,10 +114,13 @@ public class User {
         public UserBuilder fullName(String fullName) { this.fullName = fullName; return this; }
         public UserBuilder credits(Integer credits) { this.credits = credits; return this; }
         public UserBuilder isPremium(Boolean isPremium) { this.isPremium = isPremium; return this; }
+        public UserBuilder isVerified(Boolean isVerified) { this.isVerified = isVerified; return this; }
+        public UserBuilder verificationCode(String verificationCode) { this.verificationCode = verificationCode; return this; }
+        public UserBuilder verificationCodeExpiresAt(LocalDateTime verificationCodeExpiresAt) { this.verificationCodeExpiresAt = verificationCodeExpiresAt; return this; }
         public UserBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
 
         public User build() {
-            return new User(id, email, password, fullName, credits, isPremium, createdAt);
+            return new User(id, email, password, fullName, credits, isPremium, isVerified, verificationCode, verificationCodeExpiresAt, createdAt);
         }
     }
 }

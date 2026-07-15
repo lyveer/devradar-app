@@ -31,4 +31,12 @@ public class ProjectAnalysisController {
     public ResponseEntity<List<ProjectAnalysisResponse>> getHistory(Authentication authentication) {
         return ResponseEntity.ok(analysisService.getHistory(authentication.getName()));
     }
+
+    @PostMapping("/{id}/steps")
+    public ResponseEntity<Void> updateCompletedSteps(Authentication authentication,
+                                                     @PathVariable Long id,
+                                                     @RequestBody List<Integer> steps) {
+        analysisService.updateCompletedSteps(authentication.getName(), id, steps);
+        return ResponseEntity.ok().build();
+    }
 }
