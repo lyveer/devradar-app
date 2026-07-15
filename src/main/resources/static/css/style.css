@@ -94,18 +94,32 @@ header {
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 100%;
+    text-decoration: none;
+}
+
+.logo img {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    transition: var(--transition-smooth);
+    display: block;
+}
+
+.logo img:hover {
+    transform: scale(1.03);
+}
+
+.logo span {
     font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: -0.05em;
     background: linear-gradient(135deg, var(--text-primary) 30%, var(--primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.logo span {
     color: var(--secondary);
     -webkit-text-fill-color: var(--secondary);
 }

@@ -20,15 +20,15 @@ public class EmailService {
     private String fromEmail;
 
     public void sendVerificationCode(String toEmail, String code) {
-        String subject = "DevRadar E-posta Doğrulama Kodu";
-        String text = "Merhaba,\n\nDevRadar platformuna kaydolduğunuz için teşekkür ederiz. E-posta adresinizi doğrulamak için aşağıdaki 6 haneli kodu kullanın:\n\n"
+        String subject = "DevRadarAI E-posta Doğrulama Kodu";
+        String text = "Merhaba,\n\nDevRadarAI platformuna kaydolduğunuz için teşekkür ederiz. E-posta adresinizi doğrulamak için aşağıdaki 6 haneli kodu kullanın:\n\n"
                 + "Doğrulama Kodu: " + code + "\n\nBu kod 10 dakika geçerlidir.\n\nİyi çalışmalar,\nLyver Software Ekibi";
 
         sendEmail(toEmail, subject, text);
     }
 
     public void sendPasswordResetCode(String toEmail, String code) {
-        String subject = "DevRadar Şifre Sıfırlama Kodu";
+        String subject = "DevRadarAI Şifre Sıfırlama Kodu";
         String text = "Merhaba,\n\nŞifrenizi sıfırlamak için bir talepte bulundunuz. Şifrenizi sıfırlamak için aşağıdaki 6 haneli doğrulama kodunu kullanın:\n\n"
                 + "Şifre Sıfırlama Kodu: " + code + "\n\nBu kod 10 dakika geçerlidir. Eğer bu talebi siz yapmadıysanız lütfen bu e-postayı dikkate almayın.\n\nİyi çalışmalar,\nLyver Software Ekibi";
 

@@ -61,7 +61,7 @@ function switchAuthMode(mode) {
 
     if (mode === 'login') {
         title.innerText = 'Giriş Yap';
-        desc.innerText = 'Lyver Software DevRadar paneline erişmek için bilgilerinizi girin.';
+        desc.innerText = 'Lyver Software DevRadarAI paneline erişmek için bilgilerinizi girin.';
         if (loginForm) loginForm.style.display = 'block';
         if (tabLogin) tabLogin.classList.add('active');
         if (tabRegister) tabRegister.classList.remove('active');
