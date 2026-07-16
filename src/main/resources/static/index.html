@@ -15,7 +15,7 @@
     <header>
         <div class="container nav-container">
             <a href="/" class="logo" style="text-decoration: none;">
-                <img src="/images/devradar_ai_lyver_software.png" alt="DevRadar Logo">
+                <img src="/images/devradar_ai_lyver_software_site.png" alt="DevRadar Logo">
                 <span>DevRadarAI</span>
             </a>
             <div class="nav-links" style="display: flex; align-items: center; gap: 0.5rem;">
@@ -169,20 +169,20 @@
             <div class="faq-container" style="max-width: 800px; margin: 0 auto;">
                 <div class="faq-item" style="margin-bottom: 1rem;">
                     <div class="faq-question" onclick="toggleLandingFaq(this)" style="padding: 1.5rem; border-radius: 10px; background: var(--bg-surface); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 600; color: white;">DevRadarAI ücretsiz mi?</span>
+                        <span data-i18n="faq-q1" style="font-weight: 600; color: white;">DevRadarAI ücretsiz mi?</span>
                         <span class="faq-arrow">▼</span>
                     </div>
-                    <div class="faq-answer" style="padding: 1.5rem; color: var(--text-secondary); display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.03);">
+                    <div class="faq-answer" data-i18n="faq-a1" style="padding: 1.5rem; color: var(--text-secondary); display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.03);">
                         Evet! Her yeni kayıt olan kullanıcımıza 5 adet ücretsiz analiz kredisi tanımlanır. Krediniz bittiğinde veya sınırsız özelliklere erişmek istediğinizde premium aboneliğe geçiş yapabilirsiniz.
                     </div>
                 </div>
 
                 <div class="faq-item" style="margin-bottom: 1rem;">
                     <div class="faq-question" onclick="toggleLandingFaq(this)" style="padding: 1.5rem; border-radius: 10px; background: var(--bg-surface); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 600; color: white;">Profil puanlama ve proje analiz raporu ne kadar sürer?</span>
+                        <span data-i18n="faq-q2" style="font-weight: 600; color: white;">Profil puanlama ve proje analiz raporu ne kadar sürer?</span>
                         <span class="faq-arrow">▼</span>
                     </div>
-                    <div class="faq-answer" style="padding: 1.5rem; color: var(--text-secondary); display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.03);">
+                    <div class="faq-answer" data-i18n="faq-a2" style="padding: 1.5rem; color: var(--text-secondary); display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.03);">
                         Gelişmiş AI modellerimiz ve Google Search Grounding entegrasyonumuz sayesinde tüm piyasa analizi ve profil değerlendirme işlemi ortalama 3-5 saniye içinde tamamlanır ve önünüze sunulur.
                     </div>
                 </div>
@@ -209,7 +209,7 @@
         <div class="container" style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 4rem; margin-bottom: 3rem;">
             <div>
                 <a href="/" class="logo" style="text-decoration: none; margin-bottom: 1rem; display: inline-flex;">
-                    <img src="/images/devradar_ai_lyver_software.png" alt="DevRadar Logo">
+                    <img src="/images/devradar_ai_lyver_software_site.png" alt="DevRadar Logo">
                     <span>DevRadarAI</span>
                 </a>
                 <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; max-width: 320px;">
@@ -254,7 +254,10 @@
                 const cta = document.getElementById('hero-cta-btn');
                 if (cta) {
                     cta.href = '/dashboard';
-                    cta.innerText = 'Panelime Git';
+                    cta.setAttribute('data-i18n', 'nav-dashboard');
+                }
+                if (typeof applyTranslations === 'function') {
+                    applyTranslations();
                 }
             }
 

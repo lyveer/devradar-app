@@ -1,6 +1,17 @@
 // API Base URL
 const API_URL = '/api';
 
+// Translation Helper
+function t(key, fallback) {
+    if (typeof getLanguage === 'function' && typeof translations !== 'undefined') {
+        const lang = getLanguage();
+        if (translations[lang] && translations[lang][key]) {
+            return translations[lang][key];
+        }
+    }
+    return fallback;
+}
+
 // Toast System
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
@@ -108,10 +119,10 @@ async function handleLogin(event) {
     const password = document.getElementById('login-password').value;
 
     const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerText : 'Giriş Yap';
+    const originalText = submitBtn ? submitBtn.innerText : t('nav-login', 'Giriş Yap');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerText = 'Giriş yapılıyor...';
+        submitBtn.innerText = t('toast-login-loading', 'Giriş yapılıyor...');
     }
 
     try {
@@ -127,16 +138,16 @@ async function handleLogin(event) {
             localStorage.setItem('devradar_token', data.token);
             localStorage.setItem('devradar_email', data.email);
             localStorage.setItem('devradar_name', data.fullName);
-            showToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
+            showToast(t('toast-login-success', 'Giriş başarılı! Yönlendiriliyorsunuz...'), 'success');
             setTimeout(() => window.location.href = '/dashboard', 1000);
         } else {
             if (data.message && data.message.includes('EMAIL_NOT_VERIFIED')) {
                 currentVerificationEmail = email;
-                document.getElementById('verify-email-text').innerText = `${email} adresine doğrulama kodu gönderilmiştir. Lütfen kodu girin.`;
-                showToast('Lütfen e-posta adresinizi doğrulayın.', 'error');
+                document.getElementById('verify-email-text').innerText = `${email} ${t('verify-email-text-sent', 'adresine doğrulama kodu gönderilmiştir. Lütfen kodu girin.')}`;
+                showToast(t('toast-please-verify', 'Lütfen e-posta adresinizi doğrulayın.'), 'error');
                 switchAuthMode('verify');
             } else {
-                showToast(data.message || 'Giriş başarısız', 'error');
+                showToast(data.message || t('toast-login-fail', 'Giriş başarısız'), 'error');
             }
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -144,7 +155,7 @@ async function handleLogin(event) {
             }
         }
     } catch (err) {
-        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerText = originalText;
@@ -159,10 +170,10 @@ async function handleRegister(event) {
     const password = document.getElementById('register-password').value;
 
     const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerText : 'Kayıt Ol';
+    const originalText = submitBtn ? submitBtn.innerText : t('auth-register-btn', 'Kayıt Ol');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerText = 'Kayıt yapılıyor...';
+        submitBtn.innerText = t('toast-register-loading', 'Kayıt yapılıyor...');
     }
 
     try {
@@ -176,14 +187,14 @@ async function handleRegister(event) {
 
         if (response.ok) {
             currentVerificationEmail = email;
-            document.getElementById('verify-email-text').innerText = `${email} adresine doğrulama kodu gönderilmiştir. Lütfen kodu girin.`;
-            showToast('Kayıt başarılı! Lütfen e-postanıza gelen doğrulama kodunu girin.', 'success');
+            document.getElementById('verify-email-text').innerText = `${email} ${t('verify-email-text-sent', 'adresine doğrulama kodu gönderilmiştir. Lütfen kodu girin.')}`;
+            showToast(t('toast-register-success', 'Kayıt başarılı! Lütfen e-postanıza gelen doğrulama kodunu girin.'), 'success');
             switchAuthMode('verify');
         } else {
-            showToast(data.message || 'Kayıt başarısız', 'error');
+            showToast(data.message || t('toast-register-fail', 'Kayıt başarısız'), 'error');
         }
     } catch (err) {
-        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -198,10 +209,10 @@ async function handleVerify(event) {
     const email = currentVerificationEmail;
 
     const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerText : 'Doğrula ve Giriş Yap';
+    const originalText = submitBtn ? submitBtn.innerText : t('btn-verify-login', 'Doğrula ve Giriş Yap');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerText = 'Doğrulanıyor...';
+        submitBtn.innerText = t('toast-verify-loading', 'Doğrulanıyor...');
     }
 
     try {
@@ -217,13 +228,13 @@ async function handleVerify(event) {
             localStorage.setItem('devradar_token', data.token);
             localStorage.setItem('devradar_email', data.email);
             localStorage.setItem('devradar_name', data.fullName);
-            showToast('Hesabınız başarıyla doğrulandı! Yönlendiriliyorsunuz...', 'success');
+            showToast(t('toast-verify-success', 'Hesabınız başarıyla doğrulandı! Yönlendiriliyorsunuz...'), 'success');
             setTimeout(() => window.location.href = '/dashboard', 1000);
         } else {
-            showToast(data.message || 'Doğrulama başarısız', 'error');
+            showToast(data.message || t('toast-verify-fail', 'Doğrulama başarısız'), 'error');
         }
     } catch (err) {
-        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -235,7 +246,7 @@ async function handleVerify(event) {
 async function handleResendCode() {
     const email = currentVerificationEmail;
     if (!email) {
-        showToast('E-posta adresi bulunamadı', 'error');
+        showToast(t('toast-email-not-found', 'E-posta adresi bulunamadı'), 'error');
         return;
     }
 
@@ -245,12 +256,12 @@ async function handleResendCode() {
         });
 
         if (response.ok) {
-            showToast('Yeni doğrulama kodu e-postanıza gönderildi!', 'success');
+            showToast(t('toast-code-resent', 'Yeni doğrulama kodu e-postanıza gönderildi!'), 'success');
         } else {
-            showToast('Kod gönderilemedi', 'error');
+            showToast(t('toast-code-send-fail', 'Kod gönderilemedi'), 'error');
         }
     } catch (err) {
-        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     }
 }
 
@@ -259,10 +270,10 @@ async function handleForgotPassword(event) {
     const email = document.getElementById('forgot-email').value;
 
     const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerText : 'Sıfırlama Kodu Gönder';
+    const originalText = submitBtn ? submitBtn.innerText : t('btn-resend-btn', 'Sıfırlama Kodu Gönder');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerText = 'Gönderiliyor...';
+        submitBtn.innerText = t('btn-resending', 'Gönderiliyor...');
     }
 
     try {
@@ -274,15 +285,15 @@ async function handleForgotPassword(event) {
 
         if (response.ok) {
             currentVerificationEmail = email;
-            document.getElementById('reset-email-text').innerText = `${email} adresine gönderilen 6 haneli şifre sıfırlama kodunu ve yeni şifrenizi girin.`;
-            showToast('Sıfırlama kodu e-postanıza gönderildi!', 'success');
+            document.getElementById('reset-email-text').innerText = `${email} ${t('reset-email-text-sent', 'adresine gönderilen 6 haneli şifre sıfırlama kodunu ve yeni şifrenizi girin.')}`;
+            showToast(t('toast-forgot-sent', 'Sıfırlama kodu e-postanıza gönderildi!'), 'success');
             switchAuthMode('reset-password');
         } else {
             const data = await response.json().catch(() => ({}));
-            showToast(data.message || 'Sıfırlama kodu gönderilemedi', 'error');
+            showToast(data.message || t('toast-forgot-fail', 'Sıfırlama kodu gönderilemedi'), 'error');
         }
     } catch (err) {
-        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -298,10 +309,10 @@ async function handleResetPassword(event) {
     const newPassword = document.getElementById('reset-password').value;
 
     const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerText : 'Şifremi Güncelle';
+    const originalText = submitBtn ? submitBtn.innerText : t('auth-reset-btn', 'Şifremi Güncelle');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerText = 'Güncelleniyor...';
+        submitBtn.innerText = t('toast-reset-loading', 'Güncelleniyor...');
     }
 
     try {
@@ -312,14 +323,14 @@ async function handleResetPassword(event) {
         });
 
         if (response.ok) {
-            showToast('Şifreniz başarıyla sıfırlandı! Yeni şifrenizle giriş yapabilirsiniz.', 'success');
+            showToast(t('toast-reset-success', 'Şifreniz başarıyla sıfırlandı! Yeni şifrenizle giriş yapabilirsiniz.'), 'success');
             switchAuthMode('login');
         } else {
             const data = await response.json().catch(() => ({}));
-            showToast(data.message || 'Şifre sıfırlama başarısız', 'error');
+            showToast(data.message || t('toast-reset-fail', 'Şifre sıfırlama başarısız'), 'error');
         }
     } catch (err) {
-        showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -386,14 +397,16 @@ async function loadUserInfo() {
             }
 
             if (creditDisplay) {
+                const creditsLabel = t('nav-credits', 'Kredi:');
+                const unlimitedText = t('unlimited-text', 'Sınırsız');
                 if (user.isPremium) {
-                    creditDisplay.innerText = 'Kredi: Sınırsız';
+                    creditDisplay.innerText = `${creditsLabel} ${unlimitedText}`;
                     creditDisplay.style.background = 'rgba(124, 58, 237, 0.15)';
                     creditDisplay.style.color = 'var(--primary-light)';
                     creditDisplay.style.borderColor = 'rgba(124, 58, 237, 0.25)';
                     if (subscribeBtn) subscribeBtn.style.display = 'none';
                 } else {
-                    creditDisplay.innerText = `Kredi: ${user.credits}`;
+                    creditDisplay.innerText = `${creditsLabel} ${user.credits}`;
                     creditDisplay.style.background = 'rgba(16, 185, 129, 0.15)';
                     creditDisplay.style.color = '#10b981';
                     creditDisplay.style.borderColor = 'rgba(16, 185, 129, 0.25)';
@@ -411,11 +424,11 @@ async function loadUserInfo() {
 
             if (cardName) cardName.innerText = user.fullName || 'Geliştirici';
             if (cardEmail) cardEmail.innerText = user.email || '';
-            if (cardCredits) cardCredits.innerText = user.isPremium ? 'Sınırsız' : user.credits;
+            if (cardCredits) cardCredits.innerText = user.isPremium ? t('unlimited-text', 'Sınırsız') : user.credits;
             if (cardDate) {
                 if (user.createdAt) {
                     const d = new Date(user.createdAt);
-                    cardDate.innerText = d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    cardDate.innerText = d.toLocaleDateString(t('locale-date-format', 'tr-TR'), { day: '2-digit', month: '2-digit', year: 'numeric' });
                 } else {
                     cardDate.innerText = '-';
                 }
@@ -430,10 +443,10 @@ async function loadUserInfo() {
             }
             if (cardBadge) {
                 if (user.isPremium) {
-                    cardBadge.innerText = 'PREMIUM ÜYE';
+                    cardBadge.innerText = t('settings-premium-member', 'PREMIUM ÜYE');
                     cardBadge.className = 'badge badge-premium';
                 } else {
-                    cardBadge.innerText = 'STANDART ÜYE';
+                    cardBadge.innerText = t('settings-member-type', 'STANDART ÜYE');
                     cardBadge.className = 'badge badge-standard';
                 }
             }
@@ -452,13 +465,13 @@ async function handleSubscribe() {
         });
 
         if (response.ok) {
-            showToast('Abonelik başarıyla tamamlandı! Artık sınırsız analiz yapabilirsiniz.', 'success');
+            showToast(t('toast-sub-success', 'Abonelik başarıyla tamamlandı! Artık sınırsız analiz yapabilirsiniz.'), 'success');
             await loadUserInfo();
         } else {
-            showToast('Abonelik işlemi gerçekleştirilemedi.', 'error');
+            showToast(t('toast-sub-fail', 'Abonelik işlemi gerçekleştirilemedi.'), 'error');
         }
     } catch (err) {
-        showToast('Bağlantı hatası', 'error');
+        showToast(t('toast-conn-error', 'Bağlantı hatası'), 'error');
     }
 }
 
@@ -525,7 +538,7 @@ async function loadProfile() {
             }
         }
     } catch (err) {
-        showToast('Profil bilgileri yüklenemedi', 'error');
+        showToast(t('toast-profile-load-fail', 'Profil bilgileri yüklenemedi'), 'error');
     }
 }
 
@@ -541,7 +554,7 @@ async function handleSaveProfile(event) {
                            .map(cb => cb.value);
 
     if (languages.length === 0) {
-        showToast('Lütfen en az bir programlama dili seçin', 'error');
+        showToast(t('toast-select-lang-error', 'Lütfen en az bir programlama dili seçin'), 'error');
         return;
     }
 
@@ -556,7 +569,7 @@ async function handleSaveProfile(event) {
 
         if (response.ok) {
             const profile = await response.json();
-            showToast('Profil başarıyla güncellendi ve Yapay Zeka ile analiz edildi!', 'success');
+            showToast(t('toast-profile-saved', 'Profil başarıyla güncellendi ve Yapay Zeka ile analiz edildi!'), 'success');
             await loadUserInfo(); // Update remaining credits display
             if (profile.aiScore !== null && profile.aiScore !== undefined) {
                 renderProfileScore(profile.aiScore, profile.aiSummary, 
@@ -569,16 +582,16 @@ async function handleSaveProfile(event) {
                 document.getElementById('profile-ai-results').style.display = 'none';
             }
         } else {
-            showToast('Profil kaydedilemedi', 'error');
+            showToast(t('toast-profile-fail', 'Profil kaydedilemedi'), 'error');
         }
     } catch (err) {
-        showToast('Bağlantı hatası', 'error');
+        showToast(t('toast-conn-error', 'Bağlantı hatası'), 'error');
     }
 }
 
 async function handleTriggerScoring() {
     const scoreBtn = document.getElementById('score-btn');
-    scoreBtn.innerText = 'Analiz Ediliyor...';
+    scoreBtn.innerText = t('toast-verify-loading', 'Analiz Ediliyor...');
     scoreBtn.disabled = true;
 
     try {
@@ -590,17 +603,17 @@ async function handleTriggerScoring() {
         if (response.ok) {
             const data = await response.json();
             renderProfileScore(data.score, data.summary, data.strengths, data.weaknesses, data.recommendations);
-            showToast('Profil AI Analizi tamamlandı!', 'success');
+            showToast(t('toast-ai-scoring-complete', 'Profil AI Analizi tamamlandı!'), 'success');
             await loadUserInfo(); // Update remaining credits display
         } else {
             const errData = await response.json().catch(() => ({}));
-            showToast(errData.message || 'AI Puanlama başarısız oldu', 'error');
-            scoreBtn.innerText = 'Profil Puanımı Analiz Et';
+            showToast(errData.message || t('toast-profile-fail', 'AI Puanlama başarısız oldu'), 'error');
+            scoreBtn.innerText = t('profile-score-btn', 'Profil Puanımı Analiz Et');
             scoreBtn.disabled = false;
         }
     } catch (err) {
-        showToast('Bağlantı hatası', 'error');
-        scoreBtn.innerText = 'Profil Puanımı Analiz Et';
+        showToast(t('toast-conn-error', 'Bağlantı hatası'), 'error');
+        scoreBtn.innerText = t('profile-score-btn', 'Profil Puanımı Analiz Et');
         scoreBtn.disabled = false;
     }
 }
@@ -1017,17 +1030,17 @@ async function loadAdminPanel() {
                     <td>${user.id}</td>
                     <td><strong>${user.fullName}</strong></td>
                     <td>${user.email}</td>
-                    <td>${user.isPremium ? 'Sınırsız' : user.credits}</td>
+                    <td>${user.isPremium ? t('admin-unlimited-text', 'Sınırsız') : user.credits}</td>
                     <td>
                         <span class="badge" style="margin-bottom: 0; background: ${user.isPremium ? 'rgba(124, 58, 237, 0.15); color: var(--primary-light)' : 'rgba(255,255,255,0.05); color: var(--text-secondary)'}; border: none;">
-                            ${user.isPremium ? 'Premium' : 'Standart'}
+                            ${user.isPremium ? t('admin-premium-text', 'Premium') : t('admin-standard-text', 'Standart')}
                         </span>
                     </td>
                     <td>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="admin-btn primary" onclick="changeCreditsPrompt(${user.id}, ${user.credits})">Kredi Düzenle</button>
+                            <button class="admin-btn primary" onclick="changeCreditsPrompt(${user.id}, ${user.credits})">${t('admin-edit-credits-btn', 'Kredi Düzenle')}</button>
                             <button class="admin-btn secondary" onclick="toggleUserPremium(${user.id}, ${!user.isPremium})">
-                                ${user.isPremium ? 'Premium İptal' : 'Premium Yap'}
+                                ${user.isPremium ? t('admin-cancel-premium-btn', 'Premium İptal') : t('admin-make-premium-btn', 'Premium Yap')}
                             </button>
                         </div>
                     </td>
@@ -1040,12 +1053,12 @@ async function loadAdminPanel() {
 }
 
 async function changeCreditsPrompt(userId, currentCredits) {
-    const newCredits = prompt("Lütfen yeni kredi değerini girin:", currentCredits);
+    const newCredits = prompt(t('admin-prompt-new-credits', 'Lütfen yeni kredi değerini girin:'), currentCredits);
     if (newCredits === null) return;
     
     const parsed = parseInt(newCredits);
     if (isNaN(parsed)) {
-        alert("Lütfen geçerli bir sayı girin.");
+        alert(t('admin-alert-invalid-number', 'Lütfen geçerli bir sayı girin.'));
         return;
     }
 
@@ -1056,14 +1069,14 @@ async function changeCreditsPrompt(userId, currentCredits) {
         });
 
         if (res.ok) {
-            showToast('Kullanıcı kredisi başarıyla güncellendi', 'success');
+            showToast(t('toast-admin-credits-updated', 'Kullanıcı kredisi başarıyla güncellendi'), 'success');
             await loadAdminPanel();
             await loadUserInfo(); // Update headers credit display if active
         } else {
-            showToast('Kredi düzenleme başarısız', 'error');
+            showToast(t('toast-admin-credits-fail', 'Kredi düzenleme başarısız'), 'error');
         }
     } catch (err) {
-        showToast('Bağlantı hatası', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     }
 }
 
@@ -1075,14 +1088,14 @@ async function toggleUserPremium(userId, isPremium) {
         });
 
         if (res.ok) {
-            showToast(isPremium ? 'Kullanıcı premium yapıldı!' : 'Kullanıcı premium üyeliği iptal edildi.', 'success');
+            showToast(isPremium ? t('toast-admin-premium-success', 'Kullanıcı premium yapıldı!') : t('toast-admin-premium-cancelled', 'Kullanıcı premium üyeliği iptal edildi.'), 'success');
             await loadAdminPanel();
             await loadUserInfo();
         } else {
-            showToast('Aksiyon başarısız oldu', 'error');
+            showToast(t('toast-admin-action-fail', 'Aksiyon başarısız oldu'), 'error');
         }
     } catch (err) {
-        showToast('Bağlantı hatası', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     }
 }
 
@@ -1099,16 +1112,16 @@ async function handlePostAnnouncement(event) {
         });
 
         if (res.ok) {
-            showToast('Duyuru başarıyla yayınlandı!', 'success');
+            showToast(t('toast-announce-success', 'Duyuru başarıyla yayınlandı!'), 'success');
             document.getElementById('announce-title').value = '';
             document.getElementById('announce-content').value = '';
             await loadAdminPanel();
         } else {
             const data = await res.json().catch(() => ({}));
-            showToast(data.message || 'Duyuru yayınlanamadı', 'error');
+            showToast(data.message || t('toast-announce-fail', 'Duyuru yayınlanamadı'), 'error');
         }
     } catch (err) {
-        showToast('Bağlantı hatası', 'error');
+        showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
     }
 }
 
@@ -1136,7 +1149,7 @@ async function loadSettingsForm() {
             }
         }
     } catch (err) {
-        showToast('Kullanıcı bilgileri yüklenemedi', 'error');
+        showToast(t('toast-profile-load-fail', 'Kullanıcı bilgileri yüklenemedi'), 'error');
     }
 }
 
@@ -1152,7 +1165,7 @@ async function handleRequestEmailChange(event) {
     if (emailChangeStep === 1) {
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Kod Gönderiliyor...';
+            submitBtn.innerText = t('btn-email-requesting', 'Kod Gönderiliyor...');
         }
         try {
             const response = await fetch(`${API_URL}/auth/profile/request-email-change`, {
@@ -1161,30 +1174,30 @@ async function handleRequestEmailChange(event) {
                 body: JSON.stringify({ newEmail, currentPassword })
             });
             if (response.ok) {
-                showToast('Doğrulama kodu e-posta adresinize gönderildi.', 'success');
+                showToast(t('toast-email-code-sent', 'Doğrulama kodu e-posta adresinize gönderildi.'), 'success');
                 document.getElementById('email-change-code-group').style.display = 'block';
                 emailChangeStep = 2;
-                if (submitBtn) submitBtn.innerText = 'E-postayı Güncelle';
+                if (submitBtn) submitBtn.innerText = t('btn-email-confirm', 'E-postayı Güncelle');
             } else {
                 const data = await response.json();
-                showToast(data.message || 'Kod gönderilemedi', 'error');
+                showToast(data.message || t('toast-code-send-fail', 'Kod gönderilemedi'), 'error');
             }
         } catch (err) {
-            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+            showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
         } finally {
             if (submitBtn && emailChangeStep === 1) {
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Doğrulama Kodu Gönder';
+                submitBtn.innerText = t('btn-email-send-code', 'Doğrulama Kodu Gönder');
             }
         }
     } else if (emailChangeStep === 2) {
         if (!code || code.length !== 6) {
-            showToast('Lütfen 6 haneli doğrulama kodunu girin.', 'error');
+            showToast(t('toast-code-length-error', 'Lütfen 6 haneli doğrulama kodunu girin.'), 'error');
             return;
         }
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = 'E-posta Güncelleniyor...';
+            submitBtn.innerText = t('btn-email-confirming', 'E-posta Güncelleniyor...');
         }
         try {
             const response = await fetch(`${API_URL}/auth/profile/confirm-email-change`, {
@@ -1196,18 +1209,18 @@ async function handleRequestEmailChange(event) {
             if (response.ok) {
                 localStorage.setItem('devradar_token', data.token);
                 localStorage.setItem('devradar_email', data.email);
-                showToast('E-posta adresiniz başarıyla güncellendi!', 'success');
+                showToast(t('toast-email-updated', 'E-posta adresiniz başarıyla güncellendi!'), 'success');
                 emailChangeStep = 1;
                 document.getElementById('email-change-code-group').style.display = 'none';
                 document.getElementById('settings-email-code').value = '';
                 document.getElementById('settings-email-current-password').value = '';
-                if (submitBtn) submitBtn.innerText = 'Doğrulama Kodu Gönder';
+                if (submitBtn) submitBtn.innerText = t('btn-email-send-code', 'Doğrulama Kodu Gönder');
                 await loadUserInfo();
             } else {
-                showToast(data.message || 'Doğrulama başarısız', 'error');
+                showToast(data.message || t('toast-verify-fail', 'Doğrulama başarısız'), 'error');
             }
         } catch (err) {
-            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+            showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
         } finally {
             if (submitBtn) submitBtn.disabled = false;
         }
@@ -1225,7 +1238,7 @@ async function handleRequestPasswordChange(event) {
     if (passwordChangeStep === 1) {
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Kod Gönderiliyor...';
+            submitBtn.innerText = t('btn-email-requesting', 'Kod Gönderiliyor...');
         }
         try {
             const response = await fetch(`${API_URL}/auth/profile/request-password-change`, {
@@ -1233,30 +1246,30 @@ async function handleRequestPasswordChange(event) {
                 headers: getAuthHeaders()
             });
             if (response.ok) {
-                showToast('Doğrulama kodu e-posta adresinize gönderildi.', 'success');
+                showToast(t('toast-pwd-code-sent', 'Doğrulama kodu e-posta adresinize gönderildi.'), 'success');
                 document.getElementById('password-change-code-group').style.display = 'block';
                 passwordChangeStep = 2;
-                if (submitBtn) submitBtn.innerText = 'Şifreyi Güncelle';
+                if (submitBtn) submitBtn.innerText = t('btn-password-confirm', 'Şifreyi Güncelle');
             } else {
                 const data = await response.json();
-                showToast(data.message || 'Kod gönderilemedi', 'error');
+                showToast(data.message || t('toast-code-send-fail', 'Kod gönderilemedi'), 'error');
             }
         } catch (err) {
-            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+            showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
         } finally {
             if (submitBtn && passwordChangeStep === 1) {
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Doğrulama Kodu Gönder';
+                submitBtn.innerText = t('btn-email-send-code', 'Doğrulama Kodu Gönder');
             }
         }
     } else if (passwordChangeStep === 2) {
         if (!code || code.length !== 6) {
-            showToast('Lütfen 6 haneli doğrulama kodunu girin.', 'error');
+            showToast(t('toast-code-length-error', 'Lütfen 6 haneli doğrulama kodunu girin.'), 'error');
             return;
         }
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Şifre Güncelleniyor...';
+            submitBtn.innerText = t('btn-password-confirming', 'Şifre Güncelleniyor...');
         }
         try {
             const response = await fetch(`${API_URL}/auth/profile/confirm-password-change`, {
@@ -1265,19 +1278,19 @@ async function handleRequestPasswordChange(event) {
                 body: JSON.stringify({ newPassword, code })
             });
             if (response.ok) {
-                showToast('Şifreniz başarıyla güncellendi!', 'success');
+                showToast(t('toast-pwd-updated', 'Şifreniz başarıyla güncellendi!'), 'success');
                 passwordChangeStep = 1;
                 document.getElementById('password-change-code-group').style.display = 'none';
                 document.getElementById('settings-password-code').value = '';
                 document.getElementById('settings-new-password').value = '';
-                if (submitBtn) submitBtn.innerText = 'Doğrulama Kodu Gönder';
+                if (submitBtn) submitBtn.innerText = t('btn-email-send-code', 'Doğrulama Kodu Gönder');
                 await loadUserInfo();
             } else {
                 const data = await response.json();
-                showToast(data.message || 'Doğrulama başarısız', 'error');
+                showToast(data.message || t('toast-verify-fail', 'Doğrulama başarısız'), 'error');
             }
         } catch (err) {
-            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+            showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
         } finally {
             if (submitBtn) submitBtn.disabled = false;
         }
@@ -1294,7 +1307,7 @@ async function handleModalEmailChange(event) {
     if (modalEmailStep === 1) {
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Kod Gönderiliyor...';
+            submitBtn.innerText = t('btn-email-requesting', 'Kod Gönderiliyor...');
         }
         try {
             const response = await fetch(`${API_URL}/auth/profile/request-email-change`, {
@@ -1303,30 +1316,30 @@ async function handleModalEmailChange(event) {
                 body: JSON.stringify({ newEmail })
             });
             if (response.ok) {
-                showToast('Doğrulama kodu e-posta adresinize gönderildi.', 'success');
+                showToast(t('toast-email-code-sent', 'Doğrulama kodu e-posta adresinize gönderildi.'), 'success');
                 document.getElementById('modal-email-code-group').style.display = 'block';
                 modalEmailStep = 2;
-                if (submitBtn) submitBtn.innerText = 'E-postayı Doğrula ve Kaydet';
+                if (submitBtn) submitBtn.innerText = t('btn-email-modal-confirm', 'E-postayı Doğrula ve Kaydet');
             } else {
                 const data = await response.json();
-                showToast(data.message || 'Hata oluştu', 'error');
+                showToast(data.message || t('toast-conn-error', 'Hata oluştu'), 'error');
             }
         } catch (err) {
-            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+            showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
         } finally {
             if (submitBtn && modalEmailStep === 1) {
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Doğrulama Kodu Gönder';
+                submitBtn.innerText = t('btn-email-send-code', 'Doğrulama Kodu Gönder');
             }
         }
     } else if (modalEmailStep === 2) {
         if (!code || code.length !== 6) {
-            showToast('Lütfen 6 haneli doğrulama kodunu girin.', 'error');
+            showToast(t('toast-code-length-error', 'Lütfen 6 haneli doğrulama kodunu girin.'), 'error');
             return;
         }
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Doğrulanıyor...';
+            submitBtn.innerText = t('btn-email-modal-confirming', 'Doğrulanıyor...');
         }
         try {
             const response = await fetch(`${API_URL}/auth/profile/confirm-email-change`, {
@@ -1338,14 +1351,14 @@ async function handleModalEmailChange(event) {
             if (response.ok) {
                 localStorage.setItem('devradar_token', data.token);
                 localStorage.setItem('devradar_email', data.email);
-                showToast('E-posta adresiniz başarıyla tanımlandı!', 'success');
+                showToast(t('toast-email-updated', 'E-posta adresiniz başarıyla tanımlandı!'), 'success');
                 document.getElementById('github-email-modal').style.display = 'none';
                 await loadUserInfo();
             } else {
-                showToast(data.message || 'Doğrulama başarısız', 'error');
+                showToast(data.message || t('toast-verify-fail', 'Doğrulama başarısız'), 'error');
             }
         } catch (err) {
-            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+            showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
         } finally {
             if (submitBtn) submitBtn.disabled = false;
         }

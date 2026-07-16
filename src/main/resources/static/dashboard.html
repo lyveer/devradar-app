@@ -14,7 +14,7 @@
 <body>
     <header>
         <div class="container nav-container">
-            <a href="/" class="logo" style="text-decoration: none;"><img src="/images/devradar_ai_lyver_software.png" alt="DevRadar Logo"></a>
+            <a href="/" class="logo" style="text-decoration: none;"><img src="/images/devradar_ai_lyver_software_site.png" alt="DevRadar Logo"></a>
             <div class="nav-links" style="display: flex; align-items: center; gap: 0.5rem;">
                 <div class="lang-switcher">
                     <select id="lang-select" onchange="changeLanguage(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; outline: none; margin-right: 0.5rem;">
@@ -93,52 +93,52 @@
                 <div class="dashboard-grid">
                     <!-- Left: Profile Form Card -->
                     <div class="card">
-                        <h3 style="margin-bottom: 1.5rem;">Kariyer Profilinizi Doldurun</h3>
+                        <h3 style="margin-bottom: 1.5rem;" data-i18n="profile-title">Kariyer Profilinizi Doldurun</h3>
                         <form id="profile-form" onsubmit="handleSaveProfile(event)">
                             <div class="form-group">
-                                <label style="margin-bottom: 0.75rem; display: block;">Yazılım Alanı (Uzmanlık)</label>
+                                <label style="margin-bottom: 0.75rem; display: block;" data-i18n="profile-field-specialization">Yazılım Alanı (Uzmanlık)</label>
                                 <input type="hidden" id="profile-specialization" required>
                                 <div class="specialization-grid">
                                     <div class="spec-card" data-value="Frontend Developer" onclick="selectSpecialization('Frontend Developer')">
                                         <span class="spec-icon">💻</span>
-                                        <span class="spec-title">Frontend Developer</span>
-                                        <span class="spec-desc">React, Angular, Vue, CSS</span>
+                                        <span class="spec-title" data-i18n="spec-frontend-title">Frontend Developer</span>
+                                        <span class="spec-desc" data-i18n="spec-frontend-desc">React, Angular, Vue, CSS</span>
                                     </div>
                                     <div class="spec-card" data-value="Backend Developer" onclick="selectSpecialization('Backend Developer')">
                                         <span class="spec-icon">⚙️</span>
-                                        <span class="spec-title">Backend Developer</span>
-                                        <span class="spec-desc">Spring Boot, Node.js, API, SQL</span>
+                                        <span class="spec-title" data-i18n="spec-backend-title">Backend Developer</span>
+                                        <span class="spec-desc" data-i18n="spec-backend-desc">Spring Boot, Node.js, API, SQL</span>
                                     </div>
                                     <div class="spec-card" data-value="Fullstack Developer" onclick="selectSpecialization('Fullstack Developer')">
                                         <span class="spec-icon">🚀</span>
-                                        <span class="spec-title">Fullstack Developer</span>
-                                        <span class="spec-desc">Hem Front hem Back-end</span>
+                                        <span class="spec-title" data-i18n="spec-fullstack-title">Fullstack Developer</span>
+                                        <span class="spec-desc" data-i18n="spec-fullstack-desc">Hem Front hem Back-end</span>
                                     </div>
                                     <div class="spec-card" data-value="Mobile App Developer" onclick="selectSpecialization('Mobile App Developer')">
                                         <span class="spec-icon">📱</span>
-                                        <span class="spec-title">Mobile App Developer</span>
-                                        <span class="spec-desc">Flutter, iOS, Android</span>
+                                        <span class="spec-title" data-i18n="spec-mobile-title">Mobile App Developer</span>
+                                        <span class="spec-desc" data-i18n="spec-mobile-desc">Flutter, iOS, Android</span>
                                     </div>
                                     <div class="spec-card" data-value="DevOps Engineer" onclick="selectSpecialization('DevOps Engineer')">
                                         <span class="spec-icon">☁️</span>
-                                        <span class="spec-title">DevOps Engineer</span>
-                                        <span class="spec-desc">Docker, CI/CD, AWS, K8s</span>
+                                        <span class="spec-title" data-i18n="spec-devops-title">DevOps Engineer</span>
+                                        <span class="spec-desc" data-i18n="spec-devops-desc">Docker, CI/CD, AWS, K8s</span>
                                     </div>
                                     <div class="spec-card" data-value="Data Scientist / AI Engineer" onclick="selectSpecialization('Data Scientist / AI Engineer')">
                                         <span class="spec-icon">🧠</span>
-                                        <span class="spec-title">AI & Data Scientist</span>
-                                        <span class="spec-desc">Python, ML, NLP, LLM</span>
+                                        <span class="spec-title" data-i18n="spec-ai-title">AI & Data Scientist</span>
+                                        <span class="spec-desc" data-i18n="spec-ai-desc">Python, ML, NLP, LLM</span>
                                     </div>
                                     <div class="spec-card" data-value="Embedded Systems Specialist" onclick="selectSpecialization('Embedded Systems Specialist')">
                                         <span class="spec-icon">🔌</span>
-                                        <span class="spec-title">Embedded Systems</span>
-                                        <span class="spec-desc">C/C++, IoT, Firmware</span>
+                                        <span class="spec-title" data-i18n="spec-embedded-title">Embedded Systems</span>
+                                        <span class="spec-desc" data-i18n="spec-embedded-desc">C/C++, IoT, Firmware</span>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="form-group">
-                                <label>Kullandığınız Diller / Teknolojiler</label>
+                                <label data-i18n="profile-field-languages">Kullandığınız Diller / Teknolojiler</label>
                                 <div class="checkbox-group">
                                     <div class="checkbox-btn">
                                         <input type="checkbox" name="languages" value="Java" id="lang-java">
@@ -180,49 +180,49 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="profile-experience">Deneyim Süresi (Yıl)</label>
-                                <input type="number" id="profile-experience" class="form-control" min="0" max="50" required placeholder="Örn: 3">
+                                <label for="profile-experience" data-i18n="profile-field-experience">Deneyim Süresi (Yıl)</label>
+                                <input type="number" id="profile-experience" class="form-control" min="0" max="50" required data-i18n-placeholder="ph-experience" placeholder="Örn: 3">
                             </div>
 
                             <div class="form-group">
-                                <label for="profile-projects">Önceki Projeler / Referanslar</label>
-                                <textarea id="profile-projects" class="form-control" rows="3" placeholder="Geliştirdiğiniz e-ticaret siteleri, mobil uygulamalar veya open-source katkıları..."></textarea>
+                                <label for="profile-projects" data-i18n="profile-field-projects">Önceki Projeler / Referanslar</label>
+                                <textarea id="profile-projects" class="form-control" rows="3" data-i18n-placeholder="ph-projects" placeholder="Geliştirdiğiniz e-ticaret siteleri..."></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label for="profile-github">GitHub Adresi (İsteğe Bağlı)</label>
+                                <label for="profile-github" data-i18n="profile-field-github">GitHub Adresi (İsteğe Bağlı)</label>
                                 <input type="url" id="profile-github" class="form-control" placeholder="https://github.com/username">
                             </div>
 
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">Profili Kaydet</button>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="profile-save-btn">Profili Kaydet</button>
                         </form>
                     </div>
 
                     <!-- Right: AI Evaluation Output -->
                     <div class="card profile-score-box" id="profile-ai-box">
-                        <h3 style="margin-bottom: 2rem;">Yapay Zeka Profil Skoru</h3>
+                        <h3 style="margin-bottom: 2rem;" data-i18n="profile-score-title">Yapay Zeka Profil Skoru</h3>
                         
                         <div class="radial-progress" id="profile-score-meter">
                             <span class="value" id="profile-score-val">-</span>
                         </div>
                         
-                        <button onclick="handleTriggerScoring()" class="btn btn-secondary" id="score-btn" style="margin-bottom: 2rem; display: none;">Profil Puanımı Analiz Et</button>
+                        <button onclick="handleTriggerScoring()" class="btn btn-secondary" id="score-btn" style="margin-bottom: 2rem; display: none;" data-i18n="profile-score-btn">Profil Puanımı Analiz Et</button>
                         
                         <div id="profile-ai-results" style="display: none; width: 100%;">
                             <p class="score-desc" id="profile-ai-summary" style="margin-bottom: 1.5rem;"></p>
                             
-                            <h4 style="text-align: left; margin-bottom: 0.5rem;">Güçlü Yönler</h4>
+                            <h4 style="text-align: left; margin-bottom: 0.5rem;" data-i18n="profile-score-strengths">Güçlü Yönler</h4>
                             <ul class="detail-list strengths" id="profile-ai-strengths"></ul>
 
-                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;">Zayıf Yönler</h4>
+                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;" data-i18n="profile-score-weaknesses">Zayıf Yönler</h4>
                             <ul class="detail-list weaknesses" id="profile-ai-weaknesses"></ul>
 
-                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;">AI Tavsiyeleri</h4>
+                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;" data-i18n="profile-score-recommendations">AI Tavsiyeleri</h4>
                             <ul class="detail-list" id="profile-ai-recommendations"></ul>
                         </div>
 
                         <div id="profile-ai-empty">
-                            <p class="score-desc">Öncelikle sol taraftaki formu doldurup kaydetmeniz gerekmektedir.</p>
+                            <p class="score-desc" data-i18n="profile-score-empty">Öncelikle sol taraftaki formu doldurup kaydetmeniz gerekmektedir.</p>
                         </div>
                     </div>
                 </div>
@@ -233,90 +233,90 @@
                 <div class="dashboard-grid">
                     <!-- Left: Project Form Card -->
                     <div class="card">
-                        <h3 style="margin-bottom: 1.5rem;">Yeni Proje Fikri Analiz Edin</h3>
+                        <h3 style="margin-bottom: 1.5rem;" data-i18n="project-title">Yeni Proje Fikri Analiz Edin</h3>
                         <form id="project-form" onsubmit="handleAnalyzeProject(event)">
                             <div class="form-group">
-                                <label for="project-name">Proje Adı</label>
-                                <input type="text" id="project-name" class="form-control" placeholder="Örn: Restoran Sipariş SaaS Modülü" required>
+                                <label for="project-name" data-i18n="project-field-name">Proje Adı</label>
+                                <input type="text" id="project-name" class="form-control" data-i18n-placeholder="ph-project-name" placeholder="Örn: Restoran Sipariş SaaS Modülü" required>
                             </div>
                             
                             <div class="form-group">
-                                <label for="project-description">Proje Detayları & Amacı</label>
-                                <textarea id="project-description" class="form-control" rows="4" placeholder="Projenin işlevi nedir? Kullanıcılar ne yapacak? Temel özellikler..." required></textarea>
+                                <label for="project-description" data-i18n="project-field-desc">Proje Detayları & Amacı</label>
+                                <textarea id="project-description" class="form-control" rows="4" data-i18n-placeholder="ph-project-desc" placeholder="Projenin işlevi nedir? Kullanıcılar ne yapacak? Temel özellikler..." required></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label for="project-language">Kullanılacak Dil / Ana Teknoloji</label>
-                                <input type="text" id="project-language" class="form-control" placeholder="Örn: Java (Spring Boot) & React" required>
+                                <label for="project-language" data-i18n="project-field-lang">Kullanılacak Dil / Ana Teknoloji</label>
+                                <input type="text" id="project-language" class="form-control" data-i18n-placeholder="ph-project-lang" placeholder="Örn: Java (Spring Boot) & React" required>
                             </div>
 
-                            <button type="submit" class="btn btn-primary" style="width: 100%;" id="analyze-submit-btn">Analizi Başlat</button>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;" id="analyze-submit-btn" data-i18n="project-analyze-btn">Analizi Başlat</button>
                         </form>
                     </div>
 
                     <!-- Right: Analysis Output Display -->
                     <div class="card" id="project-analysis-result-card">
-                        <h3 id="analysis-result-header" style="margin-bottom: 1.5rem;">Proje Analiz Raporu</h3>
+                        <h3 id="analysis-result-header" style="margin-bottom: 1.5rem;" data-i18n="project-report-title">Proje Analiz Raporu</h3>
                         
                         <div id="analysis-empty">
-                            <p class="score-desc" style="text-align: center; padding: 4rem 0;">Sol taraftan projenizi girin ve AI tabanlı pazar radarını çalıştırın.</p>
+                            <p class="score-desc" style="text-align: center; padding: 4rem 0;" data-i18n="project-report-empty">Sol taraftan projenizi girin ve AI tabanlı pazar radarını çalıştırın.</p>
                         </div>
 
                         <div id="analysis-loading" style="display: none; text-align: center; padding: 4rem 0;">
                             <div class="radial-progress" style="margin: 0 auto; --progress: 180deg; animation: spin 2s linear infinite;">
                                 <span class="value" style="font-size: 1.5rem;">AI</span>
                             </div>
-                            <p class="score-desc" style="margin-top: 2rem;">Yapay Zeka pazar verilerini, freelancer gelir oranlarını ve teknolojik tüyoları derliyor...</p>
+                            <p class="score-desc" style="margin-top: 2rem;" data-i18n="project-report-loading">Yapay Zeka pazar verilerini, freelancer gelir oranlarını ve teknolojik tüyoları derliyor...</p>
                         </div>
 
                         <div id="analysis-content" style="display: none;">
                             <div class="analysis-results-grid">
                                 <div class="metric-card">
-                                    <div class="metric-title">💰 Piyasa Satış Fiyatı (Tahmini)</div>
+                                    <div class="metric-title" data-i18n="project-metric-price">💰 Piyasa Satış Fiyatı (Tahmini)</div>
                                     <div class="metric-val" id="res-market-price">-</div>
                                 </div>
                                 <div class="metric-card">
-                                    <div class="metric-title">💼 Freelancer Saatlik Ücret</div>
+                                    <div class="metric-title" data-i18n="project-metric-hourly">💼 Freelancer Saatlik Ücret</div>
                                     <div class="metric-val" id="res-freelancer-hourly">-</div>
                                 </div>
                                 <div class="metric-card">
-                                    <div class="metric-title">🔥 Pazar Talebi</div>
+                                    <div class="metric-title" data-i18n="project-metric-demand">🔥 Pazar Talebi</div>
                                     <div class="metric-val" id="res-demand">-</div>
                                     <p class="score-desc" id="res-demand-desc" style="font-size: 0.8rem; margin-top: 0.5rem;"></p>
                                 </div>
                                 <div class="metric-card">
-                                    <div class="metric-title">⏱️ Geliştirme Süresi</div>
+                                    <div class="metric-title" data-i18n="project-metric-duration">⏱️ Geliştirme Süresi</div>
                                     <div class="metric-val" id="res-dev-time">-</div>
                                     <p class="score-desc" id="res-dev-time-desc" style="font-size: 0.8rem; margin-top: 0.5rem;"></p>
                                 </div>
                                 
                                 <div class="metric-card analysis-full-width">
-                                    <h4 style="margin-bottom: 0.75rem;">🛠️ Önerilen Teknoloji Stack Detayları</h4>
+                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-tech-title">🛠️ Önerilen Teknoloji Stack Detayları</h4>
                                     <div id="res-tech-stack"></div>
                                 </div>
 
                                 <div class="metric-card analysis-full-width">
-                                    <h4 style="margin-bottom: 0.75rem;">💡 Nasıl Ekleme Yapılabilir & Geliştirilebilir</h4>
+                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-enhancements-title">💡 Nasıl Ekleme Yapılabilir & Geliştirilebilir</h4>
                                     <ul class="detail-list" id="res-enhancements" style="margin-top: 0;"></ul>
                                 </div>
 
                                 <div class="metric-card analysis-full-width">
-                                    <h4 style="margin-bottom: 0.75rem;">⭐ Önemli Geliştirici Tüyoları</h4>
+                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-tips-title">⭐ Önemli Geliştirici Tüyoları</h4>
                                     <ul class="detail-list" id="res-tips" style="margin-top: 0;"></ul>
                                 </div>
 
                                 <div class="metric-card analysis-full-width" id="res-competitor-box" style="display: none;">
-                                    <h4 style="margin-bottom: 0.5rem;">📊 Pazar Rekabet Analizi</h4>
+                                    <h4 style="margin-bottom: 0.5rem;" data-i18n="project-competitor-title">📊 Pazar Rekabet Analizi</h4>
                                     <p class="score-desc" id="res-competitor-insight"></p>
                                 </div>
 
                                 <div class="metric-card analysis-full-width" id="res-competitors-list-box" style="display: none;">
-                                    <h4 style="margin-bottom: 0.75rem;">🌐 Pazardaki Örnekler & Rakipler</h4>
+                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-competitors-list-title">🌐 Pazardaki Örnekler & Rakipler</h4>
                                     <div id="res-competitors-list" style="display: flex; flex-wrap: wrap; gap: 0.75rem;"></div>
                                 </div>
 
                                 <div class="metric-card analysis-full-width" id="res-freelancer-platforms-box" style="display: none;">
-                                    <h4 style="margin-bottom: 0.75rem;">💼 Freelance Pazarı & Fiyatlandırma</h4>
+                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-freelancer-title">💼 Freelance Pazarı & Fiyatlandırma</h4>
                                     <div id="res-freelancer-platforms" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
                                 </div>
                             </div>
@@ -328,10 +328,10 @@
             <!-- HISTORY TAB -->
             <section id="tab-history-pane" class="tab-pane">
                 <div class="card" style="margin-bottom: 2rem;">
-                    <h3>Geçmiş Proje Analizleriniz</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;">Daha önce yaptığınız analizleri buradan görebilir ve raporlara tekrar göz atabilirsiniz.</p>
+                    <h3 data-i18n="history-title">Geçmiş Proje Analizleriniz</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="history-desc">Daha önce yaptığınız analizleri buradan görebilir ve raporlara tekrar göz atabilirsiniz.</p>
                     
-                    <div id="history-empty" class="score-desc" style="text-align: center; padding: 3rem 0;">
+                    <div id="history-empty" class="score-desc" style="text-align: center; padding: 3rem 0;" data-i18n="history-empty">
                         Henüz herhangi bir proje analizi yapmadınız.
                     </div>
 
@@ -344,10 +344,10 @@
             <!-- PROGRESS TRACKER TAB -->
             <section id="tab-progress-pane" class="tab-pane">
                 <div class="card" style="margin-bottom: 2rem;">
-                    <h3>Proje İlerleme Takibi</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;">Analiz ettiğiniz projelerin geliştirme adımlarını işaretleyerek ilerlemenizi adım adım takip edin.</p>
+                    <h3 data-i18n="progress-title">Proje İlerleme Takibi</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="progress-desc">Analiz ettiğiniz projelerin geliştirme adımlarını işaretleyerek ilerlemenizi adım adım takip edin.</p>
                     
-                    <div id="progress-empty" class="score-desc" style="text-align: center; padding: 3rem 0;">
+                    <div id="progress-empty" class="score-desc" style="text-align: center; padding: 3rem 0;" data-i18n="progress-empty">
                         İlerleme takibi yapmak için öncelikle "Proje Analizi" sekmesinden bir proje analizi yapmalısınız.
                     </div>
 
@@ -360,29 +360,29 @@
             <!-- ROADMAP TAB -->
             <section id="tab-roadmap-pane" class="tab-pane">
                 <div class="card" style="margin-bottom: 2rem;">
-                    <h3>Lyver Software Ürün Yol Haritası (Roadmap)</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;">Lyver Software DevRadarAI platformu için 2026 yılı geliştirme hedefleri ve gelecek planlarımız.</p>
+                    <h3 data-i18n="roadmap-title">Lyver Software Ürün Yol Haritası (Roadmap)</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="roadmap-desc">Lyver Software DevRadarAI platformu için 2026 yılı geliştirme hedefleri ve gelecek planlarımız.</p>
                     
                     <div class="roadmap-timeline">
                         <div class="roadmap-card completed">
-                            <div class="roadmap-quarter">Q1 2026 — Tamamlandı</div>
-                            <div class="roadmap-title">Yapay Zeka Altyapısı & Grounding</div>
-                            <p class="score-desc">Gemini ve Llama 3 entegrasyonu tamamlandı. Canlı web aramaları (Google Search Grounding) ve dizi parse tolerans sistemleri aktif edildi.</p>
+                            <div class="roadmap-quarter" data-i18n="roadmap-q1-quarter">Q1 2026 — Tamamlandı</div>
+                            <div class="roadmap-title" data-i18n="roadmap-q1-title">Yapay Zeka Altyapısı & Grounding</div>
+                            <p class="score-desc" data-i18n="roadmap-q1-desc">Gemini ve Llama 3 entegrasyonu tamamlandı. Canlı web aramaları (Google Search Grounding) ve dizi parse tolerans sistemleri aktif edildi.</p>
                         </div>
                         <div class="roadmap-card">
-                            <div class="roadmap-quarter">Q2 2026 — Planlanıyor</div>
-                            <div class="roadmap-title">Çoklu Dil Desteği & Global Pazar Raporları</div>
-                            <p class="score-desc">Platformun tüm dillere çevrilmesi, yerel pazar fiyatlandırmalarının (TL, Euro, Yen) otomatik tespiti ve para birimi desteği.</p>
+                            <div class="roadmap-quarter" data-i18n="roadmap-q2-quarter">Q2 2026 — Planlanıyor</div>
+                            <div class="roadmap-title" data-i18n="roadmap-q2-title">Çoklu Dil Desteği & Global Pazar Raporları</div>
+                            <p class="score-desc" data-i18n="roadmap-q2-desc">Platformun tüm dillere çevrilmesi, yerel pazar fiyatlandırmalarının (TL, Euro, Yen) otomatik tespiti ve para birimi desteği.</p>
                         </div>
                         <div class="roadmap-card">
-                            <div class="roadmap-quarter">Q3 2026 — Planlanıyor</div>
-                            <div class="roadmap-title">Gelişmiş Ekip & Organizasyon Yönetimi</div>
-                            <p class="score-desc">Yazılım şirketleri için çoklu kullanıcı organizasyonları, takım içi proje paylaşımı ve ortak analiz raporu oluşturma.</p>
+                            <div class="roadmap-quarter" data-i18n="roadmap-q3-quarter">Q3 2026 — Planlanıyor</div>
+                            <div class="roadmap-title" data-i18n="roadmap-q3-title">Gelişmiş Ekip & Organizasyon Yönetimi</div>
+                            <p class="score-desc" data-i18n="roadmap-q3-desc">Yazılım şirketleri için çoklu kullanıcı organizasyonları, takım içi proje paylaşımı ve ortak analiz raporu oluşturma.</p>
                         </div>
                         <div class="roadmap-card">
-                            <div class="roadmap-quarter">Q4 2026 — Planlanıyor</div>
-                            <div class="roadmap-title">AI Kod İskeleti Oluşturma</div>
-                            <p class="score-desc">Analiz edilen projeler için otomatik backend (Spring Boot/NestJS) ve frontend (React/Vue) başlangıç kod şablonlarının üretilmesi.</p>
+                            <div class="roadmap-quarter" data-i18n="roadmap-q4-quarter">Q4 2026 — Planlanıyor</div>
+                            <div class="roadmap-title" data-i18n="roadmap-q4-title">AI Kod İskeleti Oluşturma</div>
+                            <p class="score-desc" data-i18n="roadmap-q4-desc">Analiz edilen projeler için otomatik backend (Spring Boot/NestJS) ve frontend (React/Vue) başlangıç kod şablonlarının üretilmesi.</p>
                         </div>
                     </div>
                 </div>
@@ -391,10 +391,10 @@
             <!-- ANNOUNCEMENTS TAB -->
             <section id="tab-announcements-pane" class="tab-pane">
                 <div class="card" style="margin-bottom: 2rem;">
-                    <h3>Sistem Duyuruları & Güncellemeler</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;">Lyver Software ekibi tarafından yayınlanan en güncel sistem haberleri.</p>
+                    <h3 data-i18n="announcements-title">Sistem Duyuruları & Güncellemeler</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="announcements-desc">Lyver Software ekibi tarafından yayınlanan en güncel sistem haberleri.</p>
                     
-                    <div id="announcements-empty" class="score-desc" style="text-align: center; padding: 3rem 0;">
+                    <div id="announcements-empty" class="score-desc" style="text-align: center; padding: 3rem 0;" data-i18n="announcements-empty">
                         Şu anda yayınlanmış yeni bir duyuru bulunmamaktadır.
                     </div>
 
@@ -407,46 +407,46 @@
             <!-- FAQ TAB -->
             <section id="tab-faq-pane" class="tab-pane">
                 <div class="card" style="margin-bottom: 2rem;">
-                    <h3>Sıkça Sorulan Sorular (SSS)</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;">DevRadarAI platformu, analiz özellikleri ve kredi sistemi hakkında merak edilenler.</p>
+                    <h3 data-i18n="faq-tab-title">Sıkça Sorulan Sorular (SSS)</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="faq-tab-desc">DevRadarAI platformu, analiz özellikleri ve kredi sistemi hakkında merak edilenler.</p>
                     
                     <div class="faq-container">
                         <div class="faq-item">
                             <div class="faq-question" onclick="toggleFaq(this)">
-                                <span>Kredi sistemi nasıl çalışır?</span>
+                                <span data-i18n="faq-q1-question">Kredi sistemi nasıl çalışır?</span>
                                 <span class="faq-arrow">▼</span>
                             </div>
-                            <div class="faq-answer">
+                            <div class="faq-answer" data-i18n="faq-q1-answer">
                                 Her yeni kayıt olan kullanıcıya ücretsiz 5 analiz kredisi tanımlanır. Yapılan her Profil Puanlama veya Proje Analizi işlemi bakiyenizden 1 kredi düşer. Üst bardaki "Sınırsız Kredi Al" butonu ile abonelik simüle edilebilir.
                             </div>
                         </div>
 
                         <div class="faq-item">
                             <div class="faq-question" onclick="toggleFaq(this)">
-                                <span>Hangi yapay zeka modelleri kullanılıyor?</span>
+                                <span data-i18n="faq-q2-question">Hangi yapay zeka modelleri kullanılıyor?</span>
                                 <span class="faq-arrow">▼</span>
                             </div>
-                            <div class="faq-answer">
+                            <div class="faq-answer" data-i18n="faq-q2-answer">
                                 Platformumuz hibrit bir altyapıya sahiptir. Varsayılan olarak Google'ın gelişmiş Gemini 2.5 modeli (Google Search Grounding / Canlı arama entegrasyonu ile) kullanılır. Alternatif olarak Groq üzerinden Llama 3 model entegrasyonu da aktiftir.
                             </div>
                         </div>
 
                         <div class="faq-item">
                             <div class="faq-question" onclick="toggleFaq(this)">
-                                <span>Lyver Software nedir?</span>
+                                <span data-i18n="faq-q3-question">Lyver Software nedir?</span>
                                 <span class="faq-arrow">▼</span>
                             </div>
-                            <div class="faq-answer">
+                            <div class="faq-answer" data-i18n="faq-q3-answer">
                                 Lyver Software, modern yazılım çözümleri, yapay zeka destekli analiz toolları ve geliştirici dostu SaaS ürünleri üreten bağımsız bir teknoloji girişimidir. DevRadarAI, geliştiricilerin pazar analizini hızlandırmak için Lyver Software tarafından üretilmiştir.
                             </div>
                         </div>
 
                         <div class="faq-item">
                             <div class="faq-question" onclick="toggleFaq(this)">
-                                <span>Analizlerin doğruluğu nedir?</span>
+                                <span data-i18n="faq-q4-question">Analizlerin doğruluğu nedir?</span>
                                 <span class="faq-arrow">▼</span>
                             </div>
-                            <div class="faq-answer">
+                            <div class="faq-answer" data-i18n="faq-q4-answer">
                                 Yapay zekamız, projenizin detaylarına göre popüler serbest çalışan (freelance) sitelerindeki ilanları, benzer SaaS ürünlerini ve güncel yazılım maliyetlerini gerçek zamanlı analiz ederek ortalama bir pazar değerlemesi çıkarır.
                             </div>
                         </div>
@@ -465,15 +465,15 @@
                         <h3 class="profile-name" id="profile-card-name">-</h3>
                         <p class="profile-email" id="profile-card-email">-</p>
                         
-                        <div id="profile-card-badge" class="badge badge-standard">STANDART ÜYE</div>
+                        <div id="profile-card-badge" class="badge badge-standard" data-i18n="settings-member-type">STANDART ÜYE</div>
                         
                         <div class="profile-stats">
                             <div class="stat-item">
-                                <span class="stat-label">⚡ Kalan Kredi:</span>
+                                <span class="stat-label" data-i18n="settings-credits-label">⚡ Kalan Kredi:</span>
                                 <span class="stat-value" id="profile-card-credits">-</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">📅 Katılım Tarihi:</span>
+                                <span class="stat-label" data-i18n="settings-date-label">📅 Katılım Tarihi:</span>
                                 <span class="stat-value" id="profile-card-date">-</span>
                             </div>
                         </div>
@@ -493,41 +493,41 @@
 
                         <!-- Email Change Card -->
                         <div class="card" style="padding: 1.5rem;">
-                            <h3>E-posta Adresi Değiştir</h3>
-                            <p class="score-desc" style="margin-bottom: 1.25rem;">E-postanızı değiştirmek için mevcut şifrenizi girmeniz gerekir. Kod eski e-postanıza gönderilecektir.</p>
+                            <h3 data-i18n="settings-email-title">E-posta Adresi Değiştir</h3>
+                            <p class="score-desc" style="margin-bottom: 1.25rem;" data-i18n="settings-email-desc">E-postanızı değiştirmek için mevcut şifrenizi girmeniz gerekir. Kod eski e-postanıza gönderilecektir.</p>
                             
                             <form id="email-change-form" onsubmit="handleRequestEmailChange(event)">
                                 <div class="form-group">
-                                    <label for="settings-new-email">Yeni E-posta Adresi</label>
+                                    <label for="settings-new-email" data-i18n="settings-new-email-label">Yeni E-posta Adresi</label>
                                     <input type="email" id="settings-new-email" class="form-control" required>
                                 </div>
                                 <div class="form-group" id="current-password-group">
-                                    <label for="settings-email-current-password">Mevcut Şifre</label>
-                                    <input type="password" id="settings-email-current-password" class="form-control" placeholder="••••••••">
+                                    <label for="settings-email-current-password" data-i18n="settings-current-password-label">Mevcut Şifre</label>
+                                    <input type="password" id="settings-email-current-password" class="form-control" data-i18n-placeholder="ph-password" placeholder="••••••••">
                                 </div>
                                 <div class="form-group" id="email-change-code-group" style="display: none;">
-                                    <label for="settings-email-code" style="color: var(--secondary); font-weight: bold;">Doğrulama Kodu</label>
-                                    <input type="text" id="settings-email-code" class="form-control" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
+                                    <label for="settings-email-code" style="color: var(--secondary); font-weight: bold;" data-i18n="settings-email-code-label">Doğrulama Kodu</label>
+                                    <input type="text" id="settings-email-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
                                 </div>
-                                <button type="submit" id="email-change-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Doğrulama Kodu Gönder</button>
+                                <button type="submit" id="email-change-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" data-i18n="settings-send-code-btn">Doğrulama Kodu Gönder</button>
                             </form>
                         </div>
 
                         <!-- Password Change Card -->
                         <div class="card" style="padding: 1.5rem;">
-                            <h3>Şifre Güncelle</h3>
-                            <p class="score-desc" style="margin-bottom: 1.25rem;">Şifrenizi güncellemek için doğrulama kodu mevcut e-postanıza gönderilecektir.</p>
+                            <h3 data-i18n="settings-password-title">Şifre Güncelle</h3>
+                            <p class="score-desc" style="margin-bottom: 1.25rem;" data-i18n="settings-password-desc">Şifrenizi güncellemek için doğrulama kodu mevcut e-postanıza gönderilecektir.</p>
                             
                             <form id="password-change-form" onsubmit="handleRequestPasswordChange(event)">
                                 <div class="form-group">
-                                    <label for="settings-new-password">Yeni Şifre</label>
-                                    <input type="password" id="settings-new-password" class="form-control" placeholder="••••••••" required minlength="6">
+                                    <label for="settings-new-password" data-i18n="settings-new-password-label">Yeni Şifre</label>
+                                    <input type="password" id="settings-new-password" class="form-control" data-i18n-placeholder="ph-password" placeholder="••••••••" required minlength="6">
                                 </div>
                                 <div class="form-group" id="password-change-code-group" style="display: none;">
-                                    <label for="settings-password-code" style="color: var(--secondary); font-weight: bold;">Doğrulama Kodu</label>
-                                    <input type="text" id="settings-password-code" class="form-control" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
+                                    <label for="settings-password-code" style="color: var(--secondary); font-weight: bold;" data-i18n="settings-email-code-label">Doğrulama Kodu</label>
+                                    <input type="text" id="settings-password-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
                                 </div>
-                                <button type="submit" id="password-change-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Doğrulama Kodu Gönder</button>
+                                <button type="submit" id="password-change-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" data-i18n="settings-send-code-btn">Doğrulama Kodu Gönder</button>
                             </form>
                         </div>
                     </div>
@@ -537,41 +537,41 @@
             <!-- ADMIN PANEL TAB -->
             <section id="tab-admin-pane" class="tab-pane">
                 <div class="card" style="margin-bottom: 2rem;">
-                    <h3>Lyver Yönetici Kontrol Paneli</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;">Kullanıcı yönetimi, kredi müdahaleleri, sistem istatistikleri ve genel duyuru yönetimi.</p>
+                    <h3 data-i18n="admin-title">Lyver Yönetici Kontrol Paneli</h3>
+                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="admin-desc">Kullanıcı yönetimi, kredi müdahaleleri, sistem istatistikleri ve genel duyuru yönetimi.</p>
 
                     <!-- Admin Statistics -->
                     <div class="admin-stats-grid">
                         <div class="metric-card">
-                            <div class="metric-title">Toplam Kayıtlı Kullanıcı</div>
+                            <div class="metric-title" data-i18n="admin-stat-users-label">Toplam Kayıtlı Kullanıcı</div>
                             <div class="metric-val" id="admin-stat-users">0</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-title">Toplam Yapılan Analiz</div>
+                            <div class="metric-title" data-i18n="admin-stat-analyses-label">Toplam Yapılan Analiz</div>
                             <div class="metric-val" id="admin-stat-analyses">0</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-title">Premium Üye Sayısı</div>
+                            <div class="metric-title" data-i18n="admin-stat-premium-label">Premium Üye Sayısı</div>
                             <div class="metric-val" id="admin-stat-premium">0</div>
                         </div>
                     </div>
 
                     <!-- Announcement Form -->
-                    <h4 style="margin-bottom: 1rem; color: white;">Yeni Sistem Duyurusu Yayınla</h4>
+                    <h4 style="margin-bottom: 1rem; color: white;" data-i18n="admin-post-announce-title">Yeni Sistem Duyurusu Yayınla</h4>
                     <form id="announcement-form" onsubmit="handlePostAnnouncement(event)" style="margin-bottom: 2rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
                         <div class="form-group">
-                            <label for="announce-title">Duyuru Başlığı</label>
-                            <input type="text" id="announce-title" class="form-control" placeholder="Örn. Sistem Bakım Çalışması Hakkında" required>
+                            <label for="announce-title" data-i18n="admin-announce-title-label">Duyuru Başlığı</label>
+                            <input type="text" id="announce-title" class="form-control" data-i18n-placeholder="ph-admin-announce-title" placeholder="Örn. Sistem Bakım Çalışması Hakkında" required>
                         </div>
                         <div class="form-group">
-                            <label for="announce-content">Duyuru İçeriği</label>
-                            <textarea id="announce-content" class="form-control" rows="3" placeholder="Yayınlamak istediğiniz duyuru detayları..." required></textarea>
+                            <label for="announce-content" data-i18n="admin-announce-content-label">Duyuru İçeriği</label>
+                            <textarea id="announce-content" class="form-control" rows="3" data-i18n-placeholder="ph-admin-announce-content" placeholder="Yayınlamak istediğiniz duyuru detayları..." required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Duyuruyu Yayınla</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px;" data-i18n="admin-announce-btn">Duyuruyu Yayınla</button>
                     </form>
 
                     <!-- User Management Table -->
-                    <h4 style="margin-bottom: 1rem; color: white;">Kullanıcı Listesi & Yönetimi</h4>
+                    <h4 style="margin-bottom: 1rem; color: white;" data-i18n="admin-user-list-title">Kullanıcı Listesi & Yönetimi</h4>
                     <div class="admin-table-container">
                         <table class="admin-table">
                             <thead>
@@ -611,19 +611,19 @@
     <!-- Mandatory Email Update Modal for GitHub Users -->
     <div id="github-email-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center;">
         <div class="card" style="max-width: 450px; width: 90%; padding: 2rem; border: 1px solid var(--border-highlight); box-shadow: var(--shadow-premium);">
-            <h3 style="margin-bottom: 1rem; text-align: center; color: white;">E-posta Adresinizi Belirleyin</h3>
-            <p class="score-desc" style="margin-bottom: 1.5rem; text-align: center;">GitHub ile giriş yaptınız. Hesabınızı doğrulamak ve kullanmaya başlamak için lütfen geçerli bir e-posta adresi girin.</p>
+            <h3 style="margin-bottom: 1rem; text-align: center; color: white;" data-i18n="modal-email-title">E-posta Adresinizi Belirleyin</h3>
+            <p class="score-desc" style="margin-bottom: 1.5rem; text-align: center;" data-i18n="modal-email-desc">GitHub ile giriş yaptınız. Hesabınızı doğrulamak ve kullanmaya başlamak için lütfen geçerli bir e-posta adresi girin.</p>
             
             <form id="modal-email-form" onsubmit="handleModalEmailChange(event)">
                 <div class="form-group">
-                    <label for="modal-new-email">E-posta Adresi</label>
-                    <input type="email" id="modal-new-email" class="form-control" placeholder="isim@sirket.com" required>
+                    <label for="modal-new-email" data-i18n="modal-email-label">E-posta Adresi</label>
+                    <input type="email" id="modal-new-email" class="form-control" data-i18n-placeholder="ph-email" placeholder="isim@sirket.com" required>
                 </div>
                 <div class="form-group" id="modal-email-code-group" style="display: none;">
-                    <label for="modal-email-code" style="color: var(--secondary); font-weight: bold;">Doğrulama Kodu</label>
-                    <input type="text" id="modal-email-code" class="form-control" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
+                    <label for="modal-email-code" style="color: var(--secondary); font-weight: bold;" data-i18n="modal-email-code-label">Doğrulama Kodu</label>
+                    <input type="text" id="modal-email-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
                 </div>
-                <button type="submit" id="modal-email-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Doğrulama Kodu Gönder</button>
+                <button type="submit" id="modal-email-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" data-i18n="modal-email-send-btn">Doğrulama Kodu Gönder</button>
             </form>
         </div>
     </div>

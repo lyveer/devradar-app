@@ -28,10 +28,9 @@ public class StatsController {
         long realPremium = userRepository.countByIsPremium(true);
 
         Map<String, Object> stats = new HashMap<>();
-        // Using real count + base offsets to preserve premium look of the landing page
-        stats.put("registeredDevelopers", realUsers + 12340);
-        stats.put("analyzedProjects", realProjects + 45820);
-        stats.put("premiumMembers", realPremium + 3210);
+        stats.put("registeredDevelopers", realUsers);
+        stats.put("analyzedProjects", realProjects);
+        stats.put("premiumMembers", realPremium);
         stats.put("aiAccuracy", 98.7);
 
         return ResponseEntity.ok(stats);

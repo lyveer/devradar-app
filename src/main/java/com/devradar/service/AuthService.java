@@ -167,8 +167,8 @@ public class AuthService {
             throw new RuntimeException("Bu e-posta adresi zaten başka bir kullanıcı tarafından kullanılıyor");
         }
 
-        // If the current email is a placeholder for OAuth users, we don't require the password
-        if (!currentEmail.startsWith("github-needs-email-")) {
+        // If the current email is a placeholder for OAuth users, or if they haven't set a password yet, we don't require the password
+        if (!currentEmail.startsWith("github-needs-email-") && !user.getPassword().startsWith("OAUTH_PASSWORD_")) {
             if (currentPassword == null || currentPassword.isBlank() || !passwordEncoder.matches(currentPassword, user.getPassword())) {
                 throw new RuntimeException("Mevcut şifreniz hatalı.");
             }
@@ -179,8 +179,12 @@ public class AuthService {
         user.setVerificationCodeExpiresAt(java.time.LocalDateTime.now().plusMinutes(10));
         userRepository.save(user);
 
-        // Send to old/current email address
-        emailService.sendVerificationCode(currentEmail, verificationCode);
+        // Send to old/current email address, or new email address if current is a GitHub placeholder
+        if (currentEmail.startsWith("github-needs-email-")) {
+            emailService.sendVerificationCode(targetNewEmail, verificationCode);
+        } else {
+            emailService.sendVerificationCode(currentEmail, verificationCode);
+        }
     }
 
     public AuthResponse confirmEmailChange(String currentEmail, String newEmail, String code) {
