@@ -71,8 +71,8 @@ function switchAuthMode(mode) {
     if (resetForm) resetForm.style.display = 'none';
 
     if (mode === 'login') {
-        title.innerText = 'Giriş Yap';
-        desc.innerText = 'Lyver Software DevRadarAI paneline erişmek için bilgilerinizi girin.';
+        title.setAttribute('data-i18n', 'auth-login-title');
+        desc.setAttribute('data-i18n', 'auth-login-desc');
         if (loginForm) loginForm.style.display = 'block';
         if (tabLogin) tabLogin.classList.add('active');
         if (tabRegister) tabRegister.classList.remove('active');
@@ -80,8 +80,8 @@ function switchAuthMode(mode) {
         if (socialDivider) socialDivider.style.display = 'flex';
         if (socialButtons) socialButtons.style.display = 'flex';
     } else if (mode === 'register') {
-        title.innerText = 'Hesap Oluştur';
-        desc.innerText = 'Hemen ücretsiz kaydolun ve AI gücünü keşfedin.';
+        title.setAttribute('data-i18n', 'auth-register-title');
+        desc.setAttribute('data-i18n', 'auth-register-desc');
         if (registerForm) registerForm.style.display = 'block';
         if (tabLogin) tabLogin.classList.remove('active');
         if (tabRegister) tabRegister.classList.add('active');
@@ -89,26 +89,30 @@ function switchAuthMode(mode) {
         if (socialDivider) socialDivider.style.display = 'flex';
         if (socialButtons) socialButtons.style.display = 'flex';
     } else if (mode === 'verify') {
-        title.innerText = 'E-postanızı Doğrulayın';
-        desc.innerText = 'Hesabınızı aktifleştirmek için e-postanıza gönderilen doğrulama kodunu girin.';
+        title.setAttribute('data-i18n', 'auth-verify-title-header');
+        desc.setAttribute('data-i18n', 'auth-verify-desc');
         if (verifyForm) verifyForm.style.display = 'block';
         if (tabsContainer) tabsContainer.style.display = 'none';
         if (socialDivider) socialDivider.style.display = 'none';
         if (socialButtons) socialButtons.style.display = 'none';
     } else if (mode === 'forgot-password') {
-        title.innerText = 'Şifremi Unuttum';
-        desc.innerText = 'Şifrenizi güvenle sıfırlayın.';
+        title.setAttribute('data-i18n', 'auth-forgot-title');
+        desc.setAttribute('data-i18n', 'auth-forgot-desc');
         if (forgotForm) forgotForm.style.display = 'block';
         if (tabsContainer) tabsContainer.style.display = 'none';
         if (socialDivider) socialDivider.style.display = 'none';
         if (socialButtons) socialButtons.style.display = 'none';
     } else if (mode === 'reset-password') {
-        title.innerText = 'Şifrenizi Sıfırlayın';
-        desc.innerText = 'Lütfen yeni bir şifre belirleyin.';
+        title.setAttribute('data-i18n', 'auth-reset-title');
+        desc.setAttribute('data-i18n', 'auth-reset-desc');
         if (resetForm) resetForm.style.display = 'block';
         if (tabsContainer) tabsContainer.style.display = 'none';
         if (socialDivider) socialDivider.style.display = 'none';
         if (socialButtons) socialButtons.style.display = 'none';
+    }
+
+    if (typeof applyTranslations === 'function') {
+        applyTranslations();
     }
 }
 
