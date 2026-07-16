@@ -102,11 +102,15 @@ header {
 }
 
 .logo img {
-    height: 38px;
+    height: 34px;
     width: auto;
     object-fit: contain;
     transition: var(--transition-smooth);
     display: block;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .logo img:hover {

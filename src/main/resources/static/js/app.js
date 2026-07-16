@@ -1123,64 +1123,241 @@ async function loadSettingsForm() {
         if (response.ok) {
             const user = await response.json();
             document.getElementById('settings-name').value = user.fullName || '';
-            document.getElementById('settings-email').value = user.email || '';
-            document.getElementById('settings-password').value = '';
+            const newEmailEl = document.getElementById('settings-new-email');
+            if (newEmailEl) newEmailEl.value = user.email || '';
+
+            // If the user's email is a placeholder from GitHub OAuth
+            if (user.email && user.email.startsWith('github-needs-email-')) {
+                const group = document.getElementById('current-password-group');
+                if (group) group.style.display = 'none';
+            } else {
+                const group = document.getElementById('current-password-group');
+                if (group) group.style.display = 'block';
+            }
         }
     } catch (err) {
         showToast('Kullanıcı bilgileri yüklenemedi', 'error');
     }
 }
 
-async function handleUpdateSettings(event) {
+let emailChangeStep = 1; // 1: request, 2: confirm
+async function handleRequestEmailChange(event) {
     event.preventDefault();
+    const newEmail = document.getElementById('settings-new-email').value;
+    const currentPassword = document.getElementById('settings-email-current-password').value;
+    const code = document.getElementById('settings-email-code').value;
 
-    const fullName = document.getElementById('settings-name').value;
-    const email = document.getElementById('settings-email').value;
-    const password = document.getElementById('settings-password').value;
-    const code = document.getElementById('settings-code').value;
+    const submitBtn = document.getElementById('email-change-submit-btn');
 
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerText : 'Bilgileri Güncelle';
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Güncelleniyor...';
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/auth/update`, {
-            method: 'PUT',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ fullName, email, password, code })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            localStorage.setItem('devradar_token', data.token);
-            localStorage.setItem('devradar_email', data.email);
-            localStorage.setItem('devradar_name', data.fullName);
-
-            document.getElementById('user-display').innerText = data.fullName;
-
-            showToast('Hesap bilgileriniz başarıyla güncellendi!', 'success');
-            document.getElementById('settings-password').value = '';
-            document.getElementById('settings-code').value = '';
-            document.getElementById('settings-code-group').style.display = 'none';
-            await loadUserInfo();
-        } else {
-            if (data.message && data.message.includes('PASSWORD_CHANGE_CODE_SENT')) {
-                document.getElementById('settings-code-group').style.display = 'block';
-                showToast('Şifre değişikliği için e-postanıza gönderilen doğrulama kodunu girin.', 'success');
+    if (emailChangeStep === 1) {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Kod Gönderiliyor...';
+        }
+        try {
+            const response = await fetch(`${API_URL}/auth/profile/request-email-change`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ newEmail, currentPassword })
+            });
+            if (response.ok) {
+                showToast('Doğrulama kodu e-posta adresinize gönderildi.', 'success');
+                document.getElementById('email-change-code-group').style.display = 'block';
+                emailChangeStep = 2;
+                if (submitBtn) submitBtn.innerText = 'E-postayı Güncelle';
             } else {
-                showToast(data.message || 'Güncelleme başarısız', 'error');
+                const data = await response.json();
+                showToast(data.message || 'Kod gönderilemedi', 'error');
+            }
+        } catch (err) {
+            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        } finally {
+            if (submitBtn && emailChangeStep === 1) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Doğrulama Kodu Gönder';
             }
         }
-    } catch (err) {
-        showToast('Sunucu ile bağlantı kurulamadı', 'error');
-    } finally {
+    } else if (emailChangeStep === 2) {
+        if (!code || code.length !== 6) {
+            showToast('Lütfen 6 haneli doğrulama kodunu girin.', 'error');
+            return;
+        }
         if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'E-posta Güncelleniyor...';
+        }
+        try {
+            const response = await fetch(`${API_URL}/auth/profile/confirm-email-change`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ newEmail, code })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('devradar_token', data.token);
+                localStorage.setItem('devradar_email', data.email);
+                showToast('E-posta adresiniz başarıyla güncellendi!', 'success');
+                emailChangeStep = 1;
+                document.getElementById('email-change-code-group').style.display = 'none';
+                document.getElementById('settings-email-code').value = '';
+                document.getElementById('settings-email-current-password').value = '';
+                if (submitBtn) submitBtn.innerText = 'Doğrulama Kodu Gönder';
+                await loadUserInfo();
+            } else {
+                showToast(data.message || 'Doğrulama başarısız', 'error');
+            }
+        } catch (err) {
+            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+}
+
+let passwordChangeStep = 1; // 1: request, 2: confirm
+async function handleRequestPasswordChange(event) {
+    event.preventDefault();
+    const newPassword = document.getElementById('settings-new-password').value;
+    const code = document.getElementById('settings-password-code').value;
+
+    const submitBtn = document.getElementById('password-change-submit-btn');
+
+    if (passwordChangeStep === 1) {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Kod Gönderiliyor...';
+        }
+        try {
+            const response = await fetch(`${API_URL}/auth/profile/request-password-change`, {
+                method: 'POST',
+                headers: getAuthHeaders()
+            });
+            if (response.ok) {
+                showToast('Doğrulama kodu e-posta adresinize gönderildi.', 'success');
+                document.getElementById('password-change-code-group').style.display = 'block';
+                passwordChangeStep = 2;
+                if (submitBtn) submitBtn.innerText = 'Şifreyi Güncelle';
+            } else {
+                const data = await response.json();
+                showToast(data.message || 'Kod gönderilemedi', 'error');
+            }
+        } catch (err) {
+            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        } finally {
+            if (submitBtn && passwordChangeStep === 1) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Doğrulama Kodu Gönder';
+            }
+        }
+    } else if (passwordChangeStep === 2) {
+        if (!code || code.length !== 6) {
+            showToast('Lütfen 6 haneli doğrulama kodunu girin.', 'error');
+            return;
+        }
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Şifre Güncelleniyor...';
+        }
+        try {
+            const response = await fetch(`${API_URL}/auth/profile/confirm-password-change`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ newPassword, code })
+            });
+            if (response.ok) {
+                showToast('Şifreniz başarıyla güncellendi!', 'success');
+                passwordChangeStep = 1;
+                document.getElementById('password-change-code-group').style.display = 'none';
+                document.getElementById('settings-password-code').value = '';
+                document.getElementById('settings-new-password').value = '';
+                if (submitBtn) submitBtn.innerText = 'Doğrulama Kodu Gönder';
+                await loadUserInfo();
+            } else {
+                const data = await response.json();
+                showToast(data.message || 'Doğrulama başarısız', 'error');
+            }
+        } catch (err) {
+            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+}
+
+let modalEmailStep = 1;
+async function handleModalEmailChange(event) {
+    event.preventDefault();
+    const newEmail = document.getElementById('modal-new-email').value;
+    const code = document.getElementById('modal-email-code').value;
+    const submitBtn = document.getElementById('modal-email-submit-btn');
+
+    if (modalEmailStep === 1) {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Kod Gönderiliyor...';
+        }
+        try {
+            const response = await fetch(`${API_URL}/auth/profile/request-email-change`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ newEmail })
+            });
+            if (response.ok) {
+                showToast('Doğrulama kodu e-posta adresinize gönderildi.', 'success');
+                document.getElementById('modal-email-code-group').style.display = 'block';
+                modalEmailStep = 2;
+                if (submitBtn) submitBtn.innerText = 'E-postayı Doğrula ve Kaydet';
+            } else {
+                const data = await response.json();
+                showToast(data.message || 'Hata oluştu', 'error');
+            }
+        } catch (err) {
+            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        } finally {
+            if (submitBtn && modalEmailStep === 1) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Doğrulama Kodu Gönder';
+            }
+        }
+    } else if (modalEmailStep === 2) {
+        if (!code || code.length !== 6) {
+            showToast('Lütfen 6 haneli doğrulama kodunu girin.', 'error');
+            return;
+        }
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Doğrulanıyor...';
+        }
+        try {
+            const response = await fetch(`${API_URL}/auth/profile/confirm-email-change`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ newEmail, code })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('devradar_token', data.token);
+                localStorage.setItem('devradar_email', data.email);
+                showToast('E-posta adresiniz başarıyla tanımlandı!', 'success');
+                document.getElementById('github-email-modal').style.display = 'none';
+                await loadUserInfo();
+            } else {
+                showToast(data.message || 'Doğrulama başarısız', 'error');
+            }
+        } catch (err) {
+            showToast('Sunucu ile bağlantı kurulamadı', 'error');
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+}
+
+function checkGithubEmailRequirement() {
+    const userEmail = localStorage.getItem('devradar_email');
+    if (userEmail && userEmail.startsWith('github-needs-email-')) {
+        const modal = document.getElementById('github-email-modal');
+        if (modal) {
+            modal.style.display = 'flex';
         }
     }
 }
@@ -1200,5 +1377,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadProfile();
         loadUserInfo();
+        checkGithubEmailRequirement();
     }
 });

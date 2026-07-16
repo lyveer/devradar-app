@@ -5,11 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevRadarAI — Giriş & Kayıt | Lyver Software</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/i18n.js"></script>
+    <script src="js/security.js"></script>
 </head>
 <body>
     <header>
-        <div class="container nav-container">
-            <a href="/" class="logo" style="text-decoration: none;"><img src="/images/devradar_ai_lyver_software.png" alt="DevRadar Logo"></a>
+        <div class="container nav-container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="/" class="logo" style="text-decoration: none;">
+                <img src="/images/devradar_ai_lyver_software.png" alt="DevRadar Logo">
+                <span>DevRadarAI</span>
+            </a>
+            <div class="lang-switcher">
+                <select id="lang-select" onchange="changeLanguage(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; outline: none;">
+                    <option value="tr">🇹🇷 TR</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="de">🇩🇪 DE</option>
+                </select>
+            </div>
         </div>
     </header>
 
@@ -21,67 +33,67 @@
             </div>
 
             <div class="auth-tabs" id="auth-tabs-container">
-                <button class="auth-tab active" id="tab-login" onclick="switchAuthMode('login')">Giriş Yap</button>
-                <button class="auth-tab" id="tab-register" onclick="switchAuthMode('register')">Kayıt Ol</button>
+                <button class="auth-tab active" id="tab-login" data-i18n="auth-login-tab" onclick="switchAuthMode('login')">Giriş Yap</button>
+                <button class="auth-tab" id="tab-register" data-i18n="auth-register-tab" onclick="switchAuthMode('register')">Kayıt Ol</button>
             </div>
 
             <!-- Login Form -->
             <form id="login-form" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label for="login-email">E-posta</label>
-                    <input type="email" id="login-email" class="form-control" placeholder="isim@sirket.com" required>
+                    <label for="login-email" data-i18n="auth-email-label">E-posta</label>
+                    <input type="email" id="login-email" class="form-control" data-i18n-placeholder="ph-email" placeholder="isim@sirket.com" required>
                 </div>
                 <div class="form-group">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                        <label for="login-password" style="margin-bottom: 0;">Şifre</label>
-                        <a href="javascript:void(0)" onclick="switchAuthMode('forgot-password')" style="font-size: 0.8rem; color: var(--secondary); text-decoration: none;">Şifremi Unuttum</a>
+                        <label for="login-password" data-i18n="auth-password-label" style="margin-bottom: 0;">Şifre</label>
+                        <a href="javascript:void(0)" onclick="switchAuthMode('forgot-password')" data-i18n="auth-forgot-link" style="font-size: 0.8rem; color: var(--secondary); text-decoration: none;">Şifremi Unuttum</a>
                     </div>
-                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" id="login-password" class="form-control" data-i18n-placeholder="ph-password" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Giriş Yap</button>
+                <button type="submit" class="btn btn-primary" data-i18n="auth-login-btn" style="width: 100%; margin-top: 1rem;">Giriş Yap</button>
             </form>
 
             <!-- Register Form -->
             <form id="register-form" onsubmit="handleRegister(event)" style="display: none;">
                 <div class="form-group">
-                    <label for="register-name">Ad Soyad</label>
-                    <input type="text" id="register-name" class="form-control" placeholder="John Doe" required>
+                    <label for="register-name" data-i18n="auth-name-label">Ad Soyad</label>
+                    <input type="text" id="register-name" class="form-control" data-i18n-placeholder="ph-name" placeholder="John Doe" required>
                 </div>
                 <div class="form-group">
-                    <label for="register-email">E-posta Adresi</label>
-                    <input type="email" id="register-email" class="form-control" placeholder="isim@sirket.com" required>
+                    <label for="register-email" data-i18n="auth-email-label">E-posta Adresi</label>
+                    <input type="email" id="register-email" class="form-control" data-i18n-placeholder="ph-email" placeholder="isim@sirket.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="register-password">Şifre</label>
-                    <input type="password" id="register-password" class="form-control" placeholder="En az 6 karakter" required minlength="6">
+                    <label for="register-password" data-i18n="auth-password-label">Şifre</label>
+                    <input type="password" id="register-password" class="form-control" data-i18n-placeholder="ph-password" placeholder="En az 6 karakter" required minlength="6">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Kayıt Ol</button>
+                <button type="submit" class="btn btn-primary" data-i18n="auth-register-btn" style="width: 100%; margin-top: 1rem;">Kayıt Ol</button>
             </form>
 
             <!-- Verification Code Form -->
             <form id="verify-form" onsubmit="handleVerify(event)" style="display: none;">
                 <p id="verify-email-text" class="score-desc" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-secondary);"></p>
                 <div class="form-group">
-                    <label for="verify-code">6 Haneli Doğrulama Kodu</label>
-                    <input type="text" id="verify-code" class="form-control" placeholder="123456" required maxlength="6" minlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3rem;">
+                    <label for="verify-code" data-i18n="auth-verify-title">6 Haneli Doğrulama Kodu</label>
+                    <input type="text" id="verify-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" required maxlength="6" minlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3rem;">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Doğrula ve Giriş Yap</button>
+                <button type="submit" class="btn btn-primary" data-i18n="auth-verify-btn" style="width: 100%; margin-top: 1rem;">Doğrula ve Giriş Yap</button>
                 <div style="text-align: center; margin-top: 1.25rem; display: flex; justify-content: space-between; font-size: 0.85rem;">
-                    <a href="javascript:void(0)" onclick="handleResendCode()" style="color: var(--secondary); text-decoration: none; font-weight: 600;">Kodu Tekrar Gönder</a>
-                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" style="color: var(--text-secondary); text-decoration: none;">Geri Dön</a>
+                    <a href="javascript:void(0)" onclick="handleResendCode()" data-i18n="auth-resend-code" style="color: var(--secondary); text-decoration: none; font-weight: 600;">Kodu Tekrar Gönder</a>
+                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" data-i18n="auth-back-to-login" style="color: var(--text-secondary); text-decoration: none;">Geri Dön</a>
                 </div>
             </form>
 
             <!-- Forgot Password Form -->
             <form id="forgot-form" onsubmit="handleForgotPassword(event)" style="display: none;">
-                <p class="score-desc" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-secondary);">Şifrenizi sıfırlamak için kayıtlı e-posta adresinizi girin.</p>
+                <p class="score-desc" data-i18n="auth-forgot-desc" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-secondary);">Şifrenizi sıfırlamak için kayıtlı e-posta adresinizi girin.</p>
                 <div class="form-group">
-                    <label for="forgot-email">E-posta Adresi</label>
-                    <input type="email" id="forgot-email" class="form-control" placeholder="isim@sirket.com" required>
+                    <label for="forgot-email" data-i18n="auth-email-label">E-posta Adresi</label>
+                    <input type="email" id="forgot-email" class="form-control" data-i18n-placeholder="ph-email" placeholder="isim@sirket.com" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sıfırlama Kodu Gönder</button>
+                <button type="submit" class="btn btn-primary" data-i18n="auth-send-reset-btn" style="width: 100%; margin-top: 1rem;">Sıfırlama Kodu Gönder</button>
                 <div style="text-align: center; margin-top: 1.25rem;">
-                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none;">Giriş Ekranına Dön</a>
+                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" data-i18n="auth-back-to-login" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none;">Giriş Ekranına Dön</a>
                 </div>
             </form>
 
@@ -89,31 +101,31 @@
             <form id="reset-form" onsubmit="handleResetPassword(event)" style="display: none;">
                 <p id="reset-email-text" class="score-desc" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-secondary);"></p>
                 <div class="form-group">
-                    <label for="reset-code">6 Haneli Doğrulama Kodu</label>
-                    <input type="text" id="reset-code" class="form-control" placeholder="123456" required maxlength="6" minlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3rem;">
+                    <label for="reset-code" data-i18n="auth-verify-title">6 Haneli Doğrulama Kodu</label>
+                    <input type="text" id="reset-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" required maxlength="6" minlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3rem;">
                 </div>
                 <div class="form-group">
-                    <label for="reset-password">Yeni Şifre</label>
-                    <input type="password" id="reset-password" class="form-control" placeholder="En az 6 karakter" required minlength="6">
+                    <label for="reset-password" data-i18n="auth-new-password-label">Yeni Şifre</label>
+                    <input type="password" id="reset-password" class="form-control" data-i18n-placeholder="ph-password" placeholder="En az 6 karakter" required minlength="6">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Şifremi Güncelle</button>
+                <button type="submit" class="btn btn-primary" data-i18n="auth-reset-btn" style="width: 100%; margin-top: 1rem;">Şifremi Güncelle</button>
                 <div style="text-align: center; margin-top: 1.25rem;">
-                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none;">Giriş Ekranına Dön</a>
+                    <a href="javascript:void(0)" onclick="switchAuthMode('login')" data-i18n="auth-back-to-login" style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none;">Giriş Ekranına Dön</a>
                 </div>
             </form>
 
             <div id="social-divider" class="form-divider" style="display: flex; align-items: center; text-align: center; color: #6b7280; font-size: 0.85rem; margin: 1.5rem 0;">
                 <span style="flex: 1; border-bottom: 1px solid rgba(255,255,255,0.08); margin-right: 0.5rem;"></span>
-                veya sosyal medya ile bağlanın
+                <span data-i18n="auth-social-divider">veya sosyal medya ile bağlanın</span>
                 <span style="flex: 1; border-bottom: 1px solid rgba(255,255,255,0.08); margin-left: 0.5rem;"></span>
             </div>
 
             <div id="social-buttons" class="social-login-buttons" style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem;">
                 <a href="/oauth2/authorization/google" class="btn" style="flex: 1; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; border-radius: 8px; padding: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
-                    <span style="font-weight: 800;">G</span> Google ile Giriş
+                    <span style="font-weight: 800;">G</span> <span data-i18n="auth-google-login">Google ile Giriş</span>
                 </a>
                 <a href="/oauth2/authorization/github" class="btn" style="flex: 1; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(243, 244, 246, 0.08); border: 1px solid rgba(243, 244, 246, 0.2); color: #f3f4f6; border-radius: 8px; padding: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
-                    <span>🐙</span> GitHub ile Giriş
+                    <span>🐙</span> <span data-i18n="auth-github-login">GitHub ile Giriş</span>
                 </a>
             </div>
         </div>

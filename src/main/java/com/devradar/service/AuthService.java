@@ -158,43 +158,52 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public AuthResponse updateProfile(String currentEmail, UpdateProfileRequest request) {
+    public void requestEmailChange(String currentEmail, String newEmail, String currentPassword) {
         User user = userRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        // If trying to change password
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            if (request.getCode() == null || request.getCode().isBlank()) {
-                String verificationCode = String.format("%06d", new java.util.Random().nextInt(1000000));
-                user.setVerificationCode(verificationCode);
-                user.setVerificationCodeExpiresAt(java.time.LocalDateTime.now().plusMinutes(10));
-                userRepository.save(user);
+        String targetNewEmail = newEmail.trim().toLowerCase();
+        if (userRepository.existsByEmail(targetNewEmail)) {
+            throw new RuntimeException("Bu e-posta adresi zaten başka bir kullanıcı tarafından kullanılıyor");
+        }
 
-                emailService.sendPasswordResetCode(user.getEmail(), verificationCode);
-                throw new RuntimeException("PASSWORD_CHANGE_CODE_SENT: Şifre değişikliği için e-postanıza gönderilen doğrulama kodunu girin.");
-            } else {
-                if (user.getVerificationCode() == null || !user.getVerificationCode().equals(request.getCode())) {
-                    throw new RuntimeException("Geçersiz doğrulama kodu.");
-                }
-                if (user.getVerificationCodeExpiresAt() != null && user.getVerificationCodeExpiresAt().isBefore(java.time.LocalDateTime.now())) {
-                    throw new RuntimeException("Doğrulama kodunun süresi dolmuş. Lütfen tekrar deneyin.");
-                }
-                user.setPassword(passwordEncoder.encode(request.getPassword()));
-                user.setVerificationCode(null);
-                user.setVerificationCodeExpiresAt(null);
+        // If the current email is a placeholder for OAuth users, we don't require the password
+        if (!currentEmail.startsWith("github-needs-email-")) {
+            if (currentPassword == null || currentPassword.isBlank() || !passwordEncoder.matches(currentPassword, user.getPassword())) {
+                throw new RuntimeException("Mevcut şifreniz hatalı.");
             }
         }
 
-        String newEmail = request.getEmail().trim().toLowerCase();
-        if (!user.getEmail().equalsIgnoreCase(newEmail)) {
-            if (userRepository.existsByEmail(newEmail)) {
-                throw new RuntimeException("Bu e-posta adresi zaten başka bir kullanıcı tarafından kullanılıyor");
-            }
-            user.setEmail(newEmail);
+        String verificationCode = String.format("%06d", new java.util.Random().nextInt(1000000));
+        user.setVerificationCode(verificationCode);
+        user.setVerificationCodeExpiresAt(java.time.LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        // Send to old/current email address
+        emailService.sendVerificationCode(currentEmail, verificationCode);
+    }
+
+    public AuthResponse confirmEmailChange(String currentEmail, String newEmail, String code) {
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        if (user.getVerificationCode() == null || !user.getVerificationCode().equals(code)) {
+            throw new RuntimeException("Geçersiz doğrulama kodu.");
         }
 
-        user.setFullName(request.getFullName().trim());
+        if (user.getVerificationCodeExpiresAt() != null && user.getVerificationCodeExpiresAt().isBefore(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("Doğrulama kodunun süresi dolmuş. Lütfen tekrar deneyin.");
+        }
 
+        String targetNewEmail = newEmail.trim().toLowerCase();
+        if (userRepository.existsByEmail(targetNewEmail)) {
+            throw new RuntimeException("Bu e-posta adresi zaten başka bir kullanıcı tarafından kullanılıyor");
+        }
+
+        user.setEmail(targetNewEmail);
+        user.setIsVerified(true); // Verifying the new email
+        user.setVerificationCode(null);
+        user.setVerificationCodeExpiresAt(null);
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getEmail());
@@ -203,8 +212,38 @@ public class AuthService {
                 .token(token)
                 .email(user.getEmail())
                 .fullName(user.getFullName())
-                .isVerified(user.getIsVerified())
+                .isVerified(true)
                 .build();
+    }
+
+    public void requestPasswordChange(String currentEmail) {
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        String verificationCode = String.format("%06d", new java.util.Random().nextInt(1000000));
+        user.setVerificationCode(verificationCode);
+        user.setVerificationCodeExpiresAt(java.time.LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        emailService.sendPasswordResetCode(currentEmail, verificationCode);
+    }
+
+    public void confirmPasswordChange(String currentEmail, String newPassword, String code) {
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        if (user.getVerificationCode() == null || !user.getVerificationCode().equals(code)) {
+            throw new RuntimeException("Geçersiz doğrulama kodu.");
+        }
+
+        if (user.getVerificationCodeExpiresAt() != null && user.getVerificationCodeExpiresAt().isBefore(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("Doğrulama kodunun süresi dolmuş. Lütfen tekrar deneyin.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setVerificationCode(null);
+        user.setVerificationCodeExpiresAt(null);
+        userRepository.save(user);
     }
 
     public User getMe(String email) {

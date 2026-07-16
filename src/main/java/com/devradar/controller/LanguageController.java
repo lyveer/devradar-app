@@ -18,7 +18,8 @@ public class LanguageController {
 
     private static final List<Map<String, String>> SUPPORTED = List.of(
             Map.of("code", "tr", "name", "Türkçe", "flag", "🇹🇷"),
-            Map.of("code", "en", "name", "English", "flag", "🇬🇧")
+            Map.of("code", "en", "name", "English", "flag", "🇬🇧"),
+            Map.of("code", "de", "name", "Deutsch", "flag", "🇩🇪")
     );
 
     @GetMapping

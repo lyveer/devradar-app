@@ -74,6 +74,7 @@ public class GeminiAIService {
         if (language == null) return "tr";
         String l = language.trim().toLowerCase();
         if (l.startsWith("en")) return "en";
+        if (l.startsWith("de")) return "de";
         return "tr";
     }
 

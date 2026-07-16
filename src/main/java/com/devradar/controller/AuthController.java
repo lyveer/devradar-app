@@ -59,10 +59,30 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<AuthResponse> updateProfile(Authentication authentication,
-                                                      @Valid @RequestBody com.devradar.dto.UpdateProfileRequest request) {
-        return ResponseEntity.ok(authService.updateProfile(authentication.getName(), request));
+    @PostMapping("/profile/request-email-change")
+    public ResponseEntity<Void> requestEmailChange(Authentication authentication,
+                                                   @Valid @RequestBody com.devradar.dto.EmailChangeRequest request) {
+        authService.requestEmailChange(authentication.getName(), request.getNewEmail(), request.getCurrentPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/profile/confirm-email-change")
+    public ResponseEntity<AuthResponse> confirmEmailChange(Authentication authentication,
+                                                           @Valid @RequestBody com.devradar.dto.EmailChangeRequest request) {
+        return ResponseEntity.ok(authService.confirmEmailChange(authentication.getName(), request.getNewEmail(), request.getCode()));
+    }
+
+    @PostMapping("/profile/request-password-change")
+    public ResponseEntity<Void> requestPasswordChange(Authentication authentication) {
+        authService.requestPasswordChange(authentication.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/profile/confirm-password-change")
+    public ResponseEntity<Void> confirmPasswordChange(Authentication authentication,
+                                                      @Valid @RequestBody com.devradar.dto.PasswordChangeRequest request) {
+        authService.confirmPasswordChange(authentication.getName(), request.getNewPassword(), request.getCode());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/subscribe")
