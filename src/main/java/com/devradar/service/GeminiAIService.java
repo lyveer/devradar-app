@@ -286,8 +286,13 @@ public class GeminiAIService {
                 return "llama-3.3-70b-versatile";
             }
             return model;
+        } else if (apiKey != null && apiKey.trim().startsWith("pplx-")) {
+            if (model == null || (!model.contains("sonar") && !model.contains("perplexity"))) {
+                return "sonar";
+            }
+            return model;
         } else {
-            if (model == null || model.contains("llama") || model.contains("mixtral") || model.contains("gemma") || model.contains("groq")) {
+            if (model == null || model.contains("llama") || model.contains("mixtral") || model.contains("gemma") || model.contains("groq") || model.contains("sonar")) {
                 return "gemini-1.5-flash";
             }
             return model;
@@ -297,6 +302,9 @@ public class GeminiAIService {
     private GeminiCallResult callGemini(String prompt) {
         if (apiKey != null && apiKey.trim().startsWith("gsk_")) {
             return callGroq(prompt);
+        }
+        if (apiKey != null && apiKey.trim().startsWith("pplx-")) {
+            return callPerplexity(prompt);
         }
         String resolvedModel = getEffectiveModel();
         return callGeminiInternal(prompt, resolvedModel, true);
@@ -408,6 +416,45 @@ public class GeminiAIService {
             return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString());
         } catch (Exception e) {
             log.error("Groq API call failed unexpectedly", e);
+            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+    }
+
+    private GeminiCallResult callPerplexity(String prompt) {
+        String url = "https://api.perplexity.ai/chat/completions";
+        String resolvedModel = getEffectiveModel();
+
+        Map<String, Object> message = Map.of("role", "user", "content", prompt);
+        Map<String, Object> body = Map.of(
+                "model", resolvedModel,
+                "messages", List.of(message)
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + apiKey.trim());
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<JsonNode> response = restTemplate.exchange(
+                    url, HttpMethod.POST, entity, JsonNode.class);
+            JsonNode responseBody = response.getBody();
+
+            if (responseBody != null && responseBody.has("choices")
+                    && responseBody.get("choices").size() > 0) {
+                JsonNode choice = responseBody.get("choices").get(0);
+                String text = choice.path("message").path("content").asText("");
+                if (text.isBlank()) {
+                    return GeminiCallResult.fail("Perplexity returned an empty text part");
+                }
+                return GeminiCallResult.ok(text);
+            }
+            return GeminiCallResult.fail("Perplexity response had no choices. Full body: " + responseBody);
+        } catch (RestClientResponseException e) {
+            log.error("Perplexity API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
+            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString());
+        } catch (Exception e) {
+            log.error("Perplexity API call failed unexpectedly", e);
             return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
