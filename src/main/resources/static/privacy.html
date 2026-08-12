@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası — DevRadarAI | Lyver Software</title>
+    <!-- Fonts -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: {
+                            950: '#04040a',
+                            900: '#080812',
+                            800: '#0d0d1f',
+                            700: '#12122e',
+                            600: '#1a1a3e',
+                        },
+                        signal: {
+                            DEFAULT: '#e8ff47',
+                            dim: '#b8cc38',
+                        },
+                        ember: {
+                            DEFAULT: '#ff6b35',
+                        },
+                        mist: {
+                            100: '#f0f0f8',
+                            700: '#a3a3c2',
+                            900: '#47476b',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Clash Display', 'sans-serif'],
+                        body: ['Cabinet Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/css">
+        * {
+            cursor: none !important;
+        }
+        body {
+            background-color: #04040a;
+            color: #f0f0f8;
+            font-family: "Cabinet Grotesk", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden selection:bg-signal selection:text-ink-950">
+
+    <!-- Custom Cursor -->
+    <div id="custom-cursor" class="fixed top-0 left-0 w-2 h-2 bg-signal rounded-full pointer-events-none z-[9999] will-change-transform"></div>
+    <div id="custom-cursor-ring" class="fixed top-0 left-0 w-8 h-8 border border-signal/40 rounded-full pointer-events-none z-[9998] will-change-transform transition-[width,height,background-color,border-color] duration-300"></div>
+
+    <!-- Grid Background -->
+    <div class="absolute inset-0 grid-bg z-[-2] pointer-events-none opacity-40"></div>
+
+    <!-- Header -->
+    <header class="w-full border-b border-white/[0.06] bg-ink-950/80 backdrop-filter backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="relative w-8 h-8 bg-ink-900 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="/images/devradar_ai_lyver_software_site.png" alt="DevRadar Logo" class="h-6 w-auto object-contain">
+                </div>
+                <span class="font-display font-semibold text-lg text-mist-100 tracking-tight">DevRadar<span class="text-signal">AI</span></span>
+            </a>
+            <a href="/" class="text-xs font-mono font-bold text-signal tracking-widest uppercase hover:underline">← Geri Dön</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-16">
+        <div class="border border-white/10 rounded-2xl p-8 md:p-12 bg-ink-900/40 backdrop-blur-md relative">
+            <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+            
+            <h1 class="font-display font-semibold text-4xl mb-2 tracking-tight relative z-10">Gizlilik Politikası</h1>
+            <p class="text-xs text-mist-700 font-mono mb-8 relative z-10">Son Güncelleme: 12 Ağustos 2026</p>
+
+            <div class="space-y-8 relative z-10 text-mist-700 leading-relaxed text-sm">
+                <section class="space-y-3">
+                    <h2 class="text-mist-100 font-display font-semibold text-xl">1. Veri Toplama ve Kullanımı</h2>
+                    <p>DevRadarAI, Google ve GitHub OAuth aracılığıyla giriş yaptığınızda hesabınızla ilişkili olan ad, e-posta adresi ve profil fotoğrafı gibi temel bilgileri toplar. Bu veriler, profilinizi oluşturmak, doğrulama kodlarını iletmek ve sistem özelliklerini size sunmak amacıyla işlenmektedir.</p>
+                </section>
+
+                <section class="space-y-3">
+                    <h2 class="text-mist-100 font-display font-semibold text-xl">2. Çerezler ve Analizler</h2>
+                    <p>Web sitemizde gezinme deneyiminizi optimize etmek ve kullanıcı oturumlarını yönetmek amacıyla teknik çerezler kullanılmaktadır. Üçüncü taraf analiz araçları veya reklam ağları, kullanım verilerini anonim olarak izleyebilir.</p>
+                </section>
+
+                <section class="space-y-3">
+                    <h2 class="text-mist-100 font-display font-semibold text-xl">3. Veri Güvenliği</h2>
+                    <p>Toplanan tüm kişisel ve operasyonel veriler, endüstri standardı şifreleme yöntemleri (JWT token yetkilendirmesi ve güvenli SSL protokolleri) ile korunmaktadır. Yetkisiz erişim veya veri kaybını önlemek amacıyla veritabanlarımız düzenli olarak denetlenmektedir.</p>
+                </section>
+
+                <section class="space-y-3">
+                    <h2 class="text-mist-100 font-display font-semibold text-xl">4. Üçüncü Taraflarla Paylaşım</h2>
+                    <p>Kişisel verileriniz, yasal zorunluluklar hariç olmak üzere, rızanız dışında hiçbir üçüncü taraf kurum veya kuruluşla paylaşılmaz, satılmaz veya ticari amaçlarla kullanılmaz.</p>
+                </section>
+
+                <section class="space-y-3">
+                    <h2 class="text-mist-100 font-display font-semibold text-xl">5. İletişim</h2>
+                    <p>Gizlilik ilkelerimiz hakkında sorularınız varsa veya verilerinizin silinmesini talep etmek istiyorsanız, bizimle <span class="text-signal font-mono">lyver@devradarai.com</span> e-posta adresi üzerinden iletişime geçebilirsiniz.</p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // GPU-Accelerated Custom Cursor (Lag-Free)
+        const cursor = document.getElementById('custom-cursor');
+        const ring = document.getElementById('custom-cursor-ring');
+        let mouseX = 0, mouseY = 0;
+        let ringX = 0, ringY = 0;
+        let isMoving = false;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!isMoving) {
+                isMoving = true;
+                requestAnimationFrame(updateCursor);
+            }
+        });
+
+        function updateCursor() {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+
+            cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate3d(-50%, -50%, 0)`;
+            ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate3d(-50%, -50%, 0)`;
+
+            if (Math.abs(mouseX - ringX) > 0.1 || Math.abs(mouseY - ringY) > 0.1) {
+                requestAnimationFrame(updateCursor);
+            } else {
+                isMoving = false;
+            }
+        }
+
+        // Add hover effects for custom cursor
+        document.addEventListener('mouseenter', (e) => {
+            if (e.target.matches && e.target.matches('a, button, input, select, textarea, [onclick]')) {
+                ring.classList.add('w-12', 'h-12', 'bg-signal/5', 'border-signal');
+            }
+        }, true);
+        document.addEventListener('mouseleave', (e) => {
+            if (e.target.matches && e.target.matches('a, button, input, select, textarea, [onclick]')) {
+                ring.classList.remove('w-12', 'h-12', 'bg-signal/5', 'border-signal');
+            }
+        }, true);
+    </script>
+</body>
+</html>
