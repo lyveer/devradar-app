@@ -4,142 +4,335 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevRadarAI — Dashboard | Lyver Software</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Fonts -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: {
+                            950: '#04040a',
+                            900: '#080812',
+                            800: '#0d0d1f',
+                            700: '#12122e',
+                            600: '#1a1a3e',
+                        },
+                        signal: {
+                            DEFAULT: '#e8ff47',
+                            dim: '#b8cc38',
+                        },
+                        ember: {
+                            DEFAULT: '#ff6b35',
+                            dim: '#cc5529',
+                        },
+                        mist: {
+                            900: '#9898b8',
+                            700: '#c4c4d8',
+                            500: '#dcdcec',
+                            100: '#f0f0f8',
+                        },
+                    },
+                    fontFamily: {
+                        display: ['"Clash Display"', 'sans-serif'],
+                        body: ['"Cabinet Grotesk"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/css">
+        :root {
+            --success: #10b981;
+            --warning: #f59e0b;
+            --accent: #ef4444;
+        }
+        * {
+            cursor: none !important;
+        }
+        body {
+            background-color: #04040a;
+            color: #f0f0f8;
+            font-family: "Cabinet Grotesk", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+        /* Tab system active classes toggled by app.js */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        
+        /* Custom UI classes */
+        .sidebar-link.active {
+            @apply text-signal bg-signal/10 border border-signal/15 shadow-[0_0_15px_rgba(232,255,71,0.08)];
+        }
+        .spec-card.selected {
+            @apply border-signal bg-signal/10 text-signal shadow-[0_0_15px_rgba(232,255,71,0.1)];
+        }
+        
+        .checkbox-btn input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .checkbox-label {
+            @apply block border border-white/10 bg-ink-950/40 hover:border-signal/40 text-xs font-semibold px-4 py-2.5 rounded-xl cursor-pointer select-none transition-all text-center text-mist-700 hover:text-mist-100;
+        }
+        .checkbox-btn input[type="checkbox"]:checked + .checkbox-label {
+            @apply border-signal bg-signal/10 text-signal shadow-[0_0_15px_rgba(232,255,71,0.1)];
+        }
+
+        .radial-progress {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            background: conic-gradient(rgba(255,255,255,0.05) 360deg, transparent 0deg);
+        }
+        .radial-progress::after {
+            content: '';
+            position: absolute;
+            width: 124px;
+            height: 124px;
+            border-radius: 50%;
+            background-color: #080812;
+            z-index: 5;
+        }
+        .radial-progress .value {
+            position: relative;
+            z-index: 10;
+            font-size: 2.25rem;
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+        }
+
+        /* Checklist */
+        .checklist-item {
+            @apply flex items-center gap-3 p-4 border border-white/5 bg-ink-950/20 rounded-xl cursor-pointer select-none transition-all hover:border-white/10;
+        }
+        .checklist-item.completed {
+            @apply border-emerald-500/20 bg-emerald-500/5 text-mist-900 line-through;
+        }
+        .checklist-item input[type="checkbox"] {
+            @apply accent-emerald-500 rounded border-white/10 bg-ink-950 focus:ring-0 w-4 h-4 cursor-pointer;
+        }
+
+        /* Timeline Roadmap */
+        .roadmap-timeline {
+            @apply relative border-l border-white/10 pl-6 space-y-8 my-4 ml-3;
+        }
+        .roadmap-card {
+            @apply relative bg-ink-900/20 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all duration-300;
+        }
+        .roadmap-card::after {
+            content: '';
+            @apply absolute -left-[31px] top-6.5 w-4 h-4 rounded-full bg-ink-950 border-2 border-white/10 transition-colors duration-300;
+        }
+        .roadmap-card.completed {
+            @apply border-signal/40 bg-signal/5;
+        }
+        .roadmap-card.completed::after {
+            @apply border-signal bg-signal shadow-[0_0_10px_rgba(232,255,71,0.4)];
+        }
+
+        /* Tables */
+        .admin-table-container {
+            @apply overflow-x-auto border border-white/10 rounded-xl bg-ink-950/40;
+        }
+        .admin-table {
+            @apply w-full text-left border-collapse text-sm;
+        }
+        .admin-table th {
+            @apply border-b border-white/10 bg-ink-900/80 px-6 py-4 font-bold text-mist-700 uppercase text-xs tracking-wider;
+        }
+        .admin-table td {
+            @apply border-b border-white/5 px-6 py-4 text-mist-100;
+        }
+        .admin-table tr:last-child td {
+            @apply border-b-0;
+        }
+        .admin-btn {
+            @apply text-xs font-bold px-3 py-1.5 rounded-lg transition-transform hover:scale-[1.02] cursor-pointer;
+        }
+        .admin-btn.primary {
+            @apply bg-signal text-ink-950 hover:bg-signal-dim;
+        }
+        .admin-btn.secondary {
+            @apply bg-ink-900 border border-white/10 text-mist-100 hover:border-signal/50;
+        }
+    </style>
     <script src="js/i18n.js"></script>
     <script src="js/security.js"></script>
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6179884512996719"
-         crossorigin="anonymous"></script>
 </head>
-<body>
-    <header>
-        <div class="container nav-container">
-            <a href="/" class="logo" style="text-decoration: none;"><img src="/images/devradar_ai_lyver_software_site.png" alt="DevRadar Logo"></a>
-            <div class="nav-links" style="display: flex; align-items: center; gap: 0.5rem;">
-                <div class="lang-switcher">
-                    <select id="lang-select" onchange="changeLanguage(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; outline: none; margin-right: 0.5rem;">
+<body class="min-h-screen relative overflow-x-hidden selection:bg-signal selection:text-ink-950">
+
+    <!-- Custom Cursor -->
+    <div id="custom-cursor" class="fixed top-0 left-0 w-2 h-2 bg-signal rounded-full pointer-events-none z-[9999] will-change-transform"></div>
+    <div id="custom-cursor-ring" class="fixed top-0 left-0 w-8 h-8 border border-signal/40 rounded-full pointer-events-none z-[9998] will-change-transform transition-[width,height,background-color,border-color] duration-300"></div>
+
+    <!-- Grid Background -->
+    <div class="absolute inset-0 grid-bg z-[-2] pointer-events-none opacity-40"></div>
+
+    <!-- Header / Navbar -->
+    <header class="w-full border-b border-white/[0.06] bg-ink-950/80 backdrop-filter backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="relative w-8 h-8 bg-ink-900 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="/images/devradar_ai_lyver_software_site.png" alt="DevRadar Logo" class="h-6 w-auto object-contain">
+                    <span class="absolute top-1 right-1 w-1.5 h-1.5 bg-signal rounded-full animate-ping"></span>
+                    <span class="absolute top-1 right-1 w-1.5 h-1.5 bg-signal rounded-full"></span>
+                </div>
+                <span class="font-display font-semibold text-lg text-mist-100 tracking-tight group-hover:text-signal transition-colors">DevRadar<span class="text-signal">AI</span></span>
+            </a>
+
+            <div class="flex items-center gap-4">
+                <!-- Language switcher -->
+                <div class="relative">
+                    <select id="lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-ink-900 border border-white/10 text-mist-700 hover:text-mist-100 text-xs font-semibold rounded-lg px-3 py-1.5 pr-8 cursor-pointer outline-none focus:border-signal transition-colors">
                         <option value="tr">🇹🇷 TR</option>
                         <option value="en">🇬🇧 EN</option>
                         <option value="de">🇩🇪 DE</option>
                     </select>
+                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-mist-700">
+                        <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"></path></svg>
+                    </div>
                 </div>
-                <span id="credit-display" class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 6px; margin-bottom: 0; display: inline-flex; text-transform: none; border: 1px solid rgba(16, 185, 129, 0.25);"><span data-i18n="nav-credits">Kredi:</span> --</span>
-                <button id="subscribe-btn" onclick="handleSubscribe()" class="btn btn-primary" data-i18n="nav-unlimited" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Sınırsız Kredi Al</button>
-                <span id="user-display" style="font-weight: 600; color: var(--text-secondary); margin-right: 0.5rem;">Geliştirici</span>
-                <button onclick="handleLogout()" class="btn btn-outline" data-i18n="nav-logout" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Çıkış Yap</button>
+
+                <span id="credit-display" class="border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                    <span data-i18n="nav-credits">Kredi:</span> --
+                </span>
+                
+                <button id="subscribe-btn" onclick="handleSubscribe()" class="bg-signal text-ink-950 text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-signal-dim transition-transform hover:scale-[1.02]" data-i18n="nav-unlimited">Sınırsız Kredi Al</button>
+                
+                <span id="user-display" class="text-xs font-semibold text-mist-700 border-l border-white/10 pl-4 h-5 flex items-center">Geliştirici</span>
+                
+                <button onclick="handleLogout()" class="border border-white/10 hover:border-red-500/50 hover:bg-red-500/5 text-mist-700 hover:text-red-500 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors" data-i18n="nav-logout">Çıkış Yap</button>
             </div>
         </div>
     </header>
 
-    <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-link active" id="menu-profile" data-i18n="menu-profile" onclick="switchTab('profile')">
-                👤 Profil Puanlama
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8 min-h-[calc(100vh-5rem)]">
+        
+        <!-- Sidebar -->
+        <aside class="flex flex-col gap-2">
+            <div class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-profile" data-i18n="menu-profile" onclick="switchTab('profile')">
+                <span>👤</span> Profil Puanlama
             </div>
-            <div class="sidebar-link" id="menu-project" data-i18n="menu-project" onclick="switchTab('project')">
-                📊 Proje Analizi
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-project" data-i18n="menu-project" onclick="switchTab('project')">
+                <span>📊</span> Proje Analizi
             </div>
-            <div class="sidebar-link" id="menu-history" data-i18n="menu-history" onclick="switchTab('history')">
-                📜 Analiz Geçmişi
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-history" data-i18n="menu-history" onclick="switchTab('history')">
+                <span>📜</span> Analiz Geçmişi
             </div>
-            <div class="sidebar-link" id="menu-progress" data-i18n="menu-progress" onclick="switchTab('progress')">
-                📈 Proje İlerlemesi
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-progress" data-i18n="menu-progress" onclick="switchTab('progress')">
+                <span>📈</span> Proje İlerlemesi
             </div>
-            <div class="sidebar-link" id="menu-roadmap" data-i18n="menu-roadmap" onclick="switchTab('roadmap')">
-                🗺️ Yol Haritası
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-roadmap" data-i18n="menu-roadmap" onclick="switchTab('roadmap')">
+                <span>🗺️</span> Yol Haritası
             </div>
-            <div class="sidebar-link" id="menu-announcements" data-i18n="menu-announcements" onclick="switchTab('announcements')">
-                📢 Duyurular
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-announcements" data-i18n="menu-announcements" onclick="switchTab('announcements')">
+                <span>📢</span> Duyurular
             </div>
-            <div class="sidebar-link" id="menu-faq" data-i18n="menu-faq" onclick="switchTab('faq')">
-                ❓ SSS
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-faq" data-i18n="menu-faq" onclick="switchTab('faq')">
+                <span>❓</span> SSS
             </div>
-            <div class="sidebar-link" id="menu-settings" data-i18n="menu-settings" onclick="switchTab('settings')">
-                👤 Profil & Ayarlar
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-settings" data-i18n="menu-settings" onclick="switchTab('settings')">
+                <span>👤</span> Profil & Ayarlar
             </div>
-            <div class="sidebar-link" id="menu-admin" data-i18n="menu-admin" onclick="switchTab('admin')" style="display: none;">
-                🛠️ Yönetici Paneli
+            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-admin" data-i18n="menu-admin" onclick="switchTab('admin')" style="display: none;">
+                <span>🛠️</span> Yönetici Paneli
             </div>
 
-            <!-- Sidebar Google AdSense Widget -->
-            <div class="sidebar-ad-card" style="padding: 0; overflow: hidden; background: transparent; border: 1px solid var(--border-color); border-radius: 10px; min-height: 250px; display: flex; align-items: center; justify-content: center;">
-                <ins class="adsbygoogle"
-                     style="display:block; width:100%; min-height:250px;"
-                     data-ad-client="ca-pub-6179884512996719"
-                     data-ad-slot="4444444444"
-                     data-ad-format="rectangle"
-                     data-full-width-responsive="true"></ins>
+            <!-- Ad Card -->
+            <div class="mt-6 border border-white/10 rounded-2xl overflow-hidden min-h-[250px] flex items-center justify-center bg-ink-900/30 p-2">
+                <ins class="adsbygoogle" style="display:block; width:100%; min-height:250px;" data-ad-client="ca-pub-6179884512996719" data-ad-slot="4444444444" data-ad-format="rectangle" data-full-width-responsive="true"></ins>
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
         </aside>
 
         <!-- Main Workspace -->
-        <main class="dashboard-content">
+        <main class="lg:col-span-3 flex flex-col gap-6">
 
-            <!-- Top Google AdSense Banner -->
-            <div style="text-align: center; min-height: 90px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center;">
-                <ins class="adsbygoogle"
-                     style="display:block; width:100%; min-height:90px;"
-                     data-ad-client="ca-pub-6179884512996719"
-                     data-ad-slot="5555555555"
-                     data-ad-format="horizontal"
-                     data-full-width-responsive="true"></ins>
+            <!-- Top Banner Ad -->
+            <div class="border border-white/10 bg-ink-900/30 rounded-2xl overflow-hidden min-h-[90px] flex items-center justify-center p-2">
+                <ins class="adsbygoogle" style="display:block; width:100%; min-height:90px;" data-ad-client="ca-pub-6179884512996719" data-ad-slot="5555555555" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
-            
+
             <!-- PROFILE TAB -->
             <section id="tab-profile-pane" class="tab-pane active">
-                <div class="dashboard-grid">
-                    <!-- Left: Profile Form Card -->
-                    <div class="card">
-                        <h3 style="margin-bottom: 1.5rem;" data-i18n="profile-title">Kariyer Profilinizi Doldurun</h3>
-                        <form id="profile-form" onsubmit="handleSaveProfile(event)">
-                            <div class="form-group">
-                                <label style="margin-bottom: 0.75rem; display: block;" data-i18n="profile-field-specialization">Yazılım Alanı (Uzmanlık)</label>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Profile Form Card -->
+                    <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                        <h3 class="font-display font-semibold text-2xl mb-6 tracking-tight" data-i18n="profile-title">Kariyer Profilinizi Doldurun</h3>
+                        
+                        <form id="profile-form" onsubmit="handleSaveProfile(event)" class="space-y-6 relative z-10">
+                            <div class="space-y-3">
+                                <label class="block text-xs font-bold text-mist-700 tracking-wider uppercase" data-i18n="profile-field-specialization">Yazılım Alanı (Uzmanlık)</label>
                                 <input type="hidden" id="profile-specialization" required>
-                                <div class="specialization-grid">
-                                    <div class="spec-card" data-value="Frontend Developer" onclick="selectSpecialization('Frontend Developer')">
-                                        <span class="spec-icon">💻</span>
-                                        <span class="spec-title" data-i18n="spec-frontend-title">Frontend Developer</span>
-                                        <span class="spec-desc" data-i18n="spec-frontend-desc">React, Angular, Vue, CSS</span>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="spec-card border border-white/10 bg-ink-950/40 hover:border-signal/50 hover:bg-ink-900/40 cursor-pointer p-4 rounded-xl transition-all duration-300" data-value="Frontend Developer" onclick="selectSpecialization('Frontend Developer')">
+                                        <div class="text-xl mb-1">💻</div>
+                                        <div class="font-bold text-sm text-mist-100" data-i18n="spec-frontend-title">Frontend Developer</div>
+                                        <div class="text-[11px] text-mist-700 mt-0.5" data-i18n="spec-frontend-desc">React, Angular, Vue, CSS</div>
                                     </div>
-                                    <div class="spec-card" data-value="Backend Developer" onclick="selectSpecialization('Backend Developer')">
-                                        <span class="spec-icon">⚙️</span>
-                                        <span class="spec-title" data-i18n="spec-backend-title">Backend Developer</span>
-                                        <span class="spec-desc" data-i18n="spec-backend-desc">Spring Boot, Node.js, API, SQL</span>
+                                    <div class="spec-card border border-white/10 bg-ink-950/40 hover:border-signal/50 hover:bg-ink-900/40 cursor-pointer p-4 rounded-xl transition-all duration-300" data-value="Backend Developer" onclick="selectSpecialization('Backend Developer')">
+                                        <div class="text-xl mb-1">⚙️</div>
+                                        <div class="font-bold text-sm text-mist-100" data-i18n="spec-backend-title">Backend Developer</div>
+                                        <div class="text-[11px] text-mist-700 mt-0.5" data-i18n="spec-backend-desc">Spring Boot, Node.js, API, SQL</div>
                                     </div>
-                                    <div class="spec-card" data-value="Fullstack Developer" onclick="selectSpecialization('Fullstack Developer')">
-                                        <span class="spec-icon">🚀</span>
-                                        <span class="spec-title" data-i18n="spec-fullstack-title">Fullstack Developer</span>
-                                        <span class="spec-desc" data-i18n="spec-fullstack-desc">Hem Front hem Back-end</span>
+                                    <div class="spec-card border border-white/10 bg-ink-950/40 hover:border-signal/50 hover:bg-ink-900/40 cursor-pointer p-4 rounded-xl transition-all duration-300" data-value="Fullstack Developer" onclick="selectSpecialization('Fullstack Developer')">
+                                        <div class="text-xl mb-1">🚀</div>
+                                        <div class="font-bold text-sm text-mist-100" data-i18n="spec-fullstack-title">Fullstack Developer</div>
+                                        <div class="text-[11px] text-mist-700 mt-0.5" data-i18n="spec-fullstack-desc">Hem Front hem Back-end</div>
                                     </div>
-                                    <div class="spec-card" data-value="Mobile App Developer" onclick="selectSpecialization('Mobile App Developer')">
-                                        <span class="spec-icon">📱</span>
-                                        <span class="spec-title" data-i18n="spec-mobile-title">Mobile App Developer</span>
-                                        <span class="spec-desc" data-i18n="spec-mobile-desc">Flutter, iOS, Android</span>
+                                    <div class="spec-card border border-white/10 bg-ink-950/40 hover:border-signal/50 hover:bg-ink-900/40 cursor-pointer p-4 rounded-xl transition-all duration-300" data-value="Mobile App Developer" onclick="selectSpecialization('Mobile App Developer')">
+                                        <div class="text-xl mb-1">📱</div>
+                                        <div class="font-bold text-sm text-mist-100" data-i18n="spec-mobile-title">Mobile App Developer</div>
+                                        <div class="text-[11px] text-mist-700 mt-0.5" data-i18n="spec-mobile-desc">Flutter, iOS, Android</div>
                                     </div>
-                                    <div class="spec-card" data-value="DevOps Engineer" onclick="selectSpecialization('DevOps Engineer')">
-                                        <span class="spec-icon">☁️</span>
-                                        <span class="spec-title" data-i18n="spec-devops-title">DevOps Engineer</span>
-                                        <span class="spec-desc" data-i18n="spec-devops-desc">Docker, CI/CD, AWS, K8s</span>
+                                    <div class="spec-card border border-white/10 bg-ink-950/40 hover:border-signal/50 hover:bg-ink-900/40 cursor-pointer p-4 rounded-xl transition-all duration-300" data-value="DevOps Engineer" onclick="selectSpecialization('DevOps Engineer')">
+                                        <div class="text-xl mb-1">☁️</div>
+                                        <div class="font-bold text-sm text-mist-100" data-i18n="spec-devops-title">DevOps Engineer</div>
+                                        <div class="text-[11px] text-mist-700 mt-0.5" data-i18n="spec-devops-desc">Docker, CI/CD, AWS, K8s</div>
                                     </div>
-                                    <div class="spec-card" data-value="Data Scientist / AI Engineer" onclick="selectSpecialization('Data Scientist / AI Engineer')">
-                                        <span class="spec-icon">🧠</span>
-                                        <span class="spec-title" data-i18n="spec-ai-title">AI & Data Scientist</span>
-                                        <span class="spec-desc" data-i18n="spec-ai-desc">Python, ML, NLP, LLM</span>
+                                    <div class="spec-card border border-white/10 bg-ink-950/40 hover:border-signal/50 hover:bg-ink-900/40 cursor-pointer p-4 rounded-xl transition-all duration-300" data-value="Data Scientist / AI Engineer" onclick="selectSpecialization('Data Scientist / AI Engineer')">
+                                        <div class="text-xl mb-1">🧠</div>
+                                        <div class="font-bold text-sm text-mist-100" data-i18n="spec-ai-title">AI & Data Scientist</div>
+                                        <div class="text-[11px] text-mist-700 mt-0.5" data-i18n="spec-ai-desc">Python, ML, NLP, LLM</div>
                                     </div>
-                                    <div class="spec-card" data-value="Embedded Systems Specialist" onclick="selectSpecialization('Embedded Systems Specialist')">
-                                        <span class="spec-icon">🔌</span>
-                                        <span class="spec-title" data-i18n="spec-embedded-title">Embedded Systems</span>
-                                        <span class="spec-desc" data-i18n="spec-embedded-desc">C/C++, IoT, Firmware</span>
+                                    <div class="spec-card border border-white/10 bg-ink-950/40 hover:border-signal/50 hover:bg-ink-900/40 cursor-pointer p-4 rounded-xl transition-all duration-300" data-value="Embedded Systems Specialist" onclick="selectSpecialization('Embedded Systems Specialist')">
+                                        <div class="text-xl mb-1">🔌</div>
+                                        <div class="font-bold text-sm text-mist-100" data-i18n="spec-embedded-title">Embedded Systems</div>
+                                        <div class="text-[11px] text-mist-700 mt-0.5" data-i18n="spec-embedded-desc">C/C++, IoT, Firmware</div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="form-group">
-                                <label data-i18n="profile-field-languages">Kullandığınız Diller / Teknolojiler</label>
-                                <div class="checkbox-group">
+                            <div class="space-y-3">
+                                <label class="block text-xs font-bold text-mist-700 tracking-wider uppercase" data-i18n="profile-field-languages">Kullandığınız Diller / Teknolojiler</label>
+                                <div class="grid grid-cols-3 gap-2">
                                     <div class="checkbox-btn">
                                         <input type="checkbox" name="languages" value="Java" id="lang-java">
                                         <label for="lang-java" class="checkbox-label">Java</label>
@@ -179,50 +372,57 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="profile-experience" data-i18n="profile-field-experience">Deneyim Süresi (Yıl)</label>
-                                <input type="number" id="profile-experience" class="form-control" min="0" max="50" required data-i18n-placeholder="ph-experience" placeholder="Örn: 3">
+                            <div class="space-y-2">
+                                <label for="profile-experience" data-i18n="profile-field-experience" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Deneyim Süresi (Yıl)</label>
+                                <input type="number" id="profile-experience" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" min="0" max="50" required data-i18n-placeholder="ph-experience" placeholder="Örn: 3">
                             </div>
 
-                            <div class="form-group">
-                                <label for="profile-projects" data-i18n="profile-field-projects">Önceki Projeler / Referanslar</label>
-                                <textarea id="profile-projects" class="form-control" rows="3" data-i18n-placeholder="ph-projects" placeholder="Geliştirdiğiniz e-ticaret siteleri..."></textarea>
+                            <div class="space-y-2">
+                                <label for="profile-projects" data-i18n="profile-field-projects" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Önceki Projeler / Referanslar</label>
+                                <textarea id="profile-projects" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" rows="3" data-i18n-placeholder="ph-projects" placeholder="Geliştirdiğiniz e-ticaret siteleri..."></textarea>
                             </div>
 
-                            <div class="form-group">
-                                <label for="profile-github" data-i18n="profile-field-github">GitHub Adresi (İsteğe Bağlı)</label>
-                                <input type="url" id="profile-github" class="form-control" placeholder="https://github.com/username">
+                            <div class="space-y-2">
+                                <label for="profile-github" data-i18n="profile-field-github" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">GitHub Adresi (İsteğe Bağlı)</label>
+                                <input type="url" id="profile-github" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" placeholder="https://github.com/username">
                             </div>
 
-                            <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="profile-save-btn">Profili Kaydet</button>
+                            <button type="submit" class="w-full bg-signal text-ink-950 font-bold py-3.5 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(232,255,71,0.15)] text-sm tracking-wide" data-i18n="profile-save-btn">Profili Kaydet</button>
                         </form>
                     </div>
 
-                    <!-- Right: AI Evaluation Output -->
-                    <div class="card profile-score-box" id="profile-ai-box">
-                        <h3 style="margin-bottom: 2rem;" data-i18n="profile-score-title">Yapay Zeka Profil Skoru</h3>
+                    <!-- AI Evaluation Output -->
+                    <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl flex flex-col items-center justify-center relative text-center" id="profile-ai-box">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                        <h3 class="font-display font-semibold text-2xl mb-8 tracking-tight self-start" data-i18n="profile-score-title">Yapay Zeka Profil Skoru</h3>
                         
                         <div class="radial-progress" id="profile-score-meter">
                             <span class="value" id="profile-score-val">-</span>
                         </div>
                         
-                        <button onclick="handleTriggerScoring()" class="btn btn-secondary" id="score-btn" style="margin-bottom: 2rem; display: none;" data-i18n="profile-score-btn">Profil Puanımı Analiz Et</button>
+                        <button onclick="handleTriggerScoring()" class="bg-ink-900 border border-white/10 hover:border-signal text-mist-100 font-bold px-6 py-3 rounded-xl transition-all duration-300 relative z-10 mb-8" id="score-btn" style="display: none;" data-i18n="profile-score-btn">Profil Puanımı Analiz Et</button>
                         
-                        <div id="profile-ai-results" style="display: none; width: 100%;">
-                            <p class="score-desc" id="profile-ai-summary" style="margin-bottom: 1.5rem;"></p>
+                        <div id="profile-ai-results" style="display: none;" class="w-full text-left space-y-6 relative z-10">
+                            <p class="text-mist-700 text-sm leading-relaxed border-b border-white/5 pb-4" id="profile-ai-summary"></p>
                             
-                            <h4 style="text-align: left; margin-bottom: 0.5rem;" data-i18n="profile-score-strengths">Güçlü Yönler</h4>
-                            <ul class="detail-list strengths" id="profile-ai-strengths"></ul>
+                            <div>
+                                <h4 class="font-display font-semibold text-emerald-400 text-lg mb-3" data-i18n="profile-score-strengths">Güçlü Yönler</h4>
+                                <ul class="list-disc pl-5 text-mist-700 text-xs space-y-1.5" id="profile-ai-strengths"></ul>
+                            </div>
 
-                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;" data-i18n="profile-score-weaknesses">Zayıf Yönler</h4>
-                            <ul class="detail-list weaknesses" id="profile-ai-weaknesses"></ul>
+                            <div>
+                                <h4 class="font-display font-semibold text-amber-500 text-lg mb-3" data-i18n="profile-score-weaknesses">Zayıf Yönler</h4>
+                                <ul class="list-disc pl-5 text-mist-700 text-xs space-y-1.5" id="profile-ai-weaknesses"></ul>
+                            </div>
 
-                            <h4 style="text-align: left; margin-top: 1.5rem; margin-bottom: 0.5rem;" data-i18n="profile-score-recommendations">AI Tavsiyeleri</h4>
-                            <ul class="detail-list" id="profile-ai-recommendations"></ul>
+                            <div>
+                                <h4 class="font-display font-semibold text-signal text-lg mb-3" data-i18n="profile-score-recommendations">AI Tavsiyeleri</h4>
+                                <ul class="list-disc pl-5 text-mist-700 text-xs space-y-1.5" id="profile-ai-recommendations"></ul>
+                            </div>
                         </div>
 
-                        <div id="profile-ai-empty">
-                            <p class="score-desc" data-i18n="profile-score-empty">Öncelikle sol taraftaki formu doldurup kaydetmeniz gerekmektedir.</p>
+                        <div id="profile-ai-empty" class="relative z-10">
+                            <p class="text-mist-900 text-sm" data-i18n="profile-score-empty">Öncelikle sol taraftaki formu doldurup kaydetmeniz gerekmektedir.</p>
                         </div>
                     </div>
                 </div>
@@ -230,95 +430,98 @@
 
             <!-- PROJECT ANALYSIS TAB -->
             <section id="tab-project-pane" class="tab-pane">
-                <div class="dashboard-grid">
-                    <!-- Left: Project Form Card -->
-                    <div class="card">
-                        <h3 style="margin-bottom: 1.5rem;" data-i18n="project-title">Yeni Proje Fikri Analiz Edin</h3>
-                        <form id="project-form" onsubmit="handleAnalyzeProject(event)">
-                            <div class="form-group">
-                                <label for="project-name" data-i18n="project-field-name">Proje Adı</label>
-                                <input type="text" id="project-name" class="form-control" data-i18n-placeholder="ph-project-name" placeholder="Örn: Restoran Sipariş SaaS Modülü" required>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Project Form Card -->
+                    <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                        <h3 class="font-display font-semibold text-2xl mb-6 tracking-tight" data-i18n="project-title">Yeni Proje Fikri Analiz Edin</h3>
+                        
+                        <form id="project-form" onsubmit="handleAnalyzeProject(event)" class="space-y-6 relative z-10">
+                            <div class="space-y-2">
+                                <label for="project-name" data-i18n="project-field-name" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Proje Adı</label>
+                                <input type="text" id="project-name" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-project-name" placeholder="Örn: Restoran Sipariş SaaS Modülü" required>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="project-description" data-i18n="project-field-desc">Proje Detayları & Amacı</label>
-                                <textarea id="project-description" class="form-control" rows="4" data-i18n-placeholder="ph-project-desc" placeholder="Projenin işlevi nedir? Kullanıcılar ne yapacak? Temel özellikler..." required></textarea>
+                            <div class="space-y-2">
+                                <label for="project-description" data-i18n="project-field-desc" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Proje Detayları & Amacı</label>
+                                <textarea id="project-description" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" rows="4" data-i18n-placeholder="ph-project-desc" placeholder="Projenin işlevi nedir? Kullanıcılar ne yapacak? Temel özellikler..." required></textarea>
                             </div>
 
-                            <div class="form-group">
-                                <label for="project-language" data-i18n="project-field-lang">Kullanılacak Dil / Ana Teknoloji</label>
-                                <input type="text" id="project-language" class="form-control" data-i18n-placeholder="ph-project-lang" placeholder="Örn: Java (Spring Boot) & React" required>
+                            <div class="space-y-2">
+                                <label for="project-language" data-i18n="project-field-lang" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Kullanılacak Dil / Ana Teknoloji</label>
+                                <input type="text" id="project-language" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-project-lang" placeholder="Örn: Java (Spring Boot) & React" required>
                             </div>
 
-                            <button type="submit" class="btn btn-primary" style="width: 100%;" id="analyze-submit-btn" data-i18n="project-analyze-btn">Analizi Başlat</button>
+                            <button type="submit" class="w-full bg-signal text-ink-950 font-bold py-3.5 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(232,255,71,0.15)] text-sm tracking-wide" id="analyze-submit-btn" data-i18n="project-analyze-btn">Analizi Başlat</button>
                         </form>
                     </div>
 
-                    <!-- Right: Analysis Output Display -->
-                    <div class="card" id="project-analysis-result-card">
-                        <h3 id="analysis-result-header" style="margin-bottom: 1.5rem;" data-i18n="project-report-title">Proje Analiz Raporu</h3>
+                    <!-- Analysis Output Display -->
+                    <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative" id="project-analysis-result-card">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                        <h3 id="analysis-result-header" class="font-display font-semibold text-2xl mb-6 tracking-tight relative z-10" data-i18n="project-report-title">Proje Analiz Raporu</h3>
                         
-                        <div id="analysis-empty">
-                            <p class="score-desc" style="text-align: center; padding: 4rem 0;" data-i18n="project-report-empty">Sol taraftan projenizi girin ve AI tabanlı pazar radarını çalıştırın.</p>
+                        <div id="analysis-empty" class="relative z-10">
+                            <p class="text-mist-900 text-sm text-center py-20" data-i18n="project-report-empty">Sol taraftan projenizi girin ve AI tabanlı pazar radarını çalıştırın.</p>
                         </div>
 
-                        <div id="analysis-loading" style="display: none; text-align: center; padding: 4rem 0;">
-                            <div class="radial-progress" style="margin: 0 auto; --progress: 180deg; animation: spin 2s linear infinite;">
-                                <span class="value" style="font-size: 1.5rem;">AI</span>
+                        <div id="analysis-loading" style="display: none;" class="text-center py-20 relative z-10 space-y-6">
+                            <div class="radial-progress animate-spin" style="--progress: 180deg;">
+                                <span class="value text-sm font-mono text-signal">AI</span>
                             </div>
-                            <p class="score-desc" style="margin-top: 2rem;" data-i18n="project-report-loading">Yapay Zeka pazar verilerini, freelancer gelir oranlarını ve teknolojik tüyoları derliyor...</p>
+                            <p class="text-mist-700 text-sm" data-i18n="project-report-loading">Yapay Zeka pazar verilerini, freelancer gelir oranlarını ve teknolojik tüyoları derliyor...</p>
                         </div>
 
-                        <div id="analysis-content" style="display: none;">
-                            <div class="analysis-results-grid">
-                                <div class="metric-card">
-                                    <div class="metric-title" data-i18n="project-metric-price">💰 Piyasa Satış Fiyatı (Tahmini)</div>
-                                    <div class="metric-val" id="res-market-price">-</div>
+                        <div id="analysis-content" style="display: none;" class="relative z-10 space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl">
+                                    <div class="text-[11px] font-bold text-mist-700 uppercase tracking-wider mb-1" data-i18n="project-metric-price">💰 Piyasa Satış Fiyatı (Tahmini)</div>
+                                    <div class="text-lg font-bold text-mist-100 font-mono" id="res-market-price">-</div>
                                 </div>
-                                <div class="metric-card">
-                                    <div class="metric-title" data-i18n="project-metric-hourly">💼 Freelancer Saatlik Ücret</div>
-                                    <div class="metric-val" id="res-freelancer-hourly">-</div>
+                                <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl">
+                                    <div class="text-[11px] font-bold text-mist-700 uppercase tracking-wider mb-1" data-i18n="project-metric-hourly">💼 Freelancer Saatlik Ücret</div>
+                                    <div class="text-lg font-bold text-mist-100 font-mono" id="res-freelancer-hourly">-</div>
                                 </div>
-                                <div class="metric-card">
-                                    <div class="metric-title" data-i18n="project-metric-demand">🔥 Pazar Talebi</div>
-                                    <div class="metric-val" id="res-demand">-</div>
-                                    <p class="score-desc" id="res-demand-desc" style="font-size: 0.8rem; margin-top: 0.5rem;"></p>
+                                <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl col-span-1 sm:col-span-2">
+                                    <div class="text-[11px] font-bold text-mist-700 uppercase tracking-wider mb-1" data-i18n="project-metric-demand">🔥 Pazar Talebi</div>
+                                    <div class="text-lg font-bold text-signal font-mono" id="res-demand">-</div>
+                                    <p class="text-xs text-mist-700 mt-1" id="res-demand-desc"></p>
                                 </div>
-                                <div class="metric-card">
-                                    <div class="metric-title" data-i18n="project-metric-duration">⏱️ Geliştirme Süresi</div>
-                                    <div class="metric-val" id="res-dev-time">-</div>
-                                    <p class="score-desc" id="res-dev-time-desc" style="font-size: 0.8rem; margin-top: 0.5rem;"></p>
+                                <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl col-span-1 sm:col-span-2">
+                                    <div class="text-[11px] font-bold text-mist-700 uppercase tracking-wider mb-1" data-i18n="project-metric-duration">⏱️ Geliştirme Süresi</div>
+                                    <div class="text-lg font-bold text-mist-100 font-mono" id="res-dev-time">-</div>
+                                    <p class="text-xs text-mist-700 mt-1" id="res-dev-time-desc"></p>
                                 </div>
-                                
-                                <div class="metric-card analysis-full-width">
-                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-tech-title">🛠️ Önerilen Teknoloji Stack Detayları</h4>
-                                    <div id="res-tech-stack"></div>
-                                </div>
+                            </div>
+                            
+                            <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl">
+                                <h4 class="text-xs font-bold text-mist-700 uppercase tracking-wider mb-3" data-i18n="project-tech-title">🛠️ Önerilen Teknoloji Stack Detayları</h4>
+                                <div id="res-tech-stack" class="space-y-2"></div>
+                            </div>
 
-                                <div class="metric-card analysis-full-width">
-                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-enhancements-title">💡 Nasıl Ekleme Yapılabilir & Geliştirilebilir</h4>
-                                    <ul class="detail-list" id="res-enhancements" style="margin-top: 0;"></ul>
-                                </div>
+                            <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl">
+                                <h4 class="text-xs font-bold text-mist-700 uppercase tracking-wider mb-3" data-i18n="project-enhancements-title">💡 Nasıl Ekleme Yapılabilir & Geliştirilebilir</h4>
+                                <ul class="list-disc pl-5 text-mist-700 text-xs space-y-2" id="res-enhancements"></ul>
+                            </div>
 
-                                <div class="metric-card analysis-full-width">
-                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-tips-title">⭐ Önemli Geliştirici Tüyoları</h4>
-                                    <ul class="detail-list" id="res-tips" style="margin-top: 0;"></ul>
-                                </div>
+                            <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl">
+                                <h4 class="text-xs font-bold text-mist-700 uppercase tracking-wider mb-3" data-i18n="project-tips-title">⭐ Önemli Geliştirici Tüyoları</h4>
+                                <ul class="list-disc pl-5 text-mist-700 text-xs space-y-2" id="res-tips"></ul>
+                            </div>
 
-                                <div class="metric-card analysis-full-width" id="res-competitor-box" style="display: none;">
-                                    <h4 style="margin-bottom: 0.5rem;" data-i18n="project-competitor-title">📊 Pazar Rekabet Analizi</h4>
-                                    <p class="score-desc" id="res-competitor-insight"></p>
-                                </div>
+                            <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl" id="res-competitor-box" style="display: none;">
+                                <h4 class="text-xs font-bold text-mist-700 uppercase tracking-wider mb-2" data-i18n="project-competitor-title">📊 Pazar Rekabet Analizi</h4>
+                                <p class="text-xs text-mist-700 leading-relaxed" id="res-competitor-insight"></p>
+                            </div>
 
-                                <div class="metric-card analysis-full-width" id="res-competitors-list-box" style="display: none;">
-                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-competitors-list-title">🌐 Pazardaki Örnekler & Rakipler</h4>
-                                    <div id="res-competitors-list" style="display: flex; flex-wrap: wrap; gap: 0.75rem;"></div>
-                                </div>
+                            <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl" id="res-competitors-list-box" style="display: none;">
+                                <h4 class="text-xs font-bold text-mist-700 uppercase tracking-wider mb-3" data-i18n="project-competitors-list-title">🌐 Pazardaki Örnekler & Rakipler</h4>
+                                <div id="res-competitors-list" class="flex flex-wrap gap-2"></div>
+                            </div>
 
-                                <div class="metric-card analysis-full-width" id="res-freelancer-platforms-box" style="display: none;">
-                                    <h4 style="margin-bottom: 0.75rem;" data-i18n="project-freelancer-title">💼 Freelance Pazarı & Fiyatlandırma</h4>
-                                    <div id="res-freelancer-platforms" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
-                                </div>
+                            <div class="border border-white/5 bg-ink-950/40 p-4 rounded-xl" id="res-freelancer-platforms-box" style="display: none;">
+                                <h4 class="text-xs font-bold text-mist-700 uppercase tracking-wider mb-3" data-i18n="project-freelancer-title">💼 Freelance Pazarı & Fiyatlandırma</h4>
+                                <div id="res-freelancer-platforms" class="space-y-2.5"></div>
                             </div>
                         </div>
                     </div>
@@ -327,15 +530,16 @@
 
             <!-- HISTORY TAB -->
             <section id="tab-history-pane" class="tab-pane">
-                <div class="card" style="margin-bottom: 2rem;">
-                    <h3 data-i18n="history-title">Geçmiş Proje Analizleriniz</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="history-desc">Daha önce yaptığınız analizleri buradan görebilir ve raporlara tekrar göz atabilirsiniz.</p>
+                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                    <h3 class="font-display font-semibold text-2xl mb-2 tracking-tight relative z-10" data-i18n="history-title">Geçmiş Proje Analizleriniz</h3>
+                    <p class="text-mist-700 text-sm mb-6 relative z-10" data-i18n="history-desc">Daha önce yaptığınız analizleri buradan görebilir ve raporlara tekrar göz atabilirsiniz.</p>
                     
-                    <div id="history-empty" class="score-desc" style="text-align: center; padding: 3rem 0;" data-i18n="history-empty">
+                    <div id="history-empty" class="text-mist-900 text-sm text-center py-20 relative z-10" data-i18n="history-empty">
                         Henüz herhangi bir proje analizi yapmadınız.
                     </div>
 
-                    <div id="history-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div id="history-list" class="space-y-4 relative z-10">
                         <!-- Dynamically filled history list -->
                     </div>
                 </div>
@@ -343,15 +547,16 @@
 
             <!-- PROGRESS TRACKER TAB -->
             <section id="tab-progress-pane" class="tab-pane">
-                <div class="card" style="margin-bottom: 2rem;">
-                    <h3 data-i18n="progress-title">Proje İlerleme Takibi</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="progress-desc">Analiz ettiğiniz projelerin geliştirme adımlarını işaretleyerek ilerlemenizi adım adım takip edin.</p>
+                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                    <h3 class="font-display font-semibold text-2xl mb-2 tracking-tight relative z-10" data-i18n="progress-title">Proje İlerleme Takibi</h3>
+                    <p class="text-mist-700 text-sm mb-6 relative z-10" data-i18n="progress-desc">Analiz ettiğiniz projelerin geliştirme adımlarını işaretleyerek ilerlemenizi adım adım takip edin.</p>
                     
-                    <div id="progress-empty" class="score-desc" style="text-align: center; padding: 3rem 0;" data-i18n="progress-empty">
+                    <div id="progress-empty" class="text-mist-900 text-sm text-center py-20 relative z-10" data-i18n="progress-empty">
                         İlerleme takibi yapmak için öncelikle "Proje Analizi" sekmesinden bir proje analizi yapmalısınız.
                     </div>
 
-                    <div id="progress-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div id="progress-list" class="space-y-6 relative z-10">
                         <!-- Checklists generated dynamically -->
                     </div>
                 </div>
@@ -359,30 +564,31 @@
 
             <!-- ROADMAP TAB -->
             <section id="tab-roadmap-pane" class="tab-pane">
-                <div class="card" style="margin-bottom: 2rem;">
-                    <h3 data-i18n="roadmap-title">Lyver Software Ürün Yol Haritası (Roadmap)</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="roadmap-desc">Lyver Software DevRadarAI platformu için 2026 yılı geliştirme hedefleri ve gelecek planlarımız.</p>
+                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                    <h3 class="font-display font-semibold text-2xl mb-2 tracking-tight relative z-10" data-i18n="roadmap-title">Lyver Software Ürün Yol Haritası (Roadmap)</h3>
+                    <p class="text-mist-700 text-sm mb-8 relative z-10" data-i18n="roadmap-desc">Lyver Software DevRadarAI platformu için 2026 yılı geliştirme hedefleri ve gelecek planlarımız.</p>
                     
-                    <div class="roadmap-timeline">
+                    <div class="roadmap-timeline relative z-10">
                         <div class="roadmap-card completed">
-                            <div class="roadmap-quarter" data-i18n="roadmap-q1-quarter">Q1 2026 — Tamamlandı</div>
-                            <div class="roadmap-title" data-i18n="roadmap-q1-title">Yapay Zeka Altyapısı & Grounding</div>
-                            <p class="score-desc" data-i18n="roadmap-q1-desc">Gemini ve Llama 3 entegrasyonu tamamlandı. Canlı web aramaları (Google Search Grounding) ve dizi parse tolerans sistemleri aktif edildi.</p>
+                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q1-quarter">Q1 2026 — Tamamlandı</div>
+                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q1-title">Yapay Zeka Altyapısı & Grounding</div>
+                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q1-desc">Gemini ve Llama 3 entegrasyonu tamamlandı. Canlı web aramaları (Google Search Grounding) ve dizi parse tolerans sistemleri aktif edildi.</p>
                         </div>
                         <div class="roadmap-card">
-                            <div class="roadmap-quarter" data-i18n="roadmap-q2-quarter">Q2 2026 — Planlanıyor</div>
-                            <div class="roadmap-title" data-i18n="roadmap-q2-title">Çoklu Dil Desteği & Global Pazar Raporları</div>
-                            <p class="score-desc" data-i18n="roadmap-q2-desc">Platformun tüm dillere çevrilmesi, yerel pazar fiyatlandırmalarının (TL, Euro, Yen) otomatik tespiti ve para birimi desteği.</p>
+                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q2-quarter">Q2 2026 — Planlanıyor</div>
+                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q2-title">Çoklu Dil Desteği & Global Pazar Raporları</div>
+                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q2-desc">Platformun tüm dillere çevrilmesi, yerel pazar fiyatlandırmalarının (TL, Euro, Yen) otomatik tespiti ve para birimi desteği.</p>
                         </div>
                         <div class="roadmap-card">
-                            <div class="roadmap-quarter" data-i18n="roadmap-q3-quarter">Q3 2026 — Planlanıyor</div>
-                            <div class="roadmap-title" data-i18n="roadmap-q3-title">Gelişmiş Ekip & Organizasyon Yönetimi</div>
-                            <p class="score-desc" data-i18n="roadmap-q3-desc">Yazılım şirketleri için çoklu kullanıcı organizasyonları, takım içi proje paylaşımı ve ortak analiz raporu oluşturma.</p>
+                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q3-quarter">Q3 2026 — Planlanıyor</div>
+                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q3-title">Gelişmiş Ekip & Organizasyon Yönetimi</div>
+                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q3-desc">Yazılım şirketleri için çoklu kullanıcı organizasyonları, takım içi proje paylaşımı ve ortak analiz raporu oluşturma.</p>
                         </div>
                         <div class="roadmap-card">
-                            <div class="roadmap-quarter" data-i18n="roadmap-q4-quarter">Q4 2026 — Planlanıyor</div>
-                            <div class="roadmap-title" data-i18n="roadmap-q4-title">AI Kod İskeleti Oluşturma</div>
-                            <p class="score-desc" data-i18n="roadmap-q4-desc">Analiz edilen projeler için otomatik backend (Spring Boot/NestJS) ve frontend (React/Vue) başlangıç kod şablonlarının üretilmesi.</p>
+                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q4-quarter">Q4 2026 — Planlanıyor</div>
+                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q4-title">AI Kod İskeleti Oluşturma</div>
+                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q4-desc">Analiz edilen projeler için otomatik backend (Spring Boot/NestJS) ve frontend (React/Vue) başlangıç kod şablonlarının üretilmesi.</p>
                         </div>
                     </div>
                 </div>
@@ -390,15 +596,16 @@
 
             <!-- ANNOUNCEMENTS TAB -->
             <section id="tab-announcements-pane" class="tab-pane">
-                <div class="card" style="margin-bottom: 2rem;">
-                    <h3 data-i18n="announcements-title">Sistem Duyuruları & Güncellemeler</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="announcements-desc">Lyver Software ekibi tarafından yayınlanan en güncel sistem haberleri.</p>
+                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                    <h3 class="font-display font-semibold text-2xl mb-2 tracking-tight relative z-10" data-i18n="announcements-title">Sistem Duyuruları & Güncellemeler</h3>
+                    <p class="text-mist-700 text-sm mb-6 relative z-10" data-i18n="announcements-desc">Lyver Software ekibi tarafından yayınlanan en güncel sistem haberleri.</p>
                     
-                    <div id="announcements-empty" class="score-desc" style="text-align: center; padding: 3rem 0;" data-i18n="announcements-empty">
+                    <div id="announcements-empty" class="text-mist-900 text-sm text-center py-20 relative z-10" data-i18n="announcements-empty">
                         Şu anda yayınlanmış yeni bir duyuru bulunmamaktadır.
                     </div>
 
-                    <div id="announcements-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div id="announcements-list" class="space-y-4 relative z-10">
                         <!-- Announcement cards populated dynamically -->
                     </div>
                 </div>
@@ -406,47 +613,48 @@
 
             <!-- FAQ TAB -->
             <section id="tab-faq-pane" class="tab-pane">
-                <div class="card" style="margin-bottom: 2rem;">
-                    <h3 data-i18n="faq-tab-title">Sıkça Sorulan Sorular (SSS)</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="faq-tab-desc">DevRadarAI platformu, analiz özellikleri ve kredi sistemi hakkında merak edilenler.</p>
+                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                    <h3 class="font-display font-semibold text-2xl mb-2 tracking-tight relative z-10" data-i18n="faq-tab-title">Sıkça Sorulan Sorular (SSS)</h3>
+                    <p class="text-mist-700 text-sm mb-8 relative z-10" data-i18n="faq-tab-desc">DevRadarAI platformu, analiz özellikleri ve kredi sistemi hakkında merak edilenler.</p>
                     
-                    <div class="faq-container">
-                        <div class="faq-item">
-                            <div class="faq-question" onclick="toggleFaq(this)">
-                                <span data-i18n="faq-q1-question">Kredi sistemi nasıl çalışır?</span>
-                                <span class="faq-arrow">▼</span>
+                    <div class="space-y-4 relative z-10">
+                        <div class="border border-white/10 bg-ink-950/40 rounded-xl overflow-hidden">
+                            <div class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/[0.01]" onclick="toggleFaq(this)">
+                                <span data-i18n="faq-q1-question" class="font-semibold text-mist-100">Kredi sistemi nasıl çalışır?</span>
+                                <span class="faq-arrow text-signal transition-transform duration-200">▼</span>
                             </div>
-                            <div class="faq-answer" data-i18n="faq-q1-answer">
+                            <div class="faq-answer border-t border-white/5 p-5 text-xs text-mist-700 leading-relaxed hidden">
                                 Her yeni kayıt olan kullanıcıya ücretsiz 5 analiz kredisi tanımlanır. Yapılan her Profil Puanlama veya Proje Analizi işlemi bakiyenizden 1 kredi düşer. Üst bardaki "Sınırsız Kredi Al" butonu ile abonelik simüle edilebilir.
                             </div>
                         </div>
 
-                        <div class="faq-item">
-                            <div class="faq-question" onclick="toggleFaq(this)">
-                                <span data-i18n="faq-q2-question">Hangi yapay zeka modelleri kullanılıyor?</span>
-                                <span class="faq-arrow">▼</span>
+                        <div class="border border-white/10 bg-ink-950/40 rounded-xl overflow-hidden">
+                            <div class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/[0.01]" onclick="toggleFaq(this)">
+                                <span data-i18n="faq-q2-question" class="font-semibold text-mist-100">Hangi yapay zeka modelleri kullanılıyor?</span>
+                                <span class="faq-arrow text-signal transition-transform duration-200">▼</span>
                             </div>
-                            <div class="faq-answer" data-i18n="faq-q2-answer">
+                            <div class="faq-answer border-t border-white/5 p-5 text-xs text-mist-700 leading-relaxed hidden">
                                 Platformumuz hibrit bir altyapıya sahiptir. Varsayılan olarak Google'ın gelişmiş Gemini 2.5 modeli (Google Search Grounding / Canlı arama entegrasyonu ile) kullanılır. Alternatif olarak Groq üzerinden Llama 3 model entegrasyonu da aktiftir.
                             </div>
                         </div>
 
-                        <div class="faq-item">
-                            <div class="faq-question" onclick="toggleFaq(this)">
-                                <span data-i18n="faq-q3-question">Lyver Software nedir?</span>
-                                <span class="faq-arrow">▼</span>
+                        <div class="border border-white/10 bg-ink-950/40 rounded-xl overflow-hidden">
+                            <div class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/[0.01]" onclick="toggleFaq(this)">
+                                <span data-i18n="faq-q3-question" class="font-semibold text-mist-100">Lyver Software nedir?</span>
+                                <span class="faq-arrow text-signal transition-transform duration-200">▼</span>
                             </div>
-                            <div class="faq-answer" data-i18n="faq-q3-answer">
+                            <div class="faq-answer border-t border-white/5 p-5 text-xs text-mist-700 leading-relaxed hidden">
                                 Lyver Software, modern yazılım çözümleri, yapay zeka destekli analiz toolları ve geliştirici dostu SaaS ürünleri üreten bağımsız bir teknoloji girişimidir. DevRadarAI, geliştiricilerin pazar analizini hızlandırmak için Lyver Software tarafından üretilmiştir.
                             </div>
                         </div>
 
-                        <div class="faq-item">
-                            <div class="faq-question" onclick="toggleFaq(this)">
-                                <span data-i18n="faq-q4-question">Analizlerin doğruluğu nedir?</span>
-                                <span class="faq-arrow">▼</span>
+                        <div class="border border-white/10 bg-ink-950/40 rounded-xl overflow-hidden">
+                            <div class="flex justify-between items-center p-5 cursor-pointer hover:bg-white/[0.01]" onclick="toggleFaq(this)">
+                                <span data-i18n="faq-q4-question" class="font-semibold text-mist-100">Analizlerin doğruluğu nedir?</span>
+                                <span class="faq-arrow text-signal transition-transform duration-200">▼</span>
                             </div>
-                            <div class="faq-answer" data-i18n="faq-q4-answer">
+                            <div class="faq-answer border-t border-white/5 p-5 text-xs text-mist-700 leading-relaxed hidden">
                                 Yapay zekamız, projenizin detaylarına göre popüler serbest çalışan (freelance) sitelerindeki ilanları, benzer SaaS ürünlerini ve güncel yazılım maliyetlerini gerçek zamanlı analiz ederek ortalama bir pazar değerlemesi çıkarır.
                             </div>
                         </div>
@@ -456,78 +664,79 @@
 
             <!-- SETTINGS TAB -->
             <section id="tab-settings-pane" class="tab-pane">
-                <div class="profile-container-grid">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Left: Profile Preview Card -->
-                    <div class="profile-preview-card">
-                        <div class="profile-avatar-container">
-                            <div class="profile-avatar" id="profile-card-avatar">-</div>
-                        </div>
-                        <h3 class="profile-name" id="profile-card-name">-</h3>
-                        <p class="profile-email" id="profile-card-email">-</p>
+                    <div class="border border-white/10 rounded-2xl p-6 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative text-center flex flex-col items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                        <div class="w-20 h-20 bg-signal/15 border border-signal/30 text-signal font-mono text-2xl font-bold flex items-center justify-center rounded-full mb-4 relative z-10" id="profile-card-avatar">-</div>
+                        <h3 class="font-display font-semibold text-lg text-mist-100 mb-1 relative z-10" id="profile-card-name">-</h3>
+                        <p class="text-xs text-mist-700 mb-4 relative z-10" id="profile-card-email">-</p>
                         
-                        <div id="profile-card-badge" class="badge badge-standard" data-i18n="settings-member-type">STANDART ÜYE</div>
+                        <div id="profile-card-badge" class="border border-white/10 bg-white/5 text-mist-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider relative z-10 mb-6" data-i18n="settings-member-type">STANDART ÜYE</div>
                         
-                        <div class="profile-stats">
-                            <div class="stat-item">
-                                <span class="stat-label" data-i18n="settings-credits-label">⚡ Kalan Kredi:</span>
-                                <span class="stat-value" id="profile-card-credits">-</span>
+                        <div class="w-full border-t border-white/5 pt-6 space-y-4 relative z-10 text-left text-xs font-semibold">
+                            <div class="flex justify-between">
+                                <span class="text-mist-700" data-i18n="settings-credits-label">⚡ Kalan Kredi:</span>
+                                <span class="text-mist-100" id="profile-card-credits">-</span>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-label" data-i18n="settings-date-label">📅 Katılım Tarihi:</span>
-                                <span class="stat-value" id="profile-card-date">-</span>
+                            <div class="flex justify-between">
+                                <span class="text-mist-700" data-i18n="settings-date-label">📅 Katılım Tarihi:</span>
+                                <span class="text-mist-100" id="profile-card-date">-</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Right: Edit Forms Card -->
-                    <div style="display: flex; flex-direction: column; gap: 2rem;">
-                        
+                    <div class="lg:col-span-2 space-y-8">
                         <!-- Read-only Info -->
-                        <div class="card" style="padding: 1.5rem;">
-                            <h3 data-i18n="settings-title">Hesap Ayarları</h3>
-                            <div class="form-group" style="margin-top: 1rem; margin-bottom: 0;">
-                                <label data-i18n="settings-name-label">Ad Soyad</label>
-                                <input type="text" id="settings-name" class="form-control" disabled style="background: rgba(255,255,255,0.02); color: var(--text-muted);">
+                        <div class="border border-white/10 rounded-2xl p-6 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                            <h3 class="font-display font-semibold text-lg text-mist-100 mb-4 relative z-10" data-i18n="settings-title">Hesap Ayarları</h3>
+                            <div class="space-y-2 relative z-10">
+                                <label class="block text-xs font-bold text-mist-700 tracking-wider uppercase" data-i18n="settings-name-label">Ad Soyad</label>
+                                <input type="text" id="settings-name" class="w-full bg-ink-950/20 border border-white/10 rounded-xl px-4 py-3 text-mist-900 text-sm focus:outline-none cursor-not-allowed" disabled>
                             </div>
                         </div>
 
                         <!-- Email Change Card -->
-                        <div class="card" style="padding: 1.5rem;">
-                            <h3 data-i18n="settings-email-title">E-posta Adresi Değiştir</h3>
-                            <p class="score-desc" style="margin-bottom: 1.25rem;" data-i18n="settings-email-desc">E-postanızı değiştirmek için mevcut şifrenizi girmeniz gerekir. Kod eski e-postanıza gönderilecektir.</p>
+                        <div class="border border-white/10 rounded-2xl p-6 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                            <h3 class="font-display font-semibold text-lg text-mist-100 mb-1 relative z-10" data-i18n="settings-email-title">E-posta Adresi Değiştir</h3>
+                            <p class="text-xs text-mist-700 mb-6 relative z-10" data-i18n="settings-email-desc">E-postanızı değiştirmek için mevcut şifrenizi girmeniz gerekir. Kod eski e-postanıza gönderilecektir.</p>
                             
-                            <form id="email-change-form" onsubmit="handleRequestEmailChange(event)">
-                                <div class="form-group">
-                                    <label for="settings-new-email" data-i18n="settings-new-email-label">Yeni E-posta Adresi</label>
-                                    <input type="email" id="settings-new-email" class="form-control" required>
+                            <form id="email-change-form" onsubmit="handleRequestEmailChange(event)" class="space-y-4 relative z-10">
+                                <div class="space-y-2">
+                                    <label for="settings-new-email" data-i18n="settings-new-email-label" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Yeni E-posta Adresi</label>
+                                    <input type="email" id="settings-new-email" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" required>
                                 </div>
-                                <div class="form-group" id="current-password-group">
-                                    <label for="settings-email-current-password" data-i18n="settings-current-password-label">Mevcut Şifre</label>
-                                    <input type="password" id="settings-email-current-password" class="form-control" data-i18n-placeholder="ph-password" placeholder="••••••••">
+                                <div class="space-y-2" id="current-password-group">
+                                    <label for="settings-email-current-password" data-i18n="settings-current-password-label" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Mevcut Şifre</label>
+                                    <input type="password" id="settings-email-current-password" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-password" placeholder="••••••••">
                                 </div>
-                                <div class="form-group" id="email-change-code-group" style="display: none;">
-                                    <label for="settings-email-code" style="color: var(--secondary); font-weight: bold;" data-i18n="settings-email-code-label">Doğrulama Kodu</label>
-                                    <input type="text" id="settings-email-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
+                                <div class="space-y-2" id="email-change-code-group" style="display: none;">
+                                    <label for="settings-email-code" data-i18n="settings-email-code-label" class="block text-xs font-bold text-signal tracking-wider uppercase">Doğrulama Kodu</label>
+                                    <input type="text" id="settings-email-code" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 font-mono tracking-widest text-center text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6">
                                 </div>
-                                <button type="submit" id="email-change-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" data-i18n="settings-send-code-btn">Doğrulama Kodu Gönder</button>
+                                <button type="submit" id="email-change-submit-btn" class="w-full bg-signal text-ink-950 font-bold py-3 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_15px_rgba(232,255,71,0.15)] text-xs tracking-wide" data-i18n="settings-send-code-btn">Doğrulama Kodu Gönder</button>
                             </form>
                         </div>
 
                         <!-- Password Change Card -->
-                        <div class="card" style="padding: 1.5rem;">
-                            <h3 data-i18n="settings-password-title">Şifre Güncelle</h3>
-                            <p class="score-desc" style="margin-bottom: 1.25rem;" data-i18n="settings-password-desc">Şifrenizi güncellemek için doğrulama kodu mevcut e-postanıza gönderilecektir.</p>
+                        <div class="border border-white/10 rounded-2xl p-6 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                            <h3 class="font-display font-semibold text-lg text-mist-100 mb-1 relative z-10" data-i18n="settings-password-title">Şifre Güncelle</h3>
+                            <p class="text-xs text-mist-700 mb-6 relative z-10" data-i18n="settings-password-desc">Şifrenizi güncellemek için doğrulama kodu mevcut e-postanıza gönderilecektir.</p>
                             
-                            <form id="password-change-form" onsubmit="handleRequestPasswordChange(event)">
-                                <div class="form-group">
-                                    <label for="settings-new-password" data-i18n="settings-new-password-label">Yeni Şifre</label>
-                                    <input type="password" id="settings-new-password" class="form-control" data-i18n-placeholder="ph-password" placeholder="••••••••" required minlength="6">
+                            <form id="password-change-form" onsubmit="handleRequestPasswordChange(event)" class="space-y-4 relative z-10">
+                                <div class="space-y-2">
+                                    <label for="settings-new-password" data-i18n="settings-new-password-label" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Yeni Şifre</label>
+                                    <input type="password" id="settings-new-password" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-password" placeholder="••••••••" required minlength="6">
                                 </div>
-                                <div class="form-group" id="password-change-code-group" style="display: none;">
-                                    <label for="settings-password-code" style="color: var(--secondary); font-weight: bold;" data-i18n="settings-email-code-label">Doğrulama Kodu</label>
-                                    <input type="text" id="settings-password-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
+                                <div class="space-y-2" id="password-change-code-group" style="display: none;">
+                                    <label for="settings-password-code" data-i18n="settings-email-code-label" class="block text-xs font-bold text-signal tracking-wider uppercase">Doğrulama Kodu</label>
+                                    <input type="text" id="settings-password-code" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 font-mono tracking-widest text-center text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6">
                                 </div>
-                                <button type="submit" id="password-change-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" data-i18n="settings-send-code-btn">Doğrulama Kodu Gönder</button>
+                                <button type="submit" id="password-change-submit-btn" class="w-full bg-signal text-ink-950 font-bold py-3 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_15px_rgba(232,255,71,0.15)] text-xs tracking-wide" data-i18n="settings-send-code-btn">Doğrulama Kodu Gönder</button>
                             </form>
                         </div>
                     </div>
@@ -536,105 +745,146 @@
 
             <!-- ADMIN PANEL TAB -->
             <section id="tab-admin-pane" class="tab-pane">
-                <div class="card" style="margin-bottom: 2rem;">
-                    <h3 data-i18n="admin-title">Lyver Yönetici Kontrol Paneli</h3>
-                    <p class="score-desc" style="margin-bottom: 1.5rem;" data-i18n="admin-desc">Kullanıcı yönetimi, kredi müdahaleleri, sistem istatistikleri ve genel duyuru yönetimi.</p>
+                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative space-y-8">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                    <div class="relative z-10">
+                        <h3 class="font-display font-semibold text-2xl mb-2 tracking-tight" data-i18n="admin-title">Lyver Yönetici Kontrol Paneli</h3>
+                        <p class="text-mist-700 text-sm" data-i18n="admin-desc">Kullanıcı yönetimi, kredi müdahaleleri, sistem istatistikleri ve genel duyuru yönetimi.</p>
+                    </div>
 
                     <!-- Admin Statistics -->
-                    <div class="admin-stats-grid">
-                        <div class="metric-card">
-                            <div class="metric-title" data-i18n="admin-stat-users-label">Toplam Kayıtlı Kullanıcı</div>
-                            <div class="metric-val" id="admin-stat-users">0</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 relative z-10">
+                        <div class="border border-white/5 bg-ink-950/40 p-5 rounded-xl">
+                            <div class="text-[11px] font-bold text-mist-700 uppercase tracking-wider mb-2" data-i18n="admin-stat-users-label">Toplam Kayıtlı Kullanıcı</div>
+                            <div class="text-3xl font-bold text-mist-100 font-mono" id="admin-stat-users">0</div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-title" data-i18n="admin-stat-analyses-label">Toplam Yapılan Analiz</div>
-                            <div class="metric-val" id="admin-stat-analyses">0</div>
+                        <div class="border border-white/5 bg-ink-950/40 p-5 rounded-xl">
+                            <div class="text-[11px] font-bold text-mist-700 uppercase tracking-wider mb-2" data-i18n="admin-stat-analyses-label">Toplam Yapılan Analiz</div>
+                            <div class="text-3xl font-bold text-mist-100 font-mono" id="admin-stat-analyses">0</div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-title" data-i18n="admin-stat-premium-label">Premium Üye Sayısı</div>
-                            <div class="metric-val" id="admin-stat-premium">0</div>
+                        <div class="border border-white/5 bg-ink-950/40 p-5 rounded-xl">
+                            <div class="text-[11px] font-bold text-mist-700 uppercase tracking-wider mb-2" data-i18n="admin-stat-premium-label">Premium Üye Sayısı</div>
+                            <div class="text-3xl font-bold text-mist-100 font-mono" id="admin-stat-premium">0</div>
                         </div>
                     </div>
 
                     <!-- Announcement Form -->
-                    <h4 style="margin-bottom: 1rem; color: white;" data-i18n="admin-post-announce-title">Yeni Sistem Duyurusu Yayınla</h4>
-                    <form id="announcement-form" onsubmit="handlePostAnnouncement(event)" style="margin-bottom: 2rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                        <div class="form-group">
-                            <label for="announce-title" data-i18n="admin-announce-title-label">Duyuru Başlığı</label>
-                            <input type="text" id="announce-title" class="form-control" data-i18n-placeholder="ph-admin-announce-title" placeholder="Örn. Sistem Bakım Çalışması Hakkında" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="announce-content" data-i18n="admin-announce-content-label">Duyuru İçeriği</label>
-                            <textarea id="announce-content" class="form-control" rows="3" data-i18n-placeholder="ph-admin-announce-content" placeholder="Yayınlamak istediğiniz duyuru detayları..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px;" data-i18n="admin-announce-btn">Duyuruyu Yayınla</button>
-                    </form>
+                    <div class="border border-white/5 bg-ink-950/40 p-6 rounded-xl relative z-10">
+                        <h4 class="font-display font-semibold text-mist-100 text-lg mb-4" data-i18n="admin-post-announce-title">Yeni Sistem Duyurusu Yayınla</h4>
+                        <form id="announcement-form" onsubmit="handlePostAnnouncement(event)" class="space-y-4">
+                            <div class="space-y-2">
+                                <label for="announce-title" data-i18n="admin-announce-title-label" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Duyuru Başlığı</label>
+                                <input type="text" id="announce-title" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-admin-announce-title" placeholder="Örn. Sistem Bakım Çalışması Hakkında" required>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="announce-content" data-i18n="admin-announce-content-label" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">Duyuru İçeriği</label>
+                                <textarea id="announce-content" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" rows="3" data-i18n-placeholder="ph-admin-announce-content" placeholder="Yayınlamak istediğiniz duyuru detayları..." required></textarea>
+                            </div>
+                            <button type="submit" class="bg-signal text-ink-950 font-bold px-6 py-2.5 rounded-lg hover:bg-signal-dim transition-transform hover:scale-[1.02] text-xs" data-i18n="admin-announce-btn">Duyuruyu Yayınla</button>
+                        </form>
+                    </div>
 
                     <!-- User Management Table -->
-                    <h4 style="margin-bottom: 1rem; color: white;" data-i18n="admin-user-list-title">Kullanıcı Listesi & Yönetimi</h4>
-                    <div class="admin-table-container">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Ad Soyad</th>
-                                    <th>E-posta</th>
-                                    <th>Kredi</th>
-                                    <th>Üyelik</th>
-                                    <th>Aksiyonlar</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-user-rows">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
+                    <div class="space-y-4 relative z-10">
+                        <h4 class="font-display font-semibold text-mist-100 text-lg" data-i18n="admin-user-list-title">Kullanıcı Listesi & Yönetimi</h4>
+                        <div class="admin-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Ad Soyad</th>
+                                        <th>E-posta</th>
+                                        <th>Kredi</th>
+                                        <th>Üyelik</th>
+                                        <th>Aksiyonlar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-user-rows">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Bottom Google AdSense Banner -->
-            <div style="text-align: center; min-height: 90px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-top: 2rem; display: flex; align-items: center; justify-content: center;">
-                <ins class="adsbygoogle"
-                     style="display:block; width:100%; min-height:90px;"
-                     data-ad-client="ca-pub-6179884512996719"
-                     data-ad-slot="6666666666"
-                     data-ad-format="horizontal"
-                     data-full-width-responsive="true"></ins>
+            <!-- Bottom Banner Ad -->
+            <div class="border border-white/10 bg-ink-900/30 rounded-2xl overflow-hidden min-h-[90px] flex items-center justify-center p-2 mt-4">
+                <ins class="adsbygoogle" style="display:block; width:100%; min-height:90px;" data-ad-client="ca-pub-6179884512996719" data-ad-slot="6666666666" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
 
         </main>
     </div>
 
-    <div class="toast-container" id="toast-container"></div>
+    <!-- Toast Container -->
+    <div class="toast-container fixed bottom-8 right-8 z-[1000] flex flex-col gap-2" id="toast-container"></div>
 
     <!-- Mandatory Email Update Modal for GitHub Users -->
-    <div id="github-email-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center;">
-        <div class="card" style="max-width: 450px; width: 90%; padding: 2rem; border: 1px solid var(--border-highlight); box-shadow: var(--shadow-premium);">
-            <h3 style="margin-bottom: 1rem; text-align: center; color: white;" data-i18n="modal-email-title">E-posta Adresinizi Belirleyin</h3>
-            <p class="score-desc" style="margin-bottom: 1.5rem; text-align: center;" data-i18n="modal-email-desc">GitHub ile giriş yaptınız. Hesabınızı doğrulamak ve kullanmaya başlamak için lütfen geçerli bir e-posta adresi girin.</p>
+    <div id="github-email-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] hidden items-center justify-center p-4">
+        <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/60 backdrop-filter backdrop-blur-xl max-w-md w-full relative">
+            <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+            <h3 class="font-display font-semibold text-2xl text-center mb-2 tracking-tight relative z-10" data-i18n="modal-email-title">E-posta Adresinizi Belirleyin</h3>
+            <p class="text-xs text-mist-700 text-center mb-6 relative z-10" data-i18n="modal-email-desc">GitHub ile giriş yaptınız. Hesabınızı doğrulamak ve kullanmaya başlamak için lütfen geçerli bir e-posta adresi girin.</p>
             
-            <form id="modal-email-form" onsubmit="handleModalEmailChange(event)">
-                <div class="form-group">
-                    <label for="modal-new-email" data-i18n="modal-email-label">E-posta Adresi</label>
-                    <input type="email" id="modal-new-email" class="form-control" data-i18n-placeholder="ph-email" placeholder="isim@sirket.com" required>
+            <form id="modal-email-form" onsubmit="handleModalEmailChange(event)" class="space-y-4 relative z-10">
+                <div class="space-y-2">
+                    <label for="modal-new-email" data-i18n="modal-email-label" class="block text-xs font-bold text-mist-700 tracking-wider uppercase">E-posta Adresi</label>
+                    <input type="email" id="modal-new-email" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 placeholder-mist-900 text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-email" placeholder="isim@sirket.com" required>
                 </div>
-                <div class="form-group" id="modal-email-code-group" style="display: none;">
-                    <label for="modal-email-code" style="color: var(--secondary); font-weight: bold;" data-i18n="modal-email-code-label">Doğrulama Kodu</label>
-                    <input type="text" id="modal-email-code" class="form-control" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6" style="text-align: center; letter-spacing: 0.2rem; font-weight: bold;">
+                <div class="space-y-2" id="modal-email-code-group" style="display: none;">
+                    <label for="modal-email-code" data-i18n="modal-email-code-label" class="block text-xs font-bold text-signal tracking-wider uppercase">Doğrulama Kodu</label>
+                    <input type="text" id="modal-email-code" class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-mist-100 font-mono tracking-widest text-center text-sm focus:outline-none focus:border-signal transition-colors" data-i18n-placeholder="ph-code" placeholder="123456" maxlength="6" minlength="6">
                 </div>
-                <button type="submit" id="modal-email-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" data-i18n="modal-email-send-btn">Doğrulama Kodu Gönder</button>
+                <button type="submit" id="modal-email-submit-btn" class="w-full bg-signal text-ink-950 font-bold py-3.5 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(232,255,71,0.15)] text-sm tracking-wide" data-i18n="modal-email-send-btn">Doğrulama Kodu Gönder</button>
             </form>
         </div>
     </div>
 
-    <style>
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-
+    <!-- Scripts -->
     <script src="js/app.js"></script>
+    <script>
+        // GPU-Accelerated Custom Cursor (Lag-Free)
+        const cursor = document.getElementById('custom-cursor');
+        const ring = document.getElementById('custom-cursor-ring');
+        let mouseX = 0, mouseY = 0;
+        let ringX = 0, ringY = 0;
+        let isMoving = false;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!isMoving) {
+                isMoving = true;
+                requestAnimationFrame(updateCursor);
+            }
+        });
+
+        function updateCursor() {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+
+            cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate3d(-50%, -50%, 0)`;
+            ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate3d(-50%, -50%, 0)`;
+
+            if (Math.abs(mouseX - ringX) > 0.1 || Math.abs(mouseY - ringY) > 0.1) {
+                requestAnimationFrame(updateCursor);
+            } else {
+                isMoving = false;
+            }
+        }
+
+        // Add hover effects for custom cursor
+        document.addEventListener('mouseenter', (e) => {
+            if (e.target.matches && e.target.matches('a, button, input, select, textarea, [onclick], .sidebar-link, .spec-card, .checkbox-label')) {
+                ring.classList.add('w-12', 'h-12', 'bg-signal/5', 'border-signal');
+            }
+        }, true);
+        document.addEventListener('mouseleave', (e) => {
+            if (e.target.matches && e.target.matches('a, button, input, select, textarea, [onclick], .sidebar-link, .spec-card, .checkbox-label')) {
+                ring.classList.remove('w-12', 'h-12', 'bg-signal/5', 'border-signal');
+            }
+        }, true);
+    </script>
 </body>
 </html>

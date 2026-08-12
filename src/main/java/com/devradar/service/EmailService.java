@@ -16,7 +16,7 @@ public class EmailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username:}")
+    @Value("${spring.mail.username:lyver@devradarai.com}")
     private String fromEmail;
 
     public void sendVerificationCode(String toEmail, String code) {

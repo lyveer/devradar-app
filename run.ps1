@@ -1,4 +1,8 @@
 # Script to bootstrap Maven and run the application
+$Env:SPRING_DATASOURCE_URL = "jdbc:h2:mem:devradar;DB_CLOSE_DELAY=-1"
+$Env:SPRING_DATASOURCE_USERNAME = "sa"
+$Env:SPRING_DATASOURCE_PASSWORD = ""
+
 $MavenVersion = "3.9.6"
 $MavenDir = Join-Path $PSScriptRoot ".maven"
 $M2Dir = Join-Path $PSScriptRoot ".m2"
