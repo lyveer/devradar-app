@@ -1,9 +1,25 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevRadarAI — Lyver Software</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devradarai.com/">
+    <meta property="og:title" content="DevRadarAI � Lyver Software">
+    <meta property="og:description" content="AI-powered developer profiles scoring, market rates, project valuation and competitive insights integrated together.">
+    <meta property="og:image" content="https://devradarai.com/images/devradar_ai_lyver_software_site.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://devradarai.com/">
+    <meta property="twitter:title" content="DevRadarAI � Lyver Software">
+    <meta property="twitter:description" content="AI-powered developer profiles scoring, market rates, project valuation and competitive insights integrated together.">
+    <meta property="twitter:image" content="https://devradarai.com/images/devradar_ai_lyver_software_site.png">
     <!-- Fonts -->
     <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -434,6 +450,53 @@
             </div>
         </section>
 
+                <!-- Feedback Section -->
+        <section id="feedback" class="py-24 border-t border-white/[0.06]">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <span class="text-signal font-mono text-sm font-bold tracking-widest uppercase mb-2 block" data-i18n="feedback-label">📢 GERİ BİLDİRİM</span>
+                    <h2 class="font-display font-semibold text-4xl md:text-5xl mb-4 tracking-tight text-white" data-i18n="feedback-title">Platformumuzu Geliştirmemize Yardımcı Olun</h2>
+                    <p class="text-mist-700 text-lg" data-i18n="feedback-desc">Öneri, görüş ve şikayetlerinizi bizimle paylaşarak DevRadarAI'ı mükemmelleştirmemize katkı sağlayın.</p>
+                </div>
+
+                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
+                    
+                    <form id="feedback-form" onsubmit="submitFeedbackForm(event)" class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-mist-100 text-sm font-semibold mb-2" for="feedback-name" data-i18n="feedback-name-label">Adınız Soyadınız</label>
+                            <input class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-signal/50 transition-colors" type="text" id="feedback-name" required placeholder="John Doe">
+                        </div>
+                        <div>
+                            <label class="block text-mist-100 text-sm font-semibold mb-2" for="feedback-email" data-i18n="feedback-email-label">E-posta Adresiniz</label>
+                            <input class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-signal/50 transition-colors" type="email" id="feedback-email" required placeholder="john@example.com">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-mist-100 text-sm font-semibold mb-2" for="feedback-topic" data-i18n="feedback-topic-label">Konu</label>
+                            <select class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-signal/50 transition-colors appearance-none" id="feedback-topic" required>
+                                <option value="" disabled selected class="bg-ink-900 text-mist-700" data-i18n="feedback-select">Seçiniz...</option>
+                                <option value="suggestion" class="bg-ink-900 text-white" data-i18n="feedback-opt-suggestion">💡 Öneri / İstek</option>
+                                <option value="bug" class="bg-ink-900 text-white" data-i18n="feedback-opt-bug">⚠️ Hata Bildirimi</option>
+                                <option value="partnership" class="bg-ink-900 text-white" data-i18n="feedback-opt-partnership">🤝 İş Birliği</option>
+                                <option value="other" class="bg-ink-900 text-white" data-i18n="feedback-opt-other">💬 Diğer</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-mist-100 text-sm font-semibold mb-2" for="feedback-message" data-i18n="feedback-message-label">Mesajınız</label>
+                            <textarea class="w-full bg-ink-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-signal/50 transition-colors h-32 resize-none" id="feedback-message" required placeholder="Düşüncelerinizi buraya yazın..."></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end">
+                            <button type="submit" class="w-full md:w-auto bg-signal text-ink-950 font-bold px-8 py-3.5 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(232,255,71,0.15)] flex items-center justify-center gap-2">
+                                <span data-i18n="feedback-submit-btn">Geri Bildirim Gönder</span>
+                                <span>⚡</span>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="feedback-status" class="hidden text-center text-sm py-3 rounded-xl mt-4 relative z-10"></div>
+                </div>
+            </div>
+        </section>
+
         <!-- Final CTA Section -->
         <section class="py-24 border-t border-white/[0.06] text-center relative overflow-hidden rounded-3xl bg-ink-900/30 border border-white/10 mb-20 px-6">
             <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 via-transparent to-ember/5 pointer-events-none"></div>
@@ -530,7 +593,51 @@
             if (answer.classList.contains('hidden')) {
                 answer.classList.remove('hidden');
                 arrow.style.transform = 'rotate(180deg)';
-            } else {
+            }
+
+        function submitFeedbackForm(event) {
+            event.preventDefault();
+            const name = document.getElementById('feedback-name').value;
+            const email = document.getElementById('feedback-email').value;
+            const topic = document.getElementById('feedback-topic').value;
+            const message = document.getElementById('feedback-message').value;
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Gönderiliyor...';
+
+            const statusDiv = document.getElementById('feedback-status');
+            statusDiv.classList.add('hidden');
+
+            fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, topic, message })
+            })
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(res => {
+                statusDiv.classList.remove('hidden');
+                if (res.status === 200) {
+                    statusDiv.className = 'text-center text-sm py-3 rounded-xl mt-4 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20';
+                    statusDiv.innerText = res.body.message || 'Geri bildiriminiz başarıyla iletildi! Teşekkür ederiz.';
+                    event.target.reset();
+                } else {
+                    statusDiv.className = 'text-center text-sm py-3 rounded-xl mt-4 text-rose-400 bg-rose-500/10 border border-rose-500/20';
+                    statusDiv.innerText = res.body.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                statusDiv.classList.remove('hidden');
+                statusDiv.className = 'text-center text-sm py-3 rounded-xl mt-4 text-rose-400 bg-rose-500/10 border border-rose-500/20';
+                statusDiv.innerText = 'Bağlantı hatası oluştu. Lütfen tekrar deneyin.';
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        } else {
                 answer.classList.add('hidden');
                 arrow.style.transform = 'rotate(0deg)';
             }

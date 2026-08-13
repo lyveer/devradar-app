@@ -1,4 +1,4 @@
-const translations = {
+﻿const translations = {
   tr: {
     // Common / Nav
     "nav-features": "Özellikler",
@@ -290,7 +290,20 @@ const translations = {
     "admin-standard-text": "Standart",
     "admin-edit-credits-btn": "Kredi Düzenle",
     "admin-make-premium-btn": "Premium Yap",
-    "admin-cancel-premium-btn": "Premium İptal"
+    "admin-cancel-premium-btn": "Premium İptal",
+    "feedback-label": "📢 GERİ BİLDİRİM",
+    "feedback-title": "Platformumuzu Geliştirmemize Yardımcı Olun",
+    "feedback-desc": "Öneri, görüş ve şikayetlerinizi bizimle paylaşarak DevRadarAI'ı mükemmelleştirmemize katkı sağlayın.",
+    "feedback-name-label": "Adınız Soyadınız",
+    "feedback-email-label": "E-posta Adresiniz",
+    "feedback-topic-label": "Konu",
+    "feedback-select": "Seçiniz...",
+    "feedback-opt-suggestion": "💡 Öneri / İstek",
+    "feedback-opt-bug": "⚠️ Hata Bildirimi",
+    "feedback-opt-partnership": "🤝 İş Birliği",
+    "feedback-opt-other": "💬 Diğer",
+    "feedback-message-label": "Mesajınız",
+    "feedback-submit-btn": "Geri Bildirim Gönder"
   },
   en: {
     // Common / Nav
@@ -582,7 +595,20 @@ const translations = {
     "admin-standard-text": "Standard",
     "admin-edit-credits-btn": "Edit Credits",
     "admin-make-premium-btn": "Make Premium",
-    "admin-cancel-premium-btn": "Cancel Premium"
+    "admin-cancel-premium-btn": "Cancel Premium",
+    "feedback-label": "📢 FEEDBACK",
+    "feedback-title": "Help Us Improve Our Platform",
+    "feedback-desc": "Share your suggestions, opinions, and complaints to help us make DevRadarAI perfect.",
+    "feedback-name-label": "Your Name",
+    "feedback-email-label": "Your Email Address",
+    "feedback-topic-label": "Topic",
+    "feedback-select": "Select...",
+    "feedback-opt-suggestion": "💡 Suggestion / Feature Request",
+    "feedback-opt-bug": "⚠️ Bug Report",
+    "feedback-opt-partnership": "🤝 Partnership / Collaboration",
+    "feedback-opt-other": "💬 Other",
+    "feedback-message-label": "Your Message",
+    "feedback-submit-btn": "Send Feedback"
   },
   de: {
     // Common / Nav
@@ -874,7 +900,20 @@ const translations = {
     "admin-standard-text": "Standard",
     "admin-edit-credits-btn": "Guthaben bearbeiten",
     "admin-make-premium-btn": "Zu Premium machen",
-    "admin-cancel-premium-btn": "Premium kündigen"
+    "admin-cancel-premium-btn": "Premium kündigen",
+    "feedback-label": "📢 FEEDBACK",
+    "feedback-title": "Helfen Sie uns, unsere Plattform zu verbessern",
+    "feedback-desc": "Teilen Sie uns Ihre Vorschläge, Meinungen und Beschwerden mit, damit wir DevRadarAI perfekt machen können.",
+    "feedback-name-label": "Ihr Name",
+    "feedback-email-label": "Ihre E-Mail-Adresse",
+    "feedback-topic-label": "Thema",
+    "feedback-select": "Auswählen...",
+    "feedback-opt-suggestion": "💡 Vorschlag / Funktionsanfrage",
+    "feedback-opt-bug": "⚠️ Fehlerbericht",
+    "feedback-opt-partnership": "🤝 Partnerschaft / Kooperation",
+    "feedback-opt-other": "💬 Sonstiges",
+    "feedback-message-label": "Ihre Nachricht",
+    "feedback-submit-btn": "Feedback senden"
   }
 };
 

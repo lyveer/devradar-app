@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    rect { fill: #080812; stroke: #e8ff47; }
+    text { fill: #e8ff47; }
+    @media (prefers-color-scheme: light) {
+      rect { fill: #f8f9fa; stroke: #6d28d9; }
+      text { fill: #6d28d9; }
+    }
+  </style>
+  <rect width="30" height="30" x="1" y="1" rx="8" stroke-width="2"/>
+  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14">DR</text>
+</svg>
