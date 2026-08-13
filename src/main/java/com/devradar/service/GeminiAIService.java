@@ -1112,7 +1112,7 @@ public class GeminiAIService {
                     "├── models/\n" +
                     "└── services/\n" +
                     "```\n\n" +
-                    "*(Note: Configure Claude or Gemini API key to get tailored, real-time code recommendations)*";
+                    "*(Note: Configure a Claude, Gemini, or Groq API key to generate tailored, real-time code recommendations)*";
         } else if ("de".equals(lang)) {
             return "### Empfohlene Architektur (" + targetLanguage + ")\n\n" +
                     "```\n" +
@@ -1122,7 +1122,7 @@ public class GeminiAIService {
                     "├── models/\n" +
                     "└── services/\n" +
                     "```\n\n" +
-                    "*(Hinweis: Konfigurieren Sie den Claude- oder Gemini-API-Schlüssel, um maßgeschneiderte Echtzeit-Codeempfehlungen zu erhalten)*";
+                    "*(Hinweis: Konfigurieren Sie einen Claude-, Gemini- oder Groq-API-Schlüssel, um maßgeschneiderte Echtzeit-Codeempfehlungen zu generieren)*";
         } else {
             return "### Önerilen Proje Mimarisi (" + targetLanguage + ")\n\n" +
                     "```\n" +
@@ -1132,7 +1132,7 @@ public class GeminiAIService {
                     "├── models/\n" +
                     "└── services/\n" +
                     "```\n\n" +
-                    "*(Not: Claude veya Gemini API anahtarınızı bağlayarak projeye özel canlı kod taslakları üretebilirsiniz)*";
+                    "*(Not: Claude, Gemini veya Groq API anahtarınızı yapılandırarak projeye özel canlı kod taslakları oluşturabilirsiniz)*";
         }
     }
 }
