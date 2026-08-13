@@ -134,6 +134,31 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6179884512996719" crossorigin="anonymous"></script>
 </head>
 <body class="min-h-screen relative overflow-x-hidden selection:bg-signal selection:text-ink-950">
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-drawer" class="fixed inset-0 z-[100] bg-ink-950/95 backdrop-blur-2xl transition-all duration-300 transform translate-x-full hidden flex-col">
+        <div class="h-20 px-6 flex items-center justify-between border-b border-white/[0.06]">
+            <a href="/" class="flex items-center gap-3">
+                <img src="/images/devradar_ai_lyver_software_site.png" alt="DevRadar Logo" class="h-6 w-auto object-contain">
+                <span class="font-display font-semibold text-lg text-mist-100 tracking-tight">DevRadar<span class="text-signal">AI</span></span>
+            </a>
+            <button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-ink-900 border border-white/10 text-mist-700 hover:text-signal transition-colors focus:outline-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="flex-1 flex flex-col justify-between p-8">
+            <nav class="flex flex-col gap-6 text-lg font-semibold">
+                <a href="#features" onclick="toggleMobileMenu()" data-i18n="nav-features" class="text-mist-700 hover:text-signal transition-colors">Özellikler</a>
+                <a href="#stats" onclick="toggleMobileMenu()" data-i18n="nav-stats" class="text-mist-700 hover:text-signal transition-colors">İstatistikler</a>
+                <a href="#faq" onclick="toggleMobileMenu()" data-i18n="nav-faq" class="text-mist-700 hover:text-signal transition-colors">SSS</a>
+                <a href="/guide.html" data-i18n="nav-guide" class="text-emerald-400 hover:text-emerald-300 transition-colors">📚 AI Kılavuzu</a>
+            </nav>
+            <div class="flex flex-col gap-4">
+                <a href="/auth?mode=login" id="mobile-login-btn" data-i18n="nav-login" class="w-full text-center py-3.5 rounded-xl border border-white/10 text-mist-100 font-semibold hover:bg-white/[0.02] transition-colors">Giriş Yap</a>
+                <a href="/auth?mode=register" id="mobile-register-btn" data-i18n="nav-register" class="w-full text-center py-3.5 rounded-xl bg-signal text-ink-950 font-bold hover:bg-signal-dim transition-transform shadow-xl shadow-signal/10">Kayıt Ol</a>
+                <a href="/dashboard" id="mobile-dashboard-btn" data-i18n="nav-dashboard" class="hidden w-full text-center py-3.5 rounded-xl bg-ink-900 border border-white/10 text-mist-100 font-semibold hover:border-signal transition-colors">Panelime Git</a>
+            </div>
+        </div>
+    </div>
     <script>
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
@@ -553,10 +578,18 @@
                 const loginBtn = document.getElementById('nav-login-btn');
                 const registerBtn = document.getElementById('nav-register-btn');
                 const dashboardBtn = document.getElementById('nav-dashboard-btn');
+
+                const mobileLoginBtn = document.getElementById('mobile-login-btn');
+                const mobileRegisterBtn = document.getElementById('mobile-register-btn');
+                const mobileDashboardBtn = document.getElementById('mobile-dashboard-btn');
                 
                 if (loginBtn) loginBtn.style.display = 'none';
                 if (registerBtn) registerBtn.style.display = 'none';
                 if (dashboardBtn) dashboardBtn.style.display = 'inline-flex';
+
+                if (mobileLoginBtn) mobileLoginBtn.style.display = 'none';
+                if (mobileRegisterBtn) mobileRegisterBtn.style.display = 'none';
+                if (mobileDashboardBtn) mobileDashboardBtn.style.display = 'block';
                 
                 const cta = document.getElementById('hero-cta-btn');
                 if (cta) {
@@ -585,6 +618,21 @@
         });
 
         // FAQ accordion toggle logic for landing page
+                function toggleMobileMenu() {
+            const drawer = document.getElementById('mobile-drawer');
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+                setTimeout(() => {
+                    drawer.classList.remove('translate-x-full');
+                }, 50);
+            } else {
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => {
+                    drawer.classList.add('hidden');
+                }, 300);
+            }
+        }
+
         function toggleLandingFaq(element) {
             const parent = element.parentElement;
             const answer = parent.querySelector('.faq-answer');

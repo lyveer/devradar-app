@@ -416,6 +416,11 @@ function switchTab(tabId) {
         loadUserInfo();
         loadAgentProjectContexts();
     }
+
+    // Close mobile drawer if active
+    if (typeof closeDashboardSidebar === 'function') {
+        closeDashboardSidebar();
+    }
 }
 
 // FAQ Accordion Toggle
@@ -1594,6 +1599,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const name = localStorage.getItem('devradar_name');
         document.getElementById('user-display').innerText = name || 'Geliştirici';
+        const mobileUser = document.getElementById('mobile-user-display');
+        if (mobileUser) {
+            mobileUser.innerText = name || 'Geliştirici';
+        }
 
         loadProfile();
         loadUserInfo();
