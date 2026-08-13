@@ -15,26 +15,27 @@
             theme: {
                 extend: {
                     colors: {
+                        white: 'rgb(var(--site-white) / <alpha-value>)',
                         ink: {
-                            950: '#04040a',
-                            900: '#080812',
-                            800: '#0d0d1f',
-                            700: '#12122e',
-                            600: '#1a1a3e',
+                            950: 'var(--ink-950)',
+                            900: 'var(--ink-900)',
+                            800: 'var(--ink-800)',
+                            700: 'var(--ink-700)',
+                            600: 'var(--ink-600)',
                         },
                         signal: {
-                            DEFAULT: '#e8ff47',
-                            dim: '#b8cc38',
+                            DEFAULT: 'rgb(var(--color-signal) / <alpha-value>)',
+                            dim: 'rgb(var(--color-signal-dim) / <alpha-value>)',
                         },
                         ember: {
                             DEFAULT: '#ff6b35',
                             dim: '#cc5529',
                         },
                         mist: {
-                            900: '#9898b8',
-                            700: '#c4c4d8',
-                            500: '#dcdcec',
-                            100: '#f0f0f8',
+                            900: 'var(--mist-900)',
+                            700: 'var(--mist-700)',
+                            500: 'var(--mist-500)',
+                            100: 'var(--mist-100)',
                         },
                     },
                     fontFamily: {
@@ -58,19 +59,57 @@
         }
     </script>
     <style type="text/css">
+        :root {
+            /* DARK MODE (Default) */
+            --site-white: 255, 255, 255;
+            --ink-950: #04040a;
+            --ink-900: #080812;
+            --ink-800: #0d0d1f;
+            --ink-700: #12122e;
+            --ink-600: #1a1a3e;
+            
+            --mist-900: #9898b8;
+            --mist-700: #c4c4d8;
+            --mist-500: #dcdcec;
+            --mist-100: #f0f0f8;
+            
+            --color-signal: 232 255 71;
+            --color-signal-dim: 184 204 56;
+        }
+
+        body.light-mode {
+            /* LIGHT MODE */
+            --site-white: 0, 0, 0;
+            --ink-950: #ffffff;
+            --ink-900: #f8f9fa;
+            --ink-800: #f1f3f5;
+            --ink-700: #e9ecef;
+            --ink-600: #dee2e6;
+            
+            --mist-900: #495057;
+            --mist-700: #343a40;
+            --mist-500: #212529;
+            --mist-100: #04040a;
+
+            /* Purple in light mode */
+            --color-signal: 107 33 168; 
+            --color-signal-dim: 88 28 135;
+        }
+
         * {
             cursor: none !important;
         }
         body {
-            background-color: #04040a;
-            color: #f0f0f8;
+            background-color: var(--ink-950);
+            color: var(--mist-100);
             font-family: "Cabinet Grotesk", sans-serif;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
         .grid-bg {
             background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-image: linear-gradient(to right, rgb(var(--site-white) / 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgb(var(--site-white) / 0.05) 1px, transparent 1px);
         }
     </style>
     <script src="js/i18n.js"></script>
@@ -79,6 +118,11 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6179884512996719" crossorigin="anonymous"></script>
 </head>
 <body class="min-h-screen relative overflow-x-hidden selection:bg-signal selection:text-ink-950">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    </script>
 
     <!-- Scroll Progress Bar -->
     <div id="scroll-progress" class="fixed top-0 left-0 h-1 bg-signal z-[9999] transition-all duration-100" style="width: 0%;"></div>
@@ -110,9 +154,18 @@
                 <a href="#features" data-i18n="nav-features" class="text-sm font-medium text-mist-700 hover:text-signal transition-colors">Özellikler</a>
                 <a href="#stats" data-i18n="nav-stats" class="text-sm font-medium text-mist-700 hover:text-signal transition-colors">İstatistikler</a>
                 <a href="#faq" data-i18n="nav-faq" class="text-sm font-medium text-mist-700 hover:text-signal transition-colors">SSS</a>
+                <a href="/guide.html" data-i18n="nav-guide" class="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors">📚 AI Kılavuzu</a>
             </nav>
 
             <div class="flex items-center gap-4">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-lg bg-ink-900 border border-white/10 text-mist-700 hover:text-signal transition-colors focus:outline-none" aria-label="Temayı Değiştir">
+                    <!-- Sun Icon (for light mode switch) -->
+                    <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <!-- Moon Icon (for dark mode switch) -->
+                    <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+
                 <!-- Language Selector -->
                 <div class="relative">
                     <select id="lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-ink-900 border border-white/10 text-mist-700 hover:text-mist-100 text-xs font-semibold rounded-lg px-3 py-1.5 pr-8 cursor-pointer outline-none focus:border-signal transition-colors">
@@ -126,7 +179,7 @@
                 </div>
 
                 <a href="/auth?mode=login" id="nav-login-btn" data-i18n="nav-login" class="text-xs font-semibold text-mist-700 hover:text-mist-100 px-4 py-2 rounded-lg border border-transparent transition-colors">Giriş Yap</a>
-                <a href="/auth?mode=register" id="nav-register-btn" data-i18n="nav-register" class="bg-signal text-ink-950 text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(232,255,71,0.2)]">Kayıt Ol</a>
+                <a href="/auth?mode=register" id="nav-register-btn" data-i18n="nav-register" class="bg-signal text-ink-950 text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-xl shadow-signal/20">Kayıt Ol</a>
                 <a href="/dashboard" id="nav-dashboard-btn" data-i18n="nav-dashboard" class="hidden bg-ink-900 border border-white/10 hover:border-signal text-mist-100 text-xs font-semibold px-4 py-2.5 rounded-lg transition-all">Panelime Git</a>
             </div>
         </div>
@@ -151,7 +204,7 @@
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4">
-                <a href="/auth?mode=register" id="hero-cta-btn" data-i18n="hero-cta" class="bg-signal text-ink-950 font-bold px-8 py-4 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_30px_rgba(232,255,71,0.25)] flex items-center justify-center gap-2">
+                <a href="/auth?mode=register" id="hero-cta-btn" data-i18n="hero-cta" class="bg-signal text-ink-950 font-bold px-8 py-4 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-2xl shadow-signal/25 flex items-center justify-center gap-2">
                     Hemen Analize Başla (Ücretsiz 5 Kredi)
                 </a>
             </div>
@@ -170,9 +223,9 @@
                         <div class="w-16 h-16 rounded-full bg-signal/10 border border-signal/20 text-signal flex items-center justify-center mx-auto mb-6 text-2xl font-mono animate-pulse-slow">
                             AI
                         </div>
-                        <h3 class="font-display font-semibold text-2xl mb-3 text-mist-100">Live AI Developer Radar</h3>
-                        <p class="text-mist-700 text-sm mb-6">Real-time profiling score, developer market rates, project valuation and competitive insights integrated together.</p>
-                        <a href="/auth?mode=register" class="inline-flex items-center gap-2 text-xs font-mono font-bold text-signal tracking-widest uppercase hover:underline">
+                        <h3 data-i18n="teaser-title" class="font-display font-semibold text-2xl mb-3 text-mist-100">Live AI Developer Radar</h3>
+                        <p data-i18n="teaser-desc" class="text-mist-700 text-sm mb-6">Real-time profiling score, developer market rates, project valuation and competitive insights integrated together.</p>
+                        <a href="/auth?mode=register" data-i18n="teaser-btn" class="inline-flex items-center gap-2 text-xs font-mono font-bold text-signal tracking-widest uppercase hover:underline">
                             Get started now
                             <span>→</span>
                         </a>
@@ -221,6 +274,92 @@
                     <p data-i18n="feat-3-desc" class="text-mist-700 text-sm leading-relaxed">
                         Projelerinizi AI ile analiz ettikten sonra, geliştirme adımlarını içeren otomatik kontrol listesi ile ilerlemenizi takip edin.
                     </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmap Section -->
+        <section id="roadmap" class="py-24 border-t border-white/[0.06]">
+            <div class="text-center mb-16">
+                <h2 data-i18n="roadmap-title" class="font-display font-semibold text-4xl md:text-5xl mb-4 tracking-tight">Yol Haritası (Roadmap)</h2>
+                <p data-i18n="roadmap-subtitle" class="text-mist-700 text-lg">Platformun gelecek planları ve aşamaları.</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto relative border-l border-white/10 ml-4 md:ml-auto">
+                <!-- Roadmap Item 1 -->
+                <div class="mb-10 ml-8 relative group">
+                    <div class="absolute -left-10 mt-1 w-4 h-4 bg-signal rounded-full border-4 border-ink-950 shadow-md shadow-signal/50 transition-transform group-hover:scale-125"></div>
+                    <span class="text-signal font-mono text-xs font-bold tracking-widest uppercase mb-1 block">Aşama 01</span>
+                    <h3 class="font-display font-semibold text-2xl text-mist-100 mb-2">Altyapı, Güvenlik & Optimizasyon</h3>
+                    <p class="text-mist-700 text-sm leading-relaxed">
+                        Platform, kullanıcı geri bildirimleriyle sürekli optimize edilerek performans ve güvenlik standartları en üst düzeye taşınacak.
+                    </p>
+                </div>
+                <!-- Roadmap Item 2 -->
+                <div class="mb-10 ml-8 relative group">
+                    <div class="absolute -left-10 mt-1 w-4 h-4 bg-white/20 rounded-full border-4 border-ink-950 transition-colors group-hover:bg-mist-500"></div>
+                    <span class="text-mist-500 font-mono text-xs font-bold tracking-widest uppercase mb-1 block">Aşama 02</span>
+                    <h3 class="font-display font-semibold text-2xl text-mist-100 mb-2">AI Modellerinin Geliştirilmesi</h3>
+                    <p class="text-mist-700 text-sm leading-relaxed">
+                        DevRadarAI ekosistemine daha güçlü ve çeşitli yeni nesil yapay zeka modelleri entegre edilecek.
+                    </p>
+                </div>
+                <!-- Roadmap Item 3 -->
+                <div class="mb-10 ml-8 relative group">
+                    <div class="absolute -left-10 mt-1 w-4 h-4 bg-white/20 rounded-full border-4 border-ink-950 transition-colors group-hover:bg-mist-500"></div>
+                    <span class="text-mist-500 font-mono text-xs font-bold tracking-widest uppercase mb-1 block">Aşama 03</span>
+                    <h3 class="font-display font-semibold text-2xl text-mist-100 mb-2">Gelişmiş AI Coding</h3>
+                    <p class="text-mist-700 text-sm leading-relaxed">
+                        Çoklu model desteğiyle (multimodal) görsel oluşturma ve dosya analizi gibi gelişmiş yapay zeka kodlama araçları devreye alınacak.
+                    </p>
+                </div>
+                <!-- Roadmap Item 4 -->
+                <div class="mb-10 ml-8 relative group">
+                    <div class="absolute -left-10 mt-1 w-4 h-4 bg-white/20 rounded-full border-4 border-ink-950 transition-colors group-hover:bg-mist-500"></div>
+                    <span class="text-mist-500 font-mono text-xs font-bold tracking-widest uppercase mb-1 block">Aşama 04</span>
+                    <h3 class="font-display font-semibold text-2xl text-mist-100 mb-2">Forum & Developer Community</h3>
+                    <p class="text-mist-700 text-sm leading-relaxed">
+                        Geliştiricilerin projelerini sergileyebileceği, iş birlikleri kurup hizmetlerini tanıtabileceği aktif bir topluluk forumu oluşturulacak.
+                    </p>
+                </div>
+                <!-- Roadmap Item 5 -->
+                <div class="mb-10 ml-8 relative group">
+                    <div class="absolute -left-10 mt-1 w-4 h-4 bg-white/20 rounded-full border-4 border-ink-950 transition-colors group-hover:bg-mist-500"></div>
+                    <span class="text-mist-500 font-mono text-xs font-bold tracking-widest uppercase mb-1 block">Aşama 05</span>
+                    <h3 class="font-display font-semibold text-2xl text-mist-100 mb-2">Groups, Studios & Companies</h3>
+                    <p class="text-mist-700 text-sm leading-relaxed">
+                        Ekipler, oyun stüdyoları ve şirketler için ortak çalışma, proje yönetimi ve takım oluşturma araçları sunulacak.
+                    </p>
+                </div>
+                <!-- Roadmap Item 6 -->
+                <div class="mb-12 ml-8 relative group">
+                    <div class="absolute -left-10 mt-1 w-4 h-4 bg-white/20 rounded-full border-4 border-ink-950 transition-colors group-hover:bg-mist-500"></div>
+                    <span class="text-mist-500 font-mono text-xs font-bold tracking-widest uppercase mb-1 block">Aşama 06</span>
+                    <h3 class="font-display font-semibold text-2xl text-mist-100 mb-2">DevRadarAI Marketplace</h3>
+                    <p class="text-mist-700 text-sm leading-relaxed">
+                        Geliştirilen projeler; dosya bütünlüğü doğrulama, gelişmiş güvenlik taramaları, erişim kontrolü ve lisanslama mekanizmalarıyla desteklenerek Marketplace'te güvenle satışa sunulacak.
+                    </p>
+                </div>
+                <!-- Roadmap Item 7 (Highlight) -->
+                <div class="ml-8 relative group border border-ember/20 bg-ember/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm">
+                    <div class="absolute -left-[44px] top-8 w-6 h-6 bg-ember rounded-full border-4 border-ink-950 shadow-[0_0_20px_rgba(255,107,53,0.8)] animate-pulse"></div>
+                    <span class="text-ember font-mono text-sm font-bold tracking-widest uppercase mb-2 block flex items-center gap-2">
+                        🌟 Final Sıçraması
+                    </span>
+                    <h3 class="font-display font-bold text-3xl md:text-4xl text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-ember to-signal">DevRadarAI 2.0 — Next Generation</h3>
+                    <p class="text-mist-100 text-base leading-relaxed mb-6 font-medium">
+                        DevRadarAI'nin yeni nesil sürümüne geçişiyle birlikte yepyeni özellikler platforma dahil edilecek ve kusursuz bir ekosistem oluşturulacak:
+                    </p>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-mist-500 text-sm">
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> GitHub analizi</li>
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> Dosya analizi</li>
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> Site güvenlik kontrolleri</li>
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> Gelişmiş AI sohbet botu</li>
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> Kullanıcının yeteneklerine uygun iş fırsatları</li>
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> Ekip kurarak ortak proje geliştirme</li>
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> Proje yarışmaları</li>
+                        <li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rounded-full bg-signal"></div> Başarılı projelere ödül ve sertifika sistemi</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -296,9 +435,9 @@
         <!-- Final CTA Section -->
         <section class="py-24 border-t border-white/[0.06] text-center relative overflow-hidden rounded-3xl bg-ink-900/30 border border-white/10 mb-20 px-6">
             <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 via-transparent to-ember/5 pointer-events-none"></div>
-            <h2 class="font-display font-semibold text-3xl md:text-5xl mb-6 text-mist-100 tracking-tight">Let's build the future together.</h2>
-            <p class="text-mist-700 max-w-md mx-auto mb-10 text-sm md:text-base">Start analyzing your projects and mapping developer success with Lyver Software technology.</p>
-            <a href="/auth?mode=register" class="bg-signal text-ink-950 font-bold px-8 py-4 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_30px_rgba(232,255,71,0.2)] inline-flex items-center gap-2">
+            <h2 data-i18n="cta-final-title" class="font-display font-semibold text-3xl md:text-5xl mb-6 text-mist-100 tracking-tight">Let's build the future together.</h2>
+            <p data-i18n="cta-final-desc" class="text-mist-700 max-w-md mx-auto mb-10 text-sm md:text-base">Start analyzing your projects and mapping developer success with Lyver Software technology.</p>
+            <a href="/auth?mode=register" data-i18n="cta-final-btn" class="bg-signal text-ink-950 font-bold px-8 py-4 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_30px_rgba(232,255,71,0.2)] inline-flex items-center gap-2">
                 Get started today
                 <span>→</span>
             </a>
@@ -444,6 +583,89 @@
             const scrolled = (winScroll / height) * 100;
             document.getElementById('scroll-progress').style.width = scrolled + '%';
         });
+
+        // Cookie Consent Logic
+        document.addEventListener("DOMContentLoaded", () => {
+            const banner = document.getElementById('cookie-consent-banner');
+            
+            const getCookie = (name) => {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            };
+
+            if (!getCookie('cookie_consent')) {
+                banner.classList.remove('hidden');
+                setTimeout(() => {
+                    banner.classList.remove('translate-y-full');
+                }, 100);
+            }
+            
+            window.handleCookieConsent = function(action) {
+                const d = new Date();
+                d.setTime(d.getTime() + (365*24*60*60*1000));
+                document.cookie = `cookie_consent=${action}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+                
+                banner.classList.add('translate-y-full');
+                setTimeout(() => {
+                    banner.classList.add('hidden');
+                }, 500);
+            };
+
+            // Theme Toggle Logic
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+
+            function updateThemeIcons() {
+                if (document.body.classList.contains('light-mode')) {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                } else {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            }
+
+            // Set initial icon based on applied theme
+            updateThemeIcons();
+
+            themeToggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                
+                if (document.body.classList.contains('light-mode')) {
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    localStorage.setItem('theme', 'dark');
+                }
+                
+                updateThemeIcons();
+            });
+        });
     </script>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent-banner" class="fixed bottom-0 left-0 w-full z-[100] transform translate-y-full transition-transform duration-500 hidden">
+        <div class="bg-ink-950/95 backdrop-blur-xl border-t border-white/10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_-10px_30px_rgba(4,4,10,0.8)]">
+            <div class="max-w-3xl">
+                <h3 class="text-mist-100 font-display font-semibold text-lg mb-2 flex items-center gap-2">
+                    <span>🍪</span> Çerez Kullanımı
+                </h3>
+                <p class="text-mist-700 text-sm leading-relaxed">
+                    Size daha iyi bir hizmet sunabilmek ve platform tercihlerini (dil, tema vb.) hatırlayabilmek için çerezleri kullanıyoruz. DevRadar platformunu kullanmaya devam ederek gizlilik ve çerez politikalarımızı kabul etmiş olursunuz. 
+                    <a href="/cookies.html" class="text-signal hover:underline">Çerezler hakkında daha fazla bilgi edinin.</a>
+                </p>
+            </div>
+            <div class="flex items-center gap-4 whitespace-nowrap">
+                <button onclick="handleCookieConsent('reject')" class="px-6 py-3 rounded-lg text-sm font-semibold text-mist-500 hover:text-mist-100 bg-white/5 hover:bg-white/10 border border-white/5 transition-colors">
+                    Sadece Zorunlular
+                </button>
+                <button onclick="handleCookieConsent('accept')" class="px-6 py-3 rounded-lg text-sm font-semibold text-ink-950 bg-signal hover:bg-signal-dim transition-colors shadow-[0_0_15px_rgba(232,255,71,0.2)]">
+                    Tümünü Kabul Et
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

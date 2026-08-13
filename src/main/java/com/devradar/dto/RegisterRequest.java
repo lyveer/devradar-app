@@ -6,13 +6,15 @@ public class RegisterRequest {
 
     @NotBlank(message = "E-posta gerekli")
     @Email(message = "Geçerli bir e-posta girin")
+    @Size(max = 100, message = "E-posta çok uzun")
     private String email;
 
     @NotBlank(message = "Şifre gerekli")
-    @Size(min = 6, message = "Şifre en az 6 karakter olmalı")
+    @Size(min = 6, max = 50, message = "Şifre 6 ile 50 karakter arasında olmalı")
     private String password;
 
     @NotBlank(message = "Ad soyad gerekli")
+    @Size(max = 100, message = "Ad soyad çok uzun")
     private String fullName;
 
     public RegisterRequest() {}

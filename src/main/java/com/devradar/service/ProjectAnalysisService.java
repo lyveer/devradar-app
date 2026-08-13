@@ -19,6 +19,9 @@ public class ProjectAnalysisService {
     private final GeminiAIService aiService;
     private final ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Value("${devradar.free.daily.limit:5}")
+    private int freeDailyLimit;
+
     public ProjectAnalysisService(ProjectAnalysisRepository analysisRepository,
                                   UserRepository userRepository,
                                   GeminiAIService aiService,
@@ -33,10 +36,30 @@ public class ProjectAnalysisService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        // Kredi kontrolü
+        String resolvedProvider;
+
         if (!Boolean.TRUE.equals(user.getIsPremium())) {
+            // Daily limit check for free tier
+            java.time.LocalDateTime startOfDay = java.time.LocalDate.now().atStartOfDay();
+            long todayCount = analysisRepository.countByUserIdAndCreatedAtGreaterThanEqual(user.getId(), startOfDay);
+            if (todayCount >= freeDailyLimit) {
+                throw new RuntimeException("Günlük analiz limitinize ulaştınız (" + freeDailyLimit + "). Daha fazla analiz için lütfen Premium üyeliğe yükseltin.");
+            }
+
+            // Kredi kontrolü
             if (user.getCredits() == null || user.getCredits() <= 0) {
                 throw new RuntimeException("Yetersiz kredi! Analiz yapabilmek için lütfen premium aboneliğe geçiş yapın.");
+            }
+
+            // Free tier users are restricted to Groq
+            resolvedProvider = "groq";
+        } else {
+            // Premium tier users can select gemini or claude, default to gemini
+            String requestedProvider = request.getAiProvider();
+            if (requestedProvider != null && (requestedProvider.equalsIgnoreCase("gemini") || requestedProvider.equalsIgnoreCase("claude"))) {
+                resolvedProvider = requestedProvider.toLowerCase();
+            } else {
+                resolvedProvider = "gemini";
             }
         }
 
@@ -44,10 +67,11 @@ public class ProjectAnalysisService {
                 request.getProjectName(),
                 request.getProjectDescription(),
                 request.getTargetLanguage(),
-                request.getLanguage()
+                request.getLanguage(),
+                resolvedProvider
         );
 
-        // Krediyi azalt
+        // Krediyi azalt (Only for free tier users)
         if (!Boolean.TRUE.equals(user.getIsPremium())) {
             user.setCredits(Math.max(0, user.getCredits() - 1));
             userRepository.save(user);

@@ -14,24 +14,25 @@
             theme: {
                 extend: {
                     colors: {
+                        white: 'rgb(var(--site-white) / <alpha-value>)',
                         ink: {
-                            950: '#04040a',
-                            900: '#080812',
-                            800: '#0d0d1f',
-                            700: '#12122e',
-                            600: '#1a1a3e',
+                            950: 'var(--ink-950)',
+                            900: 'var(--ink-900)',
+                            800: 'var(--ink-800)',
+                            700: 'var(--ink-700)',
+                            600: 'var(--ink-600)',
                         },
                         signal: {
-                            DEFAULT: '#e8ff47',
-                            dim: '#b8cc38',
+                            DEFAULT: 'rgb(var(--color-signal) / <alpha-value>)',
+                            dim: 'rgb(var(--color-signal-dim) / <alpha-value>)',
                         },
                         ember: {
                             DEFAULT: '#ff6b35',
                         },
                         mist: {
-                            100: '#f0f0f8',
-                            700: '#a3a3c2',
-                            900: '#47476b',
+                            100: 'var(--mist-100)',
+                            700: 'var(--mist-700)',
+                            900: 'var(--mist-900)',
                         }
                     },
                     fontFamily: {
@@ -43,24 +44,64 @@
             }
         }
     </script>
-    <style type="text/css">
+        :root {
+            /* DARK MODE (Default) */
+            --site-white: 255, 255, 255;
+            --ink-950: #04040a;
+            --ink-900: #080812;
+            --ink-800: #0d0d1f;
+            --ink-700: #12122e;
+            --ink-600: #1a1a3e;
+            
+            --mist-900: #47476b;
+            --mist-700: #a3a3c2;
+            --mist-100: #f0f0f8;
+            
+            --color-signal: 232 255 71;
+            --color-signal-dim: 184 204 56;
+        }
+
+        body.light-mode {
+            /* LIGHT MODE */
+            --site-white: 0, 0, 0;
+            --ink-950: #ffffff;
+            --ink-900: #f8f9fa;
+            --ink-800: #f1f3f5;
+            --ink-700: #e9ecef;
+            --ink-600: #dee2e6;
+            
+            --mist-900: #495057;
+            --mist-700: #343a40;
+            --mist-100: #04040a;
+
+            /* Purple in light mode */
+            --color-signal: 107 33 168; 
+            --color-signal-dim: 88 28 135;
+        }
+
         * {
             cursor: none !important;
         }
         body {
-            background-color: #04040a;
-            color: #f0f0f8;
+            background-color: var(--ink-950);
+            color: var(--mist-100);
             font-family: "Cabinet Grotesk", sans-serif;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
         .grid-bg {
             background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-image: linear-gradient(to right, rgba(var(--site-white), 0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(var(--site-white), 0.02) 1px, transparent 1px);
         }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden selection:bg-signal selection:text-ink-950">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    </script>
 
     <!-- Custom Cursor -->
     <div id="custom-cursor" class="fixed top-0 left-0 w-2 h-2 bg-signal rounded-full pointer-events-none z-[9999] will-change-transform"></div>
@@ -78,7 +119,14 @@
                 </div>
                 <span class="font-display font-semibold text-lg text-mist-100 tracking-tight">DevRadar<span class="text-signal">AI</span></span>
             </a>
-            <a href="/" class="text-xs font-mono font-bold text-signal tracking-widest uppercase hover:underline">← Geri Dön</a>
+            <div class="flex items-center gap-4">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-lg bg-ink-900 border border-white/10 text-mist-700 hover:text-signal transition-colors focus:outline-none" aria-label="Temayı Değiştir">
+                    <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+                <a href="/" class="text-xs font-mono font-bold text-signal tracking-widest uppercase hover:underline">← Geri Dön</a>
+            </div>
         </div>
     </header>
 
@@ -156,6 +204,39 @@
                 ring.classList.remove('w-12', 'h-12', 'bg-signal/5', 'border-signal');
             }
         }, true);
+
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+
+            function updateThemeIcons() {
+                if (document.body.classList.contains('light-mode')) {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                } else {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            }
+
+            updateThemeIcons();
+
+            if(themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    document.body.classList.toggle('light-mode');
+                    
+                    if (document.body.classList.contains('light-mode')) {
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        localStorage.setItem('theme', 'dark');
+                    }
+                    
+                    updateThemeIcons();
+                });
+            }
+        });
     </script>
 </body>
 </html>

@@ -14,6 +14,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -29,9 +30,11 @@ public class User {
     @Column(nullable = false)
     private Boolean isVerified = false;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @Column
     private String verificationCode;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @Column
     private LocalDateTime verificationCodeExpiresAt;
 

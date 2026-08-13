@@ -11,7 +11,15 @@ const translations = {
     "nav-credits": "Kredi:",
     "nav-unlimited": "Sınırsız Kredi Al",
 
+    "nav-guide": "📚 AI Kılavuzu",
+
     // index.html
+    "teaser-title": "Canlı AI Geliştirici Radarı",
+    "teaser-desc": "Gerçek zamanlı profil puanlama, pazar fiyatlandırmaları, proje tahmini ve rekabet analizleri tek bir yerde.",
+    "teaser-btn": "Hemen Başlayın →",
+    "cta-final-title": "Geleceği birlikte inşa edelim.",
+    "cta-final-desc": "Projelerinizi analiz etmeye başlayın ve Lyver Software teknolojisi ile başarınızı haritalandırın.",
+    "cta-final-btn": "Bugün Başla →",
     "hero-title": "Yazılım Projelerinizin Değerini AI Radar ile Keşfedin",
     "hero-subtitle": "Yapay zeka ve canlı pazar grounding arama analizleri ile yazılım projelerinizin tahmini değerini, pazar talebini ve geliştirici profilinizi raporlayın.",
     "hero-cta": "Hemen Analize Başla (Ücretsiz 5 Kredi)",
@@ -226,6 +234,8 @@ const translations = {
 
     // App.js Dynamic Translation Keys
     "unlimited-text": "Sınırsız",
+    "unlimited-credits-agent": "Sınırsız Kredi",
+    "remaining-credits-agent": "Kalan Kredi",
     "toast-login-loading": "Giriş yapılıyor...",
     "toast-login-success": "Giriş başarılı! Yönlendiriliyorsunuz...",
     "toast-please-verify": "Lütfen e-posta adresinizi doğrulayın.",
@@ -293,8 +303,15 @@ const translations = {
     "nav-logout": "Logout",
     "nav-credits": "Credits:",
     "nav-unlimited": "Get Unlimited Credits",
+    "nav-guide": "📚 AI Guide",
 
     // index.html
+    "teaser-title": "Live AI Developer Radar",
+    "teaser-desc": "Real-time profiling score, developer market rates, project valuation and competitive insights integrated together.",
+    "teaser-btn": "Get started now →",
+    "cta-final-title": "Let's build the future together.",
+    "cta-final-desc": "Start analyzing your projects and mapping developer success with Lyver Software technology.",
+    "cta-final-btn": "Get started today →",
     "hero-title": "Discover the Value of Your Software Projects with AI Radar",
     "hero-subtitle": "Report the estimated value of your software projects, market demand, and your developer profile using AI and live market grounding search analytics.",
     "hero-cta": "Start Analysis Now (Free 5 Credits)",
@@ -509,6 +526,8 @@ const translations = {
 
     // App.js Dynamic Translation Keys
     "unlimited-text": "Unlimited",
+    "unlimited-credits-agent": "Unlimited Credits",
+    "remaining-credits-agent": "Remaining Credits",
     "toast-login-loading": "Logging in...",
     "toast-login-success": "Login successful! Redirecting...",
     "toast-please-verify": "Please verify your email address.",
@@ -576,8 +595,15 @@ const translations = {
     "nav-logout": "Abmelden",
     "nav-credits": "Guthaben:",
     "nav-unlimited": "Unbegrenztes Guthaben holen",
+    "nav-guide": "📚 KI Handbuch",
 
     // index.html
+    "teaser-title": "Live KI-Entwicklerradar",
+    "teaser-desc": "Echtzeit-Profilbewertung, Entwicklermarktpreise, Projektbewertung und Wettbewerbseinblicke vereint.",
+    "teaser-btn": "Jetzt anfangen →",
+    "cta-final-title": "Lassen Sie uns gemeinsam die Zukunft bauen.",
+    "cta-final-desc": "Beginnen Sie mit der Analyse Ihrer Projekte und planen Sie Ihren Erfolg mit der Lyver Software-Technologie.",
+    "cta-final-btn": "Heute beginnen →",
     "hero-title": "Entdecken Sie den Wert Ihrer Softwareprojekte mit AI Radar",
     "hero-subtitle": "Melden Sie den geschätzten Wert Ihrer Softwareprojekte, die Marktnachfrage und Ihr Entwicklerprofil mithilfe von KI und Live-Marktsuche-Analysen.",
     "hero-cta": "Analyse jetzt starten (Kostenlose 5 Guthaben)",
@@ -792,6 +818,8 @@ const translations = {
 
     // App.js Dynamic Translation Keys
     "unlimited-text": "Unbegrenzt",
+    "unlimited-credits-agent": "Unbegrenztes Guthaben",
+    "remaining-credits-agent": "Verbleibende Credits",
     "toast-login-loading": "Einloggen...",
     "toast-login-success": "Login erfolgreich! Weiterleitung...",
     "toast-please-verify": "Bitte verifizieren Sie Ihre E-Mail-Adresse.",

@@ -29,6 +29,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        if (requireSsl) {
+            http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
+        }
+
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -43,22 +47,20 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
+                .loginPage("/auth")
                 .successHandler(oAuth2SuccessHandler)
             )
             .headers(headers -> {
+                headers.xssProtection(xss -> xss.headerValue(org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK));
+                headers.contentTypeOptions(ct -> {}); // Explicitly enable X-Content-Type-Options
                 headers.frameOptions(fo -> fo.sameOrigin());
-                if (requireSsl) {
-                    headers.httpStrictTransportSecurity(hsts -> hsts
-                        .includeSubDomains(true)
-                        .maxAgeInSeconds(31536000)
-                        .preload(true)
-                    );
-                    headers.contentSecurityPolicy(csp -> csp
-                        .policyDirectives("upgrade-insecure-requests")
-                    );
-                } else {
-                    headers.httpStrictTransportSecurity(hsts -> hsts.disable());
-                }
+                headers.contentSecurityPolicy(csp -> csp.policyDirectives("upgrade-insecure-requests; frame-ancestors 'self'; script-src 'self' 'unsafe-eval' https://cdn.tailwindcss.com https://pagead2.googlesyndication.com; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://pagead2.googlesyndication.com; script-src-attr 'unsafe-inline'; object-src 'none';"));
+                headers.httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000)
+                    .preload(true)
+                    .requestMatcher(request -> true) // Force HSTS even on HTTP / behind proxies without proper forwarding
+                );
             })
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -70,10 +72,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(4);
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
 }

@@ -15,17 +15,20 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final com.devradar.repository.ProfileRepository profileRepository;
     private final EmailService emailService;
+    private final com.devradar.security.LoginAttemptService loginAttemptService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JwtUtil jwtUtil,
                        com.devradar.repository.ProfileRepository profileRepository,
-                       EmailService emailService) {
+                       EmailService emailService,
+                       com.devradar.security.LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.profileRepository = profileRepository;
         this.emailService = emailService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -59,10 +62,20 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail().trim().toLowerCase())
-                .orElseThrow(() -> new RuntimeException("Geçersiz e-posta veya şifre"));
+        String emailKey = request.getEmail().trim().toLowerCase();
+        
+        if (loginAttemptService.isBlocked(emailKey)) {
+            throw new RuntimeException("Çok fazla hatalı giriş denemesi. Lütfen 15 dakika bekleyin.");
+        }
+
+        User user = userRepository.findByEmail(emailKey)
+                .orElseThrow(() -> {
+                    loginAttemptService.loginFailed(emailKey);
+                    return new RuntimeException("Geçersiz e-posta veya şifre");
+                });
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            loginAttemptService.loginFailed(emailKey);
             throw new RuntimeException("Geçersiz e-posta veya şifre");
         }
 
@@ -70,6 +83,7 @@ public class AuthService {
             throw new RuntimeException("EMAIL_NOT_VERIFIED: Lütfen e-posta adresinizi doğrulayın.");
         }
 
+        loginAttemptService.loginSucceeded(emailKey);
         String token = jwtUtil.generateToken(user.getEmail());
 
         return AuthResponse.builder()

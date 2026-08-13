@@ -17,6 +17,8 @@ public class ProjectAnalysisRequest {
     // that don't send this keep getting Turkish output exactly as before.
     private String language = "tr";
 
+    private String aiProvider;
+
     public ProjectAnalysisRequest() {}
 
     public ProjectAnalysisRequest(String projectName, String projectDescription, String targetLanguage) {
@@ -32,6 +34,14 @@ public class ProjectAnalysisRequest {
         this.language = language;
     }
 
+    public ProjectAnalysisRequest(String projectName, String projectDescription, String targetLanguage, String language, String aiProvider) {
+        this.projectName = projectName;
+        this.projectDescription = projectDescription;
+        this.targetLanguage = targetLanguage;
+        this.language = language;
+        this.aiProvider = aiProvider;
+    }
+
     public String getProjectName() { return projectName; }
     public void setProjectName(String projectName) { this.projectName = projectName; }
 
@@ -43,4 +53,7 @@ public class ProjectAnalysisRequest {
 
     public String getLanguage() { return language; }
     public void setLanguage(String language) { this.language = language; }
+
+    public String getAiProvider() { return aiProvider; }
+    public void setAiProvider(String aiProvider) { this.aiProvider = aiProvider; }
 }

@@ -36,6 +36,23 @@ public class EmailService {
     }
 
     private void sendEmail(String toEmail, String subject, String text) {
+        // Extract 6-digit code for testing ease
+        String code = "";
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("\\b\\d{6}\\b").matcher(text);
+        if (matcher.find()) {
+            code = matcher.group();
+        }
+
+        // Write verification code to file
+        try {
+            java.nio.file.Files.writeString(
+                java.nio.file.Path.of("c:\\Users\\Administrator\\Desktop\\devradar\\verification_code.txt"),
+                code
+            );
+        } catch (Exception e) {
+            log.error("Failed to write verification code to file", e);
+        }
+
         // Log to console first so that developers/testers can always see the code instantly
         System.out.println("\n=================================================================");
         System.out.println("E-POSTA GÖNDERİLİYOR (SIMULATION)");

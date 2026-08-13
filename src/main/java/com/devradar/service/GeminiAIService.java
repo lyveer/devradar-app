@@ -22,15 +22,45 @@ public class GeminiAIService {
 
     private static final Logger log = LoggerFactory.getLogger(GeminiAIService.class);
 
+    // ---- Per-provider API keys ----
     @Value("${gemini.api.key:}")
     private String apiKey;
 
+    @Value("${claude.api.key:}")
+    private String claudeApiKey;
+
+    @Value("${groq.api.key:}")
+    private String groqApiKey;
+
+    @Value("${perplexity.api.key:}")
+    private String perplexityApiKey;
+
+    @Value("${openai.api.key:}")
+    private String openaiApiKey;
+
+    // ---- Active provider selection ----
+    // Allowed values: gemini | claude | groq | perplexity | chatgpt
+    @Value("${ai.provider:gemini}")
+    private String aiProvider;
+
+    // ---- Model names (per provider) ----
     // NOTE: "gemini-2.0-flash" was shut down by Google on 2026-06-01 and now returns HTTP 404
     // for every request. "gemini-flash-latest" is a self-updating alias maintained by Google
-    // that always points at the current recommended Flash model, so this class of failure
-    // (silently falling back to mock data because the model name went stale) can't recur.
+    // that always points at the current recommended Flash model.
     @Value("${gemini.model:gemini-flash-latest}")
-    private String model;
+    private String geminiModel;
+
+    @Value("${claude.model:claude-3-haiku-20240307}")
+    private String claudeModel;
+
+    @Value("${groq.model:llama-3.3-70b-versatile}")
+    private String groqModel;
+
+    @Value("${perplexity.model:sonar}")
+    private String perplexityModel;
+
+    @Value("${openai.model:gpt-4o-mini}")
+    private String openaiModel;
 
     @Value("${gemini.timeout.connect-ms:5000}")
     private int connectTimeoutMs;
@@ -52,20 +82,43 @@ public class GeminiAIService {
         factory.setReadTimeout(readTimeoutMs);
         this.restTemplate = new RestTemplate(factory);
 
-        // Loud, unmissable startup diagnostics — this is exactly the kind of thing that was
-        // being swallowed before, making it look like "the AI barely works" with no clue why.
-        if (!isApiKeyConfigured()) {
+        // Startup diagnostics — clearly show which provider is active.
+        String activeKey = getActiveApiKey();
+        if (activeKey == null || activeKey.isBlank()) {
             log.warn("=================================================================");
-            log.warn(" GEMINI API KEY IS NOT CONFIGURED (gemini.api.key is empty).");
-            log.warn(" DevRadar will run in MOCK MODE: every response is template data,");
-            log.warn(" not real AI output. Set gemini.api.key (env var GEMINI_API_KEY)");
-            log.warn(" to enable real Gemini responses.");
+            log.warn(" NO API KEY CONFIGURED for provider '{}'.", aiProvider);
+            log.warn(" DevRadar will run in MOCK MODE.");
+            log.warn(" Set the matching key in application.properties:");
+            log.warn("   gemini.api.key   -> provider=gemini");
+            log.warn("   claude.api.key   -> provider=claude");
+            log.warn("   groq.api.key     -> provider=groq");
+            log.warn("   perplexity.api.key -> provider=perplexity");
             log.warn("=================================================================");
         } else {
-            log.info("Gemini AI service initialized. model='{}', key length={}", model, apiKey.length());
+            log.info("=================================================================");
+            log.info(" AI provider: '{}', key length={}", aiProvider, activeKey.length());
+            log.info("=================================================================");
         }
     }
 
+    /** Returns the API key for the currently active provider, or null/blank if not set. */
+    private String getActiveApiKey() {
+        return switch (aiProvider.toLowerCase().trim()) {
+            case "claude"     -> claudeApiKey;
+            case "groq"       -> groqApiKey;
+            case "perplexity" -> perplexityApiKey;
+            case "chatgpt"    -> openaiApiKey;
+            case "openai"     -> openaiApiKey;
+            default           -> apiKey; // gemini
+        };
+    }
+
+    private boolean isAnyProviderConfigured() {
+        String key = getActiveApiKey();
+        return key != null && !key.isBlank();
+    }
+
+    // Kept for internal Gemini-specific checks
     private boolean isApiKeyConfigured() {
         return apiKey != null && !apiKey.isBlank();
     }
@@ -83,7 +136,7 @@ public class GeminiAIService {
     public ProfileScoreResponse scoreProfile(Profile profile, String language) {
         String lang = normalizeLanguage(language);
 
-        if (!isApiKeyConfigured()) {
+        if (!isAnyProviderConfigured()) {
             return getMockProfileScore(profile, lang);
         }
 
@@ -120,18 +173,18 @@ public class GeminiAIService {
 
     // ========== PROJECT ANALYSIS ==========
 
-    public ProjectAnalysisResponse analyzeProject(String projectName, String description, String targetLanguage, String responseLanguage) {
+    public ProjectAnalysisResponse analyzeProject(String projectName, String description, String targetLanguage, String responseLanguage, String resolvedProvider) {
         String lang = normalizeLanguage(responseLanguage);
 
-        if (!isApiKeyConfigured()) {
+        if (!isAnyProviderConfigured()) {
             return getMockProjectAnalysis(projectName, description, targetLanguage, lang);
         }
 
         String prompt = buildProjectAnalysisPrompt(projectName, description, targetLanguage, lang);
-        GeminiCallResult result = callGemini(prompt);
+        GeminiCallResult result = callProvider(resolvedProvider, prompt);
 
         if (!result.success) {
-            log.warn("Falling back to mock project analysis because the Gemini call failed: {}", result.errorReason);
+            log.warn("Falling back to mock project analysis because the dynamic provider call failed: {}", result.errorReason);
             return getMockProjectAnalysis(projectName, description, targetLanguage, lang);
         }
 
@@ -230,6 +283,31 @@ public class GeminiAIService {
                 }
             }
 
+            // Parse project resources
+            List<ProjectAnalysisResponse.ProjectResource> projectResources = new ArrayList<>();
+            if (node.has("projectResources")) {
+                for (JsonNode res : node.get("projectResources")) {
+                    projectResources.add(ProjectAnalysisResponse.ProjectResource.builder()
+                            .title(res.path("title").asText(""))
+                            .url(res.path("url").asText(""))
+                            .build());
+                }
+            }
+
+            // Parse code snippets
+            List<ProjectAnalysisResponse.CodeSnippet> codeSnippets = new ArrayList<>();
+            if (node.has("codeSnippets")) {
+                for (JsonNode snip : node.get("codeSnippets")) {
+                    codeSnippets.add(ProjectAnalysisResponse.CodeSnippet.builder()
+                            .title(snip.path("title").asText(""))
+                            .code(snip.path("code").asText(""))
+                            .language(snip.path("language").asText(""))
+                            .build());
+                }
+            }
+
+            String codeRecommendation = getCodeRecommendation(projectName, description, targetLanguage, lang, resolvedProvider);
+
             return ProjectAnalysisResponse.builder()
                     .projectName(projectName)
                     .targetLanguage(targetLanguage)
@@ -244,7 +322,10 @@ public class GeminiAIService {
                     .competitorInsight(node.path("competitorInsight").asText(""))
                     .competitors(competitors)
                     .freelancerPlatforms(freelancerPlatforms)
+                    .projectResources(projectResources)
+                    .codeSnippets(codeSnippets)
                     .aiPowered(true)
+                    .codeRecommendation(codeRecommendation)
                     .build();
         } catch (Exception e) {
             log.error("Failed to parse AI project analysis response. Raw text was: {}", result.text, e);
@@ -252,62 +333,117 @@ public class GeminiAIService {
         }
     }
 
+    public ProjectAnalysisResponse analyzeProject(String projectName, String description, String targetLanguage, String responseLanguage) {
+        return analyzeProject(projectName, description, targetLanguage, responseLanguage, aiProvider);
+    }
+
     // Backward-compatible overload (defaults to Turkish) so existing callers keep compiling.
     public ProjectAnalysisResponse analyzeProject(String projectName, String description, String targetLanguage) {
         return analyzeProject(projectName, description, targetLanguage, "tr");
     }
 
+    public GeminiCallResult generateCode(String userPrompt, String provider, String responseLanguage) {
+        String lang = normalizeLanguage(responseLanguage);
+        boolean en = "en".equals(lang);
+        String systemInstruction = en
+                ? "You are DevRadar AI, a skilled and friendly software development assistant. Help developers build projects, write code, debug issues, explain concepts, and suggest best practices. Be natural and conversational — not just a code generator. When writing code, use markdown code blocks with the language specified (```python, ```javascript etc). Answer questions thoroughly and suggest alternatives when helpful. IMPORTANT: NEVER return your response in JSON format. Always reply in raw, plain text using markdown formatting. Before providing your final answer, ALWAYS wrap your step-by-step reasoning and plan inside <thinking> ... </thinking> XML tags."
+                : "Sen DevRadar AI'sın — deneyimli ve samimi bir yazılım geliştirme asistanısın. Geliştiricilere proje geliştirme, kod yazma, hata ayıklama, kavram açıklama ve mimari konularda yardım ediyorsun. Doğal ve akıcı bir şekilde sohbet et; sadece kod üretmekle sınırlı değilsin. Kod yazarken dil belirtilmiş markdown kod blokları kullan (```python, ```javascript vb.). Sorulara detaylı yanıt ver, gerektiğinde alternatif yaklaşımlar öner. ÖNEMLİ: YANITINI ASLA JSON FORMATINDA DÖNDÜRME! Her zaman doğrudan düz metin ve markdown kullanarak cevap ver. Nihai cevabını yazmadan önce HER ZAMAN adım adım düşünce sürecini ve planını <thinking> ... </thinking> XML etiketleri içerisine yaz.";
+
+        String fullPrompt = systemInstruction + "\n\n" + userPrompt;
+
+        if (!isAnyProviderConfigured()) {
+            return GeminiCallResult.ok(en 
+                ? "Mock Code Assistant: Here is a sample code for your request. Add an API key to enable live generation.\n\n```javascript\n// Sample placeholder code\nconsole.log(\"Hello from DevRadar AI!\");\n```"
+                : "Mock Kod Asistanı: İsteğiniz için örnek kod aşağıdadır. Gerçek yanıtlar almak için lütfen API anahtarlarını ayarlayın.\n\n```javascript\n// Örnek kod şablonu\nconsole.log(\"DevRadar AI'dan Merhaba!\");\n```", "MOCK", "mock-model");
+        }
+
+        GeminiCallResult result = callProvider(provider, fullPrompt);
+        if (!result.success) {
+            String error = en
+                ? "Error: AI assistant failed to respond: " + result.errorReason
+                : "Hata: Yapay zeka yanıt üretemedi: " + result.errorReason;
+            return GeminiCallResult.fail(error, result.providerUsed != null ? result.providerUsed : provider, result.modelUsed);
+        }
+
+        return result;
+    }
+
+    private String getCodeRecommendation(String projectName, String description, String targetLanguage, String lang, String resolvedProvider) {
+        String prompt = buildCodeRecommendationPrompt(projectName, description, targetLanguage, lang);
+
+        if (isAnyProviderConfigured()) {
+            GeminiCallResult result = callProvider(resolvedProvider, prompt);
+            if (result.success) {
+                return result.text;
+            }
+            log.warn("Code recommendation call failed (provider={}): {}", resolvedProvider, result.errorReason);
+        }
+
+        return getMockCodeRecommendation(targetLanguage, lang);
+    }
+
+    private String getCodeRecommendation(String projectName, String description, String targetLanguage, String lang) {
+        return getCodeRecommendation(projectName, description, targetLanguage, lang, aiProvider);
+    }
+
     // ========== GEMINI API CALL ==========
 
     /** Small result wrapper so callers can tell "AI succeeded" apart from "AI failed, this is a placeholder". */
-    private static class GeminiCallResult {
-        final boolean success;
-        final String text;
-        final String errorReason;
+    public static class GeminiCallResult {
+        public final boolean success;
+        public final String text;
+        public final String errorReason;
+        public final String providerUsed;
+        public final String modelUsed;
 
-        private GeminiCallResult(boolean success, String text, String errorReason) {
+        private GeminiCallResult(boolean success, String text, String errorReason, String providerUsed, String modelUsed) {
             this.success = success;
             this.text = text;
             this.errorReason = errorReason;
+            this.providerUsed = providerUsed;
+            this.modelUsed = modelUsed;
         }
 
-        static GeminiCallResult ok(String text) {
-            return new GeminiCallResult(true, text, null);
+        static GeminiCallResult ok(String text, String providerUsed, String modelUsed) {
+            return new GeminiCallResult(true, text, null, providerUsed, modelUsed);
         }
 
-        static GeminiCallResult fail(String reason) {
-            return new GeminiCallResult(false, null, reason);
+        static GeminiCallResult fail(String reason, String providerUsed, String modelUsed) {
+            return new GeminiCallResult(false, null, reason, providerUsed, modelUsed);
         }
     }
 
-    private String getEffectiveModel() {
-        if (apiKey != null && apiKey.trim().startsWith("gsk_")) {
-            if (model == null || (!model.contains("llama") && !model.contains("mixtral") && !model.contains("gemma") && !model.contains("groq"))) {
-                return "llama-3.3-70b-versatile";
-            }
-            return model;
-        } else if (apiKey != null && apiKey.trim().startsWith("pplx-")) {
-            if (model == null || (!model.contains("sonar") && !model.contains("perplexity"))) {
-                return "sonar";
-            }
-            return model;
-        } else {
-            if (model == null || model.contains("llama") || model.contains("mixtral") || model.contains("gemma") || model.contains("groq") || model.contains("sonar")) {
-                return "gemini-1.5-flash";
-            }
-            return model;
+    /**
+     * Main dispatcher — routes to the correct AI backend based on dynamic provider selection.
+     * Providers: gemini | claude | groq | perplexity
+     */
+    private GeminiCallResult callProvider(String provider, String prompt) {
+        String resolvedProvider = provider != null ? provider.toLowerCase().trim() : aiProvider.toLowerCase().trim();
+        
+        GeminiCallResult result;
+        switch (resolvedProvider) {
+            case "claude": result = callClaude(prompt); break;
+            case "groq": result = callGroq(prompt); break;
+            case "perplexity": result = callPerplexity(prompt); break;
+            case "chatgpt":
+            case "openai": result = callOpenAI(prompt); break;
+            default: result = callGeminiInternal(prompt, geminiModel, true); break; // gemini
         }
+
+        // Automatic Fallback System: If primary model fails, fallback to Groq if key is available
+        if (!result.success && !resolvedProvider.equals("groq") && groqApiKey != null && !groqApiKey.isBlank()) {
+            log.warn("Primary AI Provider ({}) failed. Error: {}. Falling back to GROQ.", resolvedProvider, result.errorReason);
+            GeminiCallResult fallbackResult = callGroq(prompt);
+            if (fallbackResult.success) {
+                return fallbackResult;
+            }
+        }
+        
+        return result;
     }
 
     private GeminiCallResult callGemini(String prompt) {
-        if (apiKey != null && apiKey.trim().startsWith("gsk_")) {
-            return callGroq(prompt);
-        }
-        if (apiKey != null && apiKey.trim().startsWith("pplx-")) {
-            return callPerplexity(prompt);
-        }
-        String resolvedModel = getEffectiveModel();
-        return callGeminiInternal(prompt, resolvedModel, true);
+        return callProvider(aiProvider, prompt);
     }
 
     private GeminiCallResult callGeminiInternal(String prompt, String resolvedModel, boolean useSearch) {
@@ -344,24 +480,23 @@ public class GeminiAIService {
                     && responseBody.get("candidates").size() > 0) {
                 JsonNode candidate = responseBody.get("candidates").get(0);
 
-                // A finishReason like SAFETY or RECITATION means there's no usable text part.
                 String finishReason = candidate.path("finishReason").asText("");
                 if (!candidate.has("content") || !candidate.get("content").has("parts")) {
-                    return GeminiCallResult.fail("Gemini returned no content (finishReason=" + finishReason + ")");
+                    return GeminiCallResult.fail("Gemini returned no content (finishReason=" + finishReason + ")", "GEMINI", resolvedModel);
                 }
 
                 String text = candidate.get("content").get("parts").get(0).path("text").asText("");
                 if (text.isBlank()) {
-                    return GeminiCallResult.fail("Gemini returned an empty text part (finishReason=" + finishReason + ")");
+                    return GeminiCallResult.fail("Gemini returned an empty text part (finishReason=" + finishReason + ")", "GEMINI", resolvedModel);
                 }
-                return GeminiCallResult.ok(text);
+                return GeminiCallResult.ok(text, "GEMINI", resolvedModel);
             }
 
             if (responseBody != null && responseBody.has("promptFeedback")) {
-                return GeminiCallResult.fail("Prompt was blocked: " + responseBody.get("promptFeedback"));
+                return GeminiCallResult.fail("Prompt was blocked: " + responseBody.get("promptFeedback"), "GEMINI", resolvedModel);
             }
 
-            return GeminiCallResult.fail("Gemini response had no candidates. Full body: " + responseBody);
+            return GeminiCallResult.fail("Gemini response had no candidates. Full body: " + responseBody, "GEMINI", resolvedModel);
 
         } catch (RestClientResponseException e) {
             log.error("Gemini API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
@@ -369,70 +504,29 @@ public class GeminiAIService {
                 log.warn("Retrying Gemini API call without search grounding tool...");
                 return callGeminiInternal(prompt, resolvedModel, false);
             }
-            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString());
+            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString(), "GEMINI", resolvedModel);
         } catch (Exception e) {
             log.error("Gemini API call failed unexpectedly", e);
             if (useSearch) {
                 log.warn("Retrying Gemini API call without search grounding tool...");
                 return callGeminiInternal(prompt, resolvedModel, false);
             }
-            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage());
+            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage(), "GEMINI", resolvedModel);
         }
     }
 
     private GeminiCallResult callGroq(String prompt) {
         String url = "https://api.groq.com/openai/v1/chat/completions";
-        String resolvedModel = getEffectiveModel();
 
         Map<String, Object> message = Map.of("role", "user", "content", prompt);
         Map<String, Object> body = Map.of(
-                "model", resolvedModel,
-                "messages", List.of(message),
-                "response_format", Map.of("type", "json_object")
-        );
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + apiKey.trim());
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-
-        try {
-            ResponseEntity<JsonNode> response = restTemplate.exchange(
-                    url, HttpMethod.POST, entity, JsonNode.class);
-            JsonNode responseBody = response.getBody();
-
-            if (responseBody != null && responseBody.has("choices")
-                    && responseBody.get("choices").size() > 0) {
-                JsonNode choice = responseBody.get("choices").get(0);
-                String text = choice.path("message").path("content").asText("");
-                if (text.isBlank()) {
-                    return GeminiCallResult.fail("Groq returned an empty text part");
-                }
-                return GeminiCallResult.ok(text);
-            }
-            return GeminiCallResult.fail("Groq response had no choices. Full body: " + responseBody);
-        } catch (RestClientResponseException e) {
-            log.error("Groq API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
-            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString());
-        } catch (Exception e) {
-            log.error("Groq API call failed unexpectedly", e);
-            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage());
-        }
-    }
-
-    private GeminiCallResult callPerplexity(String prompt) {
-        String url = "https://api.perplexity.ai/chat/completions";
-        String resolvedModel = getEffectiveModel();
-
-        Map<String, Object> message = Map.of("role", "user", "content", prompt);
-        Map<String, Object> body = Map.of(
-                "model", resolvedModel,
+                "model", groqModel,
                 "messages", List.of(message)
         );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + apiKey.trim());
+        headers.set("Authorization", "Bearer " + groqApiKey.trim());
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
         try {
@@ -445,17 +539,136 @@ public class GeminiAIService {
                 JsonNode choice = responseBody.get("choices").get(0);
                 String text = choice.path("message").path("content").asText("");
                 if (text.isBlank()) {
-                    return GeminiCallResult.fail("Perplexity returned an empty text part");
+                    return GeminiCallResult.fail("Groq returned an empty text part", "GROQ", groqModel);
                 }
-                return GeminiCallResult.ok(text);
+                return GeminiCallResult.ok(text, "GROQ", groqModel);
             }
-            return GeminiCallResult.fail("Perplexity response had no choices. Full body: " + responseBody);
+            return GeminiCallResult.fail("Groq response had no choices. Full body: " + responseBody, "GROQ", groqModel);
+        } catch (RestClientResponseException e) {
+            log.error("Groq API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
+            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString(), "GROQ", groqModel);
+        } catch (Exception e) {
+            log.error("Groq API call failed unexpectedly", e);
+            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage(), "GROQ", groqModel);
+        }
+    }
+
+    private GeminiCallResult callOpenAI(String prompt) {
+        if (openaiApiKey == null || openaiApiKey.isBlank()) {
+            log.warn("OpenAI API key is missing, using mock/placeholder coding assistance response.");
+            return GeminiCallResult.ok("Mock OpenAI Response: OpenAI API key is missing. Please set 'openai.api.key' in application.properties to enable ChatGPT.", "OPENAI", openaiModel);
+        }
+        String url = "https://api.openai.com/v1/chat/completions";
+
+        Map<String, Object> message = Map.of("role", "user", "content", prompt);
+        Map<String, Object> body = Map.of(
+                "model", openaiModel,
+                "messages", List.of(message)
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + openaiApiKey.trim());
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<JsonNode> response = restTemplate.exchange(
+                    url, HttpMethod.POST, entity, JsonNode.class);
+            JsonNode responseBody = response.getBody();
+
+            if (responseBody != null && responseBody.has("choices")
+                    && responseBody.get("choices").size() > 0) {
+                JsonNode choice = responseBody.get("choices").get(0);
+                String text = choice.path("message").path("content").asText("");
+                if (text.isBlank()) {
+                    return GeminiCallResult.fail("OpenAI returned an empty text part", "OPENAI", openaiModel);
+                }
+                return GeminiCallResult.ok(text, "OPENAI", openaiModel);
+            }
+            return GeminiCallResult.fail("OpenAI response had no choices. Full body: " + responseBody, "OPENAI", openaiModel);
+        } catch (RestClientResponseException e) {
+            log.error("OpenAI API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
+            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString(), "OPENAI", openaiModel);
+        } catch (Exception e) {
+            log.error("OpenAI API call failed unexpectedly", e);
+            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage(), "OPENAI", openaiModel);
+        }
+    }
+
+    private GeminiCallResult callPerplexity(String prompt) {
+        String url = "https://api.perplexity.ai/chat/completions";
+
+        Map<String, Object> message = Map.of("role", "user", "content", prompt);
+        Map<String, Object> body = Map.of(
+                "model", perplexityModel,
+                "messages", List.of(message)
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + perplexityApiKey.trim());
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<JsonNode> response = restTemplate.exchange(
+                    url, HttpMethod.POST, entity, JsonNode.class);
+            JsonNode responseBody = response.getBody();
+
+            if (responseBody != null && responseBody.has("choices")
+                    && responseBody.get("choices").size() > 0) {
+                JsonNode choice = responseBody.get("choices").get(0);
+                String text = choice.path("message").path("content").asText("");
+                if (text.isBlank()) {
+                    return GeminiCallResult.fail("Perplexity returned an empty text part", "PERPLEXITY", perplexityModel);
+                }
+                return GeminiCallResult.ok(text, "PERPLEXITY", perplexityModel);
+            }
+            return GeminiCallResult.fail("Perplexity response had no choices. Full body: " + responseBody, "PERPLEXITY", perplexityModel);
         } catch (RestClientResponseException e) {
             log.error("Perplexity API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
-            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString());
+            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString(), "PERPLEXITY", perplexityModel);
         } catch (Exception e) {
             log.error("Perplexity API call failed unexpectedly", e);
-            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage());
+            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage(), "PERPLEXITY", perplexityModel);
+        }
+    }
+
+    private GeminiCallResult callClaude(String prompt) {
+        String url = "https://api.anthropic.com/v1/messages";
+
+        Map<String, Object> message = Map.of("role", "user", "content", prompt);
+        Map<String, Object> body = Map.of(
+                "model", claudeModel,
+                "max_tokens", 4000,
+                "messages", List.of(message)
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("x-api-key", claudeApiKey.trim());
+        headers.set("anthropic-version", "2023-06-01");
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<JsonNode> response = restTemplate.exchange(
+                    url, HttpMethod.POST, entity, JsonNode.class);
+            JsonNode responseBody = response.getBody();
+
+            if (responseBody != null && responseBody.has("content") && responseBody.get("content").size() > 0) {
+                JsonNode contentNode = responseBody.get("content").get(0);
+                String text = contentNode.path("text").asText("");
+                if (text.isBlank()) {
+                    return GeminiCallResult.fail("Claude returned an empty text part", "CLAUDE", claudeModel);
+                }
+                return GeminiCallResult.ok(text, "CLAUDE", claudeModel);
+            }
+            return GeminiCallResult.fail("Claude response had no content. Full body: " + responseBody, "CLAUDE", claudeModel);
+        } catch (RestClientResponseException e) {
+            log.error("Claude API call failed with HTTP {} — body: {}", e.getStatusCode().value(), e.getResponseBodyAsString());
+            return GeminiCallResult.fail("HTTP " + e.getStatusCode().value() + ": " + e.getResponseBodyAsString(), "CLAUDE", claudeModel);
+        } catch (Exception e) {
+            log.error("Claude API call failed unexpectedly", e);
+            return GeminiCallResult.fail(e.getClass().getSimpleName() + ": " + e.getMessage(), "CLAUDE", claudeModel);
         }
     }
 
@@ -560,9 +773,15 @@ public class GeminiAIService {
                   "competitorInsight": "<brief competitive analysis>",
                   "competitors": [
                     {"name": "<competitor/example product name>"}
+                  ],
+                  "projectResources": [
+                    {"title": "<resource title, e.g. Official Documentation or Tutorial>", "url": "<valid url related to target technology>"}
+                  ],
+                  "codeSnippets": [
+                    {"title": "<e.g. App setup skeleton or Config template>", "code": "<clean code snippet>", "language": "<e.g. java, python, javascript>"}
                   ]
                 }
-                Do not include any URLs or web links in the response.
+                Do not include any URLs or web links in the text fields except inside the projectResources section.
                 """,
                 outputLangInstruction, projectName, description, targetLanguage);
     }
@@ -755,7 +974,22 @@ public class GeminiAIService {
                             "Focus on user experience and performance for a competitive edge.")
                     .competitors(competitors)
                     .freelancerPlatforms(freelancerPlatforms)
+                    .projectResources(List.of(
+                            ProjectAnalysisResponse.ProjectResource.builder()
+                                    .title(lang + " Official Documentation")
+                                    .url("https://docs.oracle.com/en/" + lang.toLowerCase()).build(),
+                            ProjectAnalysisResponse.ProjectResource.builder()
+                                    .title("DevRadar AI Developer Hub")
+                                    .url("https://github.com/lyveer/devradar-app").build()
+                    ))
+                    .codeSnippets(List.of(
+                            ProjectAnalysisResponse.CodeSnippet.builder()
+                                    .title("Main Application Setup")
+                                    .code("// Skeleton setup for " + lang + "\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Starting " + name + "...\");\n    }\n}")
+                                    .language(lang.toLowerCase()).build()
+                    ))
                     .aiPowered(false)
+                    .codeRecommendation(getMockCodeRecommendation(lang, outputLang))
                     .build();
         }
 
@@ -817,7 +1051,88 @@ public class GeminiAIService {
                         "Rekabet avantajı için kullanıcı deneyimi ve performansa odaklanın.")
                 .competitors(competitors)
                 .freelancerPlatforms(freelancerPlatforms)
+                .projectResources(List.of(
+                        ProjectAnalysisResponse.ProjectResource.builder()
+                                .title(lang + " Resmi Dokümantasyonu")
+                                .url("https://docs.oracle.com/en/" + lang.toLowerCase()).build(),
+                        ProjectAnalysisResponse.ProjectResource.builder()
+                                .title("DevRadar AI Geliştirici Merkezi")
+                                .url("https://github.com/lyveer/devradar-app").build()
+                ))
+                .codeSnippets(List.of(
+                        ProjectAnalysisResponse.CodeSnippet.builder()
+                                .title("Ana Uygulama Kurulumu")
+                                .code("// " + lang + " için iskelet kurulum\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"" + name + " başlatılıyor...\");\n    }\n}")
+                                .language(lang.toLowerCase()).build()
+                ))
                 .aiPowered(false)
+                .codeRecommendation(getMockCodeRecommendation(lang, outputLang))
                 .build();
+    }
+
+
+
+    private String buildCodeRecommendationPrompt(String projectName, String description, String targetLanguage, String lang) {
+        if ("en".equals(lang)) {
+            return "You are an expert AI software architect. Generate a clean, production-ready code template, " +
+                    "architecture structure, or skeleton code for the project: '" + projectName + "'.\n" +
+                    "Target Technology/Language: " + targetLanguage + "\n" +
+                    "Project Description: " + description + "\n\n" +
+                    "Please structure your response with markdown code blocks and clear architecture explanations. " +
+                    "Include folders, key files, and a sample working code block. Do NOT use any introductory or conversational text, " +
+                    "start directly with the architectural overview or the code.";
+        } else if ("de".equals(lang)) {
+            return "Sie sind ein erfahrener Softwarearchitekt. Generieren Sie eine saubere, produktionsbereite Codevorlage, " +
+                    "Architekturstruktur oder Skelettcode für das Projekt: '" + projectName + "'.\n" +
+                    "Zieltechnologie/-sprache: " + targetLanguage + "\n" +
+                    "Projektbeschreibung: " + description + "\n\n" +
+                    "Bitte strukturieren Sie Ihre Antwort mit Markdown-Codeblöcken und klaren Architekturerklärungen. " +
+                    "Geben Sie Ordner, Schlüsseldateien und einen funktionierenden Beispielcodeblock an. Verwenden Sie keine Einleitung, " +
+                    "beginnen Sie direkt mit der Architekturübersicht oder dem Code.";
+        } else {
+            return "Sen uzman bir yazılım mimarısın. Şu proje için temiz, üretime hazır bir kod şablonu, " +
+                    "mimari yapı tasarımı veya iskelet kod oluştur: '" + projectName + "'.\n" +
+                    "Hedef Teknoloji/Dil: " + targetLanguage + "\n" +
+                    "Proje Açıklaması: " + description + "\n\n" +
+                    "Lütfen yanıtını markdown kod blokları ve net mimari açıklamalarla yapılandır. " +
+                    "Klasör yapısını, anahtar dosyaları ve örnek çalışan bir kod bloğunu dahil et. Giriş veya sohbet cümleleri kullanma, " +
+                    "doğrudan mimari genel bakış veya kodla başla.";
+        }
+    }
+
+
+
+    private String getMockCodeRecommendation(String targetLanguage, String lang) {
+        if ("en".equals(lang)) {
+            return "### Recommended Architecture (" + targetLanguage + ")\n\n" +
+                    "```\n" +
+                    "src/\n" +
+                    "├── config/\n" +
+                    "├── controllers/\n" +
+                    "├── models/\n" +
+                    "└── services/\n" +
+                    "```\n\n" +
+                    "*(Note: Configure Claude or Gemini API key to get tailored, real-time code recommendations)*";
+        } else if ("de".equals(lang)) {
+            return "### Empfohlene Architektur (" + targetLanguage + ")\n\n" +
+                    "```\n" +
+                    "src/\n" +
+                    "├── config/\n" +
+                    "├── controllers/\n" +
+                    "├── models/\n" +
+                    "└── services/\n" +
+                    "```\n\n" +
+                    "*(Hinweis: Konfigurieren Sie den Claude- oder Gemini-API-Schlüssel, um maßgeschneiderte Echtzeit-Codeempfehlungen zu erhalten)*";
+        } else {
+            return "### Önerilen Proje Mimarisi (" + targetLanguage + ")\n\n" +
+                    "```\n" +
+                    "src/\n" +
+                    "├── config/\n" +
+                    "├── controllers/\n" +
+                    "├── models/\n" +
+                    "└── services/\n" +
+                    "```\n\n" +
+                    "*(Not: Claude veya Gemini API anahtarınızı bağlayarak projeye özel canlı kod taslakları üretebilirsiniz)*";
+        }
     }
 }

@@ -191,7 +191,7 @@
                 </div>
                 <button type="submit" class="w-full bg-signal text-ink-950 font-bold py-3.5 rounded-xl hover:bg-signal-dim transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(232,255,71,0.15)] text-sm tracking-wide" data-i18n="auth-verify-btn">Doğrula ve Giriş Yap</button>
                 <div class="flex justify-between items-center text-xs mt-4">
-                    <a href="javascript:void(0)" onclick="handleResendCode()" data-i18n="auth-resend-code" class="font-bold text-signal hover:underline">Kodu Tekrar Gönder</a>
+                    <a href="javascript:void(0)" id="resend-code-btn" onclick="handleResendCode()" data-i18n="auth-resend-code" class="font-bold text-signal hover:underline">Kodu Tekrar Gönder</a>
                     <a href="javascript:void(0)" onclick="switchAuthMode('login')" data-i18n="auth-back-to-login" class="text-mist-700 hover:text-mist-100 transition-colors">Geri Dön</a>
                 </div>
             </form>
@@ -255,6 +255,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             
+            if (urlParams.has('error')) {
+                showToast('Giriş başarısız oldu. Lütfen bilgilerinizi veya API yapılandırmanızı kontrol edin.', 'error');
+            }
+
             const token = urlParams.get('token');
             if (token) {
                 const email = urlParams.get('email');

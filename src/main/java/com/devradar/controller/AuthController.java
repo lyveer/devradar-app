@@ -28,7 +28,28 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+        AuthResponse authResponse = authService.login(request);
+        
+        org.springframework.http.ResponseCookie jwtCookie = org.springframework.http.ResponseCookie.from("jwt_token", authResponse.getToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60) // 7 days
+                .sameSite("Strict")
+                .build();
+                
+        org.springframework.http.ResponseCookie prefCookie = org.springframework.http.ResponseCookie.from("user_preferences", "theme=dark;lang=tr")
+                .httpOnly(false)
+                .secure(true)
+                .path("/")
+                .maxAge(365 * 24 * 60 * 60) // 1 year
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(org.springframework.http.HttpHeaders.SET_COOKIE, prefCookie.toString())
+                .body(authResponse);
     }
 
     @GetMapping("/me")
@@ -38,7 +59,23 @@ public class AuthController {
 
     @PostMapping("/verify")
     public ResponseEntity<AuthResponse> verify(@Valid @RequestBody com.devradar.dto.VerifyRequest request) {
-        return ResponseEntity.ok(authService.verify(request.getEmail(), request.getCode()));
+        AuthResponse authResponse = authService.verify(request.getEmail(), request.getCode());
+        
+        if (authResponse.getToken() != null) {
+            org.springframework.http.ResponseCookie jwtCookie = org.springframework.http.ResponseCookie.from("jwt_token", authResponse.getToken())
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(7 * 24 * 60 * 60)
+                    .sameSite("Strict")
+                    .build();
+                    
+            return ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(authResponse);
+        }
+        
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/resend")

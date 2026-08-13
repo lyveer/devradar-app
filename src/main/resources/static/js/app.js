@@ -247,11 +247,22 @@ async function handleVerify(event) {
     }
 }
 
+let isResendingCode = false;
 async function handleResendCode() {
+    if (isResendingCode) return;
     const email = currentVerificationEmail;
     if (!email) {
         showToast(t('toast-email-not-found', 'E-posta adresi bulunamadı'), 'error');
         return;
+    }
+
+    isResendingCode = true;
+    const resendBtn = document.getElementById('resend-code-btn');
+    const originalText = resendBtn ? resendBtn.innerText : 'Kodu Tekrar Gönder';
+    if (resendBtn) {
+        resendBtn.innerText = 'Gönderiliyor...';
+        resendBtn.style.pointerEvents = 'none';
+        resendBtn.style.opacity = '0.5';
     }
 
     try {
@@ -261,11 +272,40 @@ async function handleResendCode() {
 
         if (response.ok) {
             showToast(t('toast-code-resent', 'Yeni doğrulama kodu e-postanıza gönderildi!'), 'success');
+            let cooldown = 30;
+            const interval = setInterval(() => {
+                cooldown--;
+                if (cooldown <= 0) {
+                    clearInterval(interval);
+                    isResendingCode = false;
+                    if (resendBtn) {
+                        resendBtn.innerText = originalText;
+                        resendBtn.style.pointerEvents = 'auto';
+                        resendBtn.style.opacity = '1';
+                    }
+                } else {
+                    if (resendBtn) {
+                        resendBtn.innerText = `${cooldown}s`;
+                    }
+                }
+            }, 1000);
         } else {
             showToast(t('toast-code-send-fail', 'Kod gönderilemedi'), 'error');
+            isResendingCode = false;
+            if (resendBtn) {
+                resendBtn.innerText = originalText;
+                resendBtn.style.pointerEvents = 'auto';
+                resendBtn.style.opacity = '1';
+            }
         }
     } catch (err) {
         showToast(t('toast-conn-error', 'Sunucu ile bağlantı kurulamadı'), 'error');
+        isResendingCode = false;
+        if (resendBtn) {
+            resendBtn.innerText = originalText;
+            resendBtn.style.pointerEvents = 'auto';
+            resendBtn.style.opacity = '1';
+        }
     }
 }
 
@@ -372,6 +412,9 @@ function switchTab(tabId) {
         loadAdminPanel();
     } else if (tabId === 'settings') {
         loadSettingsForm();
+    } else if (tabId === 'agent') {
+        loadUserInfo();
+        loadAgentProjectContexts();
     }
 }
 
@@ -418,6 +461,37 @@ async function loadUserInfo() {
                 }
             }
 
+            // Show AI provider selector for premium users only
+            const aiProviderGroup = document.getElementById('ai-provider-group');
+            if (aiProviderGroup) {
+                aiProviderGroup.style.display = user.isPremium ? 'block' : 'none';
+            }
+
+            // Populate AI assistant provider selection based on premium tier
+            const agentProvider = document.getElementById('agent-provider');
+            if (agentProvider) {
+                if (user.isPremium) {
+                    agentProvider.innerHTML = `
+                        <option value="gemini">✨ Gemini</option>
+                        <option value="claude">✨ Claude</option>
+                        <option value="chatgpt">✨ ChatGPT (OpenAI)</option>
+                        <option value="groq">⚡ Groq (Hızlı)</option>
+                    `;
+                } else {
+                    agentProvider.innerHTML = `
+                        <option value="groq">Groq (Llama-3)</option>
+                    `;
+                }
+            }
+
+            // Update remaining credits in Code Assistant Workspace
+            const agentCreditsInfo = document.getElementById('agent-credits-info');
+            if (agentCreditsInfo) {
+                agentCreditsInfo.innerText = user.isPremium 
+                    ? t('unlimited-credits-agent', 'Sınırsız Kredi') 
+                    : `${t('remaining-credits-agent', 'Kalan Kredi')}: ${user.credits}`;
+            }
+
             // Update user profile card in settings/profile tab if elements exist
             const cardName = document.getElementById('profile-card-name');
             const cardEmail = document.getElementById('profile-card-email');
@@ -457,6 +531,29 @@ async function loadUserInfo() {
         }
     } catch (err) {
         console.error('Kullanıcı bilgileri yüklenemedi', err);
+    }
+}
+
+// Utility: Escape HTML for safe rendering inside <pre>
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Utility: Copy snippet to clipboard
+function copySnippet(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.select();
+    try {
+        document.execCommand('copy');
+        showToast('Kod kopyalandı!', 'success');
+    } catch (e) {
+        navigator.clipboard.writeText(el.value).then(() => showToast('Kod kopyalandı!', 'success'));
     }
 }
 
@@ -667,6 +764,8 @@ async function handleAnalyzeProject(event) {
     const projectName = document.getElementById('project-name').value;
     const projectDescription = document.getElementById('project-description').value;
     const targetLanguage = document.getElementById('project-language').value;
+    const aiProviderEl = document.getElementById('project-ai-provider');
+    const aiProvider = aiProviderEl ? aiProviderEl.value : null;
 
     const submitBtn = document.getElementById('analyze-submit-btn');
     submitBtn.disabled = true;
@@ -677,10 +776,13 @@ async function handleAnalyzeProject(event) {
     document.getElementById('analysis-content').style.display = 'none';
 
     try {
+        const body = { projectName, projectDescription, targetLanguage };
+        if (aiProvider) body.aiProvider = aiProvider;
+
         const response = await fetch(`${API_URL}/analysis`, {
             method: 'POST',
             headers: getAuthHeaders(),
-            body: JSON.stringify({ projectName, projectDescription, targetLanguage })
+            body: JSON.stringify(body)
         });
 
         if (response.ok) {
@@ -714,6 +816,52 @@ function renderProjectAnalysis(data) {
     
     const content = document.getElementById('analysis-content');
     content.style.display = 'block';
+
+    // Fallbacks for older or partial analysis records missing new fields
+    if (!data.marketPriceRange) {
+        data.marketPriceRange = { min: 5000, max: 20000, currency: 'USD' };
+    }
+    if (!data.freelancerIncome) {
+        data.freelancerIncome = { hourlyRate: { min: 25, max: 75 }, projectBased: { min: 3000, max: 12000 } };
+    } else if (!data.freelancerIncome.hourlyRate) {
+        data.freelancerIncome.hourlyRate = { min: 25, max: 75 };
+    }
+    if (!data.estimatedDevelopmentTime) {
+        data.estimatedDevelopmentTime = { minWeeks: 4, maxWeeks: 12, description: 'Temel MVP geliştirme süresi' };
+    }
+    if (!data.recommendedTechStack) {
+        data.recommendedTechStack = [];
+    }
+    if (!data.enhancements) {
+        data.enhancements = [];
+    }
+    if (!data.tips) {
+        data.tips = [];
+    }
+    if (!data.codeRecommendation) {
+        data.codeRecommendation = `### Önerilen Proje Mimarisi (${data.targetLanguage || 'Teknoloji'})\n\n\`\`\`\nsrc/\n├── config/\n├── controllers/\n├── models/\n└── services/\n\`\`\`\n\n*(Not: Bu analiz eski bir sürümde yapıldığı için kod önerileri otomatik oluşturulmuştur. Güncel AI modeli ile yeni bir analiz başlatarak canlı ve detaylı öneriler alabilirsiniz.)*`;
+    }
+    if (!data.projectResources || data.projectResources.length === 0) {
+        data.projectResources = [
+            {
+                title: `${data.targetLanguage || 'Teknoloji'} Resmi Dokümantasyonu`,
+                url: `https://www.google.com/search?q=${encodeURIComponent((data.targetLanguage || '') + ' official documentation')}`
+            },
+            {
+                title: "DevRadar AI Geliştirici Portalı",
+                url: "https://github.com/lyveer/devradar-app"
+            }
+        ];
+    }
+    if (!data.codeSnippets || data.codeSnippets.length === 0) {
+        data.codeSnippets = [
+            {
+                title: "Ana Uygulama İskeleti",
+                code: `// ${data.targetLanguage || 'Teknoloji'} için başlangıç şablonu\n// Detaylı analiz için lütfen yeni bir analiz başlatın.\n\nconsole.log("${data.projectName || 'Proje'} başlatılıyor...");`,
+                language: (data.targetLanguage || 'javascript').toLowerCase().split(' ')[0]
+            }
+        ];
+    }
 
     document.getElementById('analysis-result-header').innerText = `${data.projectName} — Analiz Sonucu`;
 
@@ -811,6 +959,61 @@ function renderProjectAnalysis(data) {
         `).join('');
     } else {
         freelancerPlatformsBox.style.display = 'none';
+    }
+
+    // Code Recommendation
+    const codeRecBox = document.getElementById('res-code-rec-box');
+    const codeRec = document.getElementById('res-code-rec');
+    if (codeRecBox && codeRec) {
+        if (data.codeRecommendation) {
+            codeRecBox.style.display = 'block';
+            codeRec.innerText = data.codeRecommendation;
+        } else {
+            codeRecBox.style.display = 'none';
+        }
+    }
+
+    // Project Resources
+    const resourcesBox = document.getElementById('res-resources-box');
+    const resourcesList = document.getElementById('res-resources-list');
+    if (resourcesBox && resourcesList) {
+        if (data.projectResources && data.projectResources.length > 0) {
+            resourcesBox.style.display = 'block';
+            resourcesList.innerHTML = data.projectResources.map(r => `
+                <a href="${r.url}" target="_blank" rel="noopener noreferrer"
+                   style="display:flex;align-items:center;gap:0.6rem;padding:0.65rem 0.9rem;border-radius:8px;background:rgba(232,255,71,0.06);border:1px solid rgba(232,255,71,0.15);text-decoration:none;transition:background 0.2s;">
+                    <span style="font-size:1rem;">&#128279;</span>
+                    <span style="color:#e8ff47;font-size:0.82rem;font-weight:600;">${r.title}</span>
+                    <span style="margin-left:auto;color:#9898b8;font-size:0.72rem;">${(r.url||'').replace(/^https?:\/\//, '').split('/')[0]}</span>
+                </a>
+            `).join('');
+        } else {
+            resourcesBox.style.display = 'none';
+        }
+    }
+
+    // Code Snippets
+    const snippetsBox = document.getElementById('res-snippets-box');
+    const snippetsList = document.getElementById('res-snippets-list');
+    if (snippetsBox && snippetsList) {
+        if (data.codeSnippets && data.codeSnippets.length > 0) {
+            snippetsBox.style.display = 'block';
+            snippetsList.innerHTML = data.codeSnippets.map((snip, i) => `
+                <div style="border:1px solid rgba(168,85,247,0.2);border-radius:10px;overflow:hidden;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.9rem;background:rgba(168,85,247,0.1);border-bottom:1px solid rgba(168,85,247,0.15);">
+                        <span style="color:#d8b4fe;font-size:0.8rem;font-weight:700;">${snip.title || 'Code Snippet'}</span>
+                        <span style="color:#9898b8;font-size:0.7rem;font-family:monospace;text-transform:uppercase;">${snip.language || ''}</span>
+                    </div>
+                    <pre style="margin:0;padding:0.85rem 1rem;background:rgba(4,4,10,0.7);color:#e8e8f8;font-size:0.75rem;font-family:'JetBrains Mono',monospace;overflow-x:auto;white-space:pre;line-height:1.6;">${escapeHtml(snip.code || '')}</pre>
+                    <div style="padding:0.4rem 0.9rem;background:rgba(168,85,247,0.05);">
+                        <button onclick="copySnippet('snippet-${i}')" style="color:#9898b8;font-size:0.7rem;background:none;border:none;cursor:pointer;padding:0;">📋 Kopyala</button>
+                        <textarea id="snippet-${i}" style="position:absolute;opacity:0;pointer-events:none;" readonly>${snip.code || ''}</textarea>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            snippetsBox.style.display = 'none';
+        }
     }
 }
 
@@ -1382,7 +1585,7 @@ function checkGithubEmailRequirement() {
 // Init Dashboard
 document.addEventListener('DOMContentLoaded', () => {
     // Only run if we are on the dashboard
-    if (window.location.pathname.endsWith('/dashboard') || window.location.pathname.endsWith('dashboard.html')) {
+    if (document.getElementById('user-display')) {
         const token = localStorage.getItem('devradar_token');
         if (!token) {
             window.location.href = '/auth?mode=login';
@@ -1395,5 +1598,309 @@ document.addEventListener('DOMContentLoaded', () => {
         loadProfile();
         loadUserInfo();
         checkGithubEmailRequirement();
+
+        // Add Enter key listener for Agent Chat Input
+        const chatInput = document.getElementById('agent-chat-input');
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAgentChatSubmit();
+                }
+            });
+        }
     }
 });
+
+// AI Agent Live Chat Functions
+let agentChatHistory = [];
+
+async function loadAgentProjectContexts() {
+    const selectEl = document.getElementById('agent-project-context');
+    if (!selectEl) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/analysis/history`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (response.ok) {
+            const list = await response.json();
+            selectEl.innerHTML = `<option value="">-- Proje Seçilmedi --</option>`;
+            
+            list.forEach(project => {
+                const opt = document.createElement('option');
+                opt.value = project.id;
+                opt.dataset.name = project.projectName;
+                opt.dataset.desc = project.description || '';
+                opt.dataset.lang = project.targetLanguage || '';
+                opt.innerText = project.projectName;
+                selectEl.appendChild(opt);
+            });
+        }
+    } catch (err) {
+        console.error('Proje bağlamları yüklenemedi:', err);
+    }
+}
+
+function useSuggestion(text) {
+    const input = document.getElementById('agent-chat-input');
+    if (input) {
+        input.value = text;
+        input.focus();
+    }
+}
+
+function clearAgentChat() {
+    agentChatHistory = [];
+    const container = document.getElementById('agent-chat-messages');
+    if (container) {
+        container.innerHTML = `
+            <div id="agent-chat-empty" class="h-full flex flex-col items-center justify-center text-center py-12">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-signal/20 to-ember/20 border border-white/10 flex items-center justify-center text-4xl mb-6 shadow-[0_0_40px_rgba(232,255,71,0.08)]">
+                    🤖
+                </div>
+                <h3 class="font-display font-bold text-xl text-mist-100 mb-2">DevRadar AI ile Proje Geliştir</h3>
+                <p class="text-sm text-mist-700 max-w-md mb-8 leading-relaxed">
+                    Kod yaz, hata ayıkla, mimari tasarla — her konuda yardım almak için sadece mesaj gönder.
+                    Üstten proje bağlamı seçersen AI projeyi tanıyarak cevap verir.
+                </p>
+                <div class="flex flex-wrap gap-2 justify-center max-w-2xl">
+                    <button onclick="useSuggestion('Express.js ile JWT authentication nasıl yapılır? Middleware dahil tam örnek yazar mısın?')" class="px-4 py-2 bg-white/5 hover:bg-signal/10 border border-white/10 hover:border-signal/40 rounded-full text-xs text-mist-700 hover:text-mist-100 transition-all">🔑 JWT Auth Middleware</button>
+                    <button onclick="useSuggestion('Spring Boot projesinde veritabanı şeması nasıl tasarlanır? JPA entity örnekleri yazar mısın?')" class="px-4 py-2 bg-white/5 hover:bg-signal/10 border border-white/10 hover:border-signal/40 rounded-full text-xs text-mist-700 hover:text-mist-100 transition-all">🗄️ Spring Boot DB Şeması</button>
+                    <button onclick="useSuggestion('React app\'de lazy loading ve code splitting nasıl uygulanır?')" class="px-4 py-2 bg-white/5 hover:bg-signal/10 border border-white/10 hover:border-signal/40 rounded-full text-xs text-mist-700 hover:text-mist-100 transition-all">⚡ React Lazy Loading</button>
+                    <button onclick="useSuggestion('Python FastAPI ile basit bir REST API nasıl yazılır? Örnek endpointler göster.')" class="px-4 py-2 bg-white/5 hover:bg-signal/10 border border-white/10 hover:border-signal/40 rounded-full text-xs text-mist-700 hover:text-mist-100 transition-all">🐍 FastAPI REST Örneği</button>
+                    <button onclick="useSuggestion('Docker ile bir Node.js uygulamasını containerize etmek için Dockerfile yazar mısın?')" class="px-4 py-2 bg-white/5 hover:bg-signal/10 border border-white/10 hover:border-signal/40 rounded-full text-xs text-mist-700 hover:text-mist-100 transition-all">🐳 Docker & Node.js</button>
+                    <button onclick="useSuggestion('SQL ve NoSQL veritabanları arasındaki farklar nelerdir? Hangi durumda hangisini kullanmalıyım?')" class="px-4 py-2 bg-white/5 hover:bg-signal/10 border border-white/10 hover:border-signal/40 rounded-full text-xs text-mist-700 hover:text-mist-100 transition-all">💾 SQL vs NoSQL</button>
+                </div>
+            </div>
+        `;
+    }
+    showToast('Sohbet sıfırlandı.', 'info');
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+function formatChatMessage(text) {
+    if (!text) return '';
+    
+    let escaped = escapeHtml(text);
+    
+    // Parse thinking blocks first
+    const thinkingRegex = /&lt;thinking&gt;([\s\S]*?)&lt;\/thinking&gt;/g;
+    escaped = escaped.replace(thinkingRegex, (match, thought) => {
+        const cleanThought = thought.trim().replace(/\n/g, '<br>');
+        return `
+            <details class="group mb-4 border border-emerald-500/20 bg-emerald-500/5 rounded-xl overflow-hidden text-left">
+                <summary class="flex items-center gap-2 px-4 py-2 cursor-pointer bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors">
+                    <span class="text-sm">🤔</span>
+                    <span class="text-xs font-bold text-emerald-400 tracking-wider">Ajanın Düşünce Süreci & Planı</span>
+                    <span class="ml-auto text-emerald-400/50 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div class="p-4 text-xs text-mist-700 leading-relaxed border-t border-emerald-500/10">
+                    ${cleanThought}
+                </div>
+            </details>
+        `;
+    });
+        
+    // Regexp to match code blocks: ```lang ... ```
+    // ?:(.*?)\n catches language or empty space until newline
+    const codeBlockRegex = /```(.*?)?\n([\s\S]*?)```/g;
+    
+    let formatted = escaped.replace(codeBlockRegex, (match, lang, code) => {
+        const uniqueId = 'code-' + Math.random().toString(36).substr(2, 9);
+        const cleanCode = code ? code.trim() : '';
+        const displayLang = lang && lang.trim() ? lang.trim().toUpperCase() : 'CODE';
+        
+        return `
+            <div class="code-block-wrapper my-4 border border-white/10 rounded-xl overflow-hidden bg-ink-950/90 text-left">
+                <div class="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+                    <span class="text-xs text-mist-700 font-mono font-bold tracking-wider">${displayLang}</span>
+                    <button onclick="copyChatCode('${uniqueId}')" class="text-xs text-purple-400 hover:text-purple-300 font-semibold transition-colors flex items-center gap-1">
+                        <span>📋</span> <span>Kopyala</span>
+                    </button>
+                </div>
+                <pre id="${uniqueId}" class="p-4 overflow-x-auto text-xs font-mono text-mist-100 whitespace-pre leading-relaxed select-all">${cleanCode}</pre>
+            </div>
+        `;
+    });
+    
+    // Parse basic markdown: bold and inline code
+    // We only do this outside of code blocks and details blocks
+    const parts = formatted.split(/(<div class="code-block-wrapper[\s\S]*?<\/div>|<details class="group[\s\S]*?<\/details>)/g);
+    for (let i = 0; i < parts.length; i++) {
+        if (!parts[i]) continue;
+        if (!parts[i].startsWith('<div class="code-block-wrapper') && !parts[i].startsWith('<details class="group')) {
+            // Convert inline code `code`
+            let textPart = parts[i].replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-white/10 text-emerald-300 font-mono text-[11px]">$1</code>');
+            // Convert bold **text**
+            textPart = textPart.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+            // Convert basic lists (lines starting with - or * )
+            textPart = textPart.replace(/^(?:-|\*)\s+(.+)$/gm, '<li class="ml-4 list-disc">$1</li>');
+            // Convert newlines to <br>
+            parts[i] = textPart.replace(/\n/g, '<br>');
+        }
+    }
+    
+    return parts.join('');
+}
+
+function copyChatCode(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    
+    navigator.clipboard.writeText(el.innerText).then(() => {
+        showToast('Kod kopyalandı!', 'success');
+    }).catch(() => {
+        showToast('Kopyalama başarısız oldu.', 'error');
+    });
+}
+
+async function handleAgentChatSubmit(event) {
+    if (event) event.preventDefault();
+    
+    const inputEl = document.getElementById('agent-chat-input');
+    if (!inputEl) return;
+    
+    const promptText = inputEl.value.trim();
+    if (!promptText) return;
+    
+    // Clear input
+    inputEl.value = '';
+    
+    const container = document.getElementById('agent-chat-messages');
+    const emptyState = document.getElementById('agent-chat-empty');
+    const typingIndicator = document.getElementById('agent-chat-typing');
+    const submitBtn = document.getElementById('agent-chat-submit-btn');
+    const aiProvider = document.getElementById('agent-provider').value;
+    
+    // Hide empty state if visible
+    if (emptyState) emptyState.style.display = 'none';
+    
+    // Append User Message to history and DOM
+    agentChatHistory.push({ role: 'user', content: promptText });
+    
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    const userMsgHtml = `
+        <div class="flex gap-3 justify-end items-start">
+            <div class="max-w-[85%] bg-violet-600/25 border border-violet-500/30 rounded-2xl rounded-tr-sm px-5 py-3.5 shadow-[0_2px_20px_rgba(124,58,237,0.15)]">
+                <p class="text-sm text-mist-100 whitespace-pre-wrap leading-relaxed">${escapeHtml(promptText)}</p>
+                <span class="text-[9px] text-violet-400/60 block mt-2 text-right font-mono">${timeStr}</span>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-violet-800 flex items-center justify-center text-xs font-bold text-white shrink-0 border border-violet-500/30 shadow-lg">
+                Sen
+            </div>
+        </div>
+    `;
+    
+    if (container) {
+        container.insertAdjacentHTML('beforeend', userMsgHtml);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    // Show typing indicator
+    if (typingIndicator) {
+        typingIndicator.classList.remove('hidden');
+        if (container) container.scrollTop = container.scrollHeight;
+    }
+    
+    if (submitBtn) {
+        submitBtn.disabled = true;
+    }
+    
+    try {
+        // Build natural conversational context
+        let fullPromptContext = "";
+        
+        const selectedProj = document.getElementById('agent-project-context');
+        if (selectedProj && selectedProj.value) {
+            const opt = selectedProj.options[selectedProj.selectedIndex];
+            fullPromptContext += `[Active project: ${opt.dataset.name} | Language: ${opt.dataset.lang}${opt.dataset.desc ? ' | ' + opt.dataset.desc.substring(0, 120) : ''}]\n\n`;
+        }
+        
+        // Add conversation history in natural chat format
+        const historyForContext = agentChatHistory.slice(0, -1); // exclude the current message we just added
+        if (historyForContext.length > 0) {
+            historyForContext.forEach(msg => {
+                fullPromptContext += msg.role === 'user'
+                    ? `Human: ${msg.content}\n\n`
+                    : `Assistant: ${msg.content}\n\n`;
+            });
+        }
+        
+        // Append the current user message and prompt the assistant to reply
+        fullPromptContext += `Human: ${promptText}\n\nAssistant:`;
+        
+        const lang = getLanguage();
+        const response = await fetch(`${API_URL}/code-assistant`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ 
+                prompt: fullPromptContext, 
+                aiProvider, 
+                language: lang 
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Add to history
+            agentChatHistory.push({ role: 'assistant', content: data.response });
+            
+            const providerLabel = data.aiProviderUsed ? data.aiProviderUsed.toUpperCase() : 'AI';
+            const modelLabel = data.modelUsed && data.modelUsed !== 'unknown' ? data.modelUsed : '';
+            
+            const badgeContent = modelLabel ? `${providerLabel} (${modelLabel})` : providerLabel;
+
+            const assistantMsgHtml = `
+                <div class="flex gap-3 justify-start items-start">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-signal/30 to-emerald-500/20 border border-signal/30 flex items-center justify-center text-[10px] font-bold text-signal shrink-0 shadow-[0_0_12px_rgba(232,255,71,0.15)]">
+                        AI
+                    </div>
+                    <div class="max-w-[95%] w-full bg-ink-800/60 border border-white/8 rounded-2xl rounded-tl-sm px-5 py-4 shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-[9px] px-2 py-0.5 rounded-full font-bold tracking-wider border" style="background:rgba(232,255,71,0.08); color:#e8ff47; border-color:rgba(232,255,71,0.2);">${badgeContent}</span>
+                            <span class="text-[9px] text-mist-900 font-mono">${timeStr}</span>
+                        </div>
+                        <div class="text-sm text-mist-100 leading-relaxed space-y-2">
+                            ${formatChatMessage(data.response)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (container) {
+                container.insertAdjacentHTML('beforeend', assistantMsgHtml);
+            }
+            
+            await loadUserInfo();
+        } else {
+            const errData = await response.json();
+            showToast(errData.message || 'Bir hata oluştu.', 'error');
+        }
+    } catch (err) {
+        showToast('Bağlantı hatası oluştu.', 'error');
+    } finally {
+        // Hide typing indicator
+        if (typingIndicator) {
+            typingIndicator.classList.add('hidden');
+        }
+        
+        if (submitBtn) {
+            submitBtn.disabled = false;
+        }
+        
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+}

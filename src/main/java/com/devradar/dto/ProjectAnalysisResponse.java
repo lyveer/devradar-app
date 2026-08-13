@@ -24,6 +24,10 @@ public class ProjectAnalysisResponse {
     // True when this result actually came from Gemini; false when it's fallback/mock data
     // (no API key configured, or the AI call failed).
     private Boolean aiPowered;
+    private String codeRecommendation;
+
+    private List<ProjectResource> projectResources;
+    private List<CodeSnippet> codeSnippets;
 
     public ProjectAnalysisResponse() {}
 
@@ -32,7 +36,8 @@ public class ProjectAnalysisResponse {
                                    DevelopmentTime estimatedDevelopmentTime, List<TechRecommendation> recommendedTechStack,
                                    List<Enhancement> enhancements, List<Tip> tips, String competitorInsight,
                                    List<CompetitorExample> competitors, List<FreelancerPlatform> freelancerPlatforms,
-                                   String createdAt, String completedSteps, Boolean aiPowered) {
+                                   String createdAt, String completedSteps, Boolean aiPowered, String codeRecommendation,
+                                   List<ProjectResource> projectResources, List<CodeSnippet> codeSnippets) {
         this.id = id;
         this.projectName = projectName;
         this.targetLanguage = targetLanguage;
@@ -50,6 +55,9 @@ public class ProjectAnalysisResponse {
         this.createdAt = createdAt;
         this.completedSteps = completedSteps;
         this.aiPowered = aiPowered;
+        this.codeRecommendation = codeRecommendation;
+        this.projectResources = projectResources;
+        this.codeSnippets = codeSnippets;
     }
 
     public Long getId() { return id; }
@@ -103,6 +111,15 @@ public class ProjectAnalysisResponse {
     public Boolean getAiPowered() { return aiPowered; }
     public void setAiPowered(Boolean aiPowered) { this.aiPowered = aiPowered; }
 
+    public String getCodeRecommendation() { return codeRecommendation; }
+    public void setCodeRecommendation(String codeRecommendation) { this.codeRecommendation = codeRecommendation; }
+
+    public List<ProjectResource> getProjectResources() { return projectResources; }
+    public void setProjectResources(List<ProjectResource> projectResources) { this.projectResources = projectResources; }
+
+    public List<CodeSnippet> getCodeSnippets() { return codeSnippets; }
+    public void setCodeSnippets(List<CodeSnippet> codeSnippets) { this.codeSnippets = codeSnippets; }
+
     public static ProjectAnalysisResponseBuilder builder() {
         return new ProjectAnalysisResponseBuilder();
     }
@@ -125,6 +142,9 @@ public class ProjectAnalysisResponse {
         private String createdAt;
         private String completedSteps;
         private Boolean aiPowered;
+        private String codeRecommendation;
+        private List<ProjectResource> projectResources;
+        private List<CodeSnippet> codeSnippets;
 
         public ProjectAnalysisResponseBuilder id(Long id) { this.id = id; return this; }
         public ProjectAnalysisResponseBuilder projectName(String projectName) { this.projectName = projectName; return this; }
@@ -143,11 +163,15 @@ public class ProjectAnalysisResponse {
         public ProjectAnalysisResponseBuilder createdAt(String createdAt) { this.createdAt = createdAt; return this; }
         public ProjectAnalysisResponseBuilder completedSteps(String completedSteps) { this.completedSteps = completedSteps; return this; }
         public ProjectAnalysisResponseBuilder aiPowered(Boolean aiPowered) { this.aiPowered = aiPowered; return this; }
+        public ProjectAnalysisResponseBuilder codeRecommendation(String codeRecommendation) { this.codeRecommendation = codeRecommendation; return this; }
+        public ProjectAnalysisResponseBuilder projectResources(List<ProjectResource> projectResources) { this.projectResources = projectResources; return this; }
+        public ProjectAnalysisResponseBuilder codeSnippets(List<CodeSnippet> codeSnippets) { this.codeSnippets = codeSnippets; return this; }
 
         public ProjectAnalysisResponse build() {
             return new ProjectAnalysisResponse(id, projectName, targetLanguage, marketPriceRange, freelancerIncome,
                     demandLevel, demandDescription, estimatedDevelopmentTime, recommendedTechStack, enhancements, tips,
-                    competitorInsight, competitors, freelancerPlatforms, createdAt, completedSteps, aiPowered);
+                    competitorInsight, competitors, freelancerPlatforms, createdAt, completedSteps, aiPowered, codeRecommendation,
+                    projectResources, codeSnippets);
         }
     }
 
@@ -443,6 +467,64 @@ public class ProjectAnalysisResponse {
             public FreelancerPlatform build() {
                 return new FreelancerPlatform(name, estimatedPrice, url);
             }
+        }
+    }
+
+    public static class ProjectResource {
+        private String title;
+        private String url;
+
+        public ProjectResource() {}
+        public ProjectResource(String title, String url) {
+            this.title = title;
+            this.url = url;
+        }
+
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public String getUrl() { return url; }
+        public void setUrl(String url) { this.url = url; }
+
+        public static ProjectResourceBuilder builder() { return new ProjectResourceBuilder(); }
+
+        public static class ProjectResourceBuilder {
+            private String title;
+            private String url;
+            public ProjectResourceBuilder title(String title) { this.title = title; return this; }
+            public ProjectResourceBuilder url(String url) { this.url = url; return this; }
+            public ProjectResource build() { return new ProjectResource(title, url); }
+        }
+    }
+
+    public static class CodeSnippet {
+        private String title;
+        private String code;
+        private String language;
+
+        public CodeSnippet() {}
+        public CodeSnippet(String title, String code, String language) {
+            this.title = title;
+            this.code = code;
+            this.language = language;
+        }
+
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public String getCode() { return code; }
+        public void setCode(String code) { this.code = code; }
+        public String getLanguage() { return language; }
+        public void setLanguage(String language) { this.language = language; }
+
+        public static CodeSnippetBuilder builder() { return new CodeSnippetBuilder(); }
+
+        public static class CodeSnippetBuilder {
+            private String title;
+            private String code;
+            private String language;
+            public CodeSnippetBuilder title(String title) { this.title = title; return this; }
+            public CodeSnippetBuilder code(String code) { this.code = code; return this; }
+            public CodeSnippetBuilder language(String language) { this.language = language; return this; }
+            public CodeSnippet build() { return new CodeSnippet(title, code, language); }
         }
     }
 }
