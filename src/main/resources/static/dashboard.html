@@ -571,9 +571,6 @@
             <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-progress" data-i18n="menu-progress" onclick="switchTab('progress')">
                 <span>📈</span> Proje İlerlemesi
             </div>
-            <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-roadmap" data-i18n="menu-roadmap" onclick="switchTab('roadmap')">
-                <span>🗺️</span> Yol Haritası
-            </div>
             <div class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-mist-700 hover:text-mist-100 hover:bg-white/[0.02] cursor-pointer transition-all duration-300 border border-transparent" id="menu-announcements" data-i18n="menu-announcements" onclick="switchTab('announcements')">
                 <span>📢</span> Duyurular
             </div>
@@ -1072,37 +1069,6 @@
                 </div>
             </section>
 
-            <!-- ROADMAP TAB -->
-            <section id="tab-roadmap-pane" class="tab-pane">
-                <div class="border border-white/10 rounded-2xl p-8 bg-ink-900/40 backdrop-filter backdrop-blur-xl relative">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-signal/5 to-ember/5 pointer-events-none rounded-2xl"></div>
-                    <h3 class="font-display font-semibold text-2xl mb-2 tracking-tight relative z-10" data-i18n="roadmap-title">Lyver Software Ürün Yol Haritası (Roadmap)</h3>
-                    <p class="text-mist-700 text-sm mb-8 relative z-10" data-i18n="roadmap-desc">Lyver Software DevRadarAI platformu için 2026 yılı geliştirme hedefleri ve gelecek planlarımız.</p>
-                    
-                    <div class="roadmap-timeline relative z-10">
-                        <div class="roadmap-card completed">
-                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q1-quarter">Q1 2026 — Tamamlandı</div>
-                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q1-title">Yapay Zeka Altyapısı & Grounding</div>
-                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q1-desc">Gemini ve Llama 3 entegrasyonu tamamlandı. Canlı web aramaları (Google Search Grounding) ve dizi parse tolerans sistemleri aktif edildi.</p>
-                        </div>
-                        <div class="roadmap-card">
-                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q2-quarter">Q2 2026 — Planlanıyor</div>
-                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q2-title">Çoklu Dil Desteği & Global Pazar Raporları</div>
-                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q2-desc">Platformun tüm dillere çevrilmesi, yerel pazar fiyatlandırmalarının (TL, Euro, Yen) otomatik tespiti ve para birimi desteği.</p>
-                        </div>
-                        <div class="roadmap-card">
-                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q3-quarter">Q3 2026 — Planlanıyor</div>
-                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q3-title">Gelişmiş Ekip & Organizasyon Yönetimi</div>
-                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q3-desc">Yazılım şirketleri için çoklu kullanıcı organizasyonları, takım içi proje paylaşımı ve ortak analiz raporu oluşturma.</p>
-                        </div>
-                        <div class="roadmap-card">
-                            <div class="roadmap-quarter text-xs font-mono font-bold tracking-widest uppercase mb-1" data-i18n="roadmap-q4-quarter">Q4 2026 — Planlanıyor</div>
-                            <div class="font-display font-bold text-mist-100 text-lg mb-2" data-i18n="roadmap-q4-title">AI Kod İskeleti Oluşturma</div>
-                            <p class="text-mist-700 text-xs leading-relaxed" data-i18n="roadmap-q4-desc">Analiz edilen projeler için otomatik backend (Spring Boot/NestJS) ve frontend (React/Vue) başlangıç kod şablonlarının üretilmesi.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <!-- ANNOUNCEMENTS TAB -->
             <section id="tab-announcements-pane" class="tab-pane">
